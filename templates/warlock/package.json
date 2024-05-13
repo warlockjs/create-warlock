@@ -1,0 +1,60 @@
+{
+  "name": "app-nme",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "warlock dev",
+    "build": "tsc && warlock build",
+    "prod": "warlock start",
+    "postman": "warlock postman",
+    "migrate": "warlock migrate",
+    "migrate.fresh": "warlock migrate --fresh",
+    "migrate.list": "warlock migrate --list",
+    "jwt": "warlock jwt.generate",
+    "test": "warlock test.init && vitest",
+    "prod.start": "yarn build && yarn prod",
+    "serve": "yarn build && nohup warlock start > /dev/null 2>&1",
+    "lint": "npx eslint --fix -c ./.eslintrc.json ./src --max-warnings=0",
+    "format": "npx prettier --write ./src/**/*.{js,jsx,ts,tsx,css,md,json} --config ./.prettierrc.json",
+    "tsc": "npx tsc --noEmit"
+  },
+  "dependencies": {
+    "@mongez/collection": "^1.1.2",
+    "@mongez/encryption": "^1.0.4",
+    "@mongez/fs": "^3.0.5",
+    "@mongez/reinforcements": "^2.3.10",
+    "@mongez/localization": "^2.2.4",
+    "@mongez/dotenv": "^1.1.9",
+    "@mongez/supportive-is": "^2.0.3",
+    "@warlock.js/auth": "^1.0.2",
+    "@warlock.js/cache": "^1.1.0",
+    "@warlock.js/cascade": "^1.0.4",
+    "@warlock.js/core": "^1.0.18",
+    "@warlock.js/logger": "^1.0.6",
+    "@warlock.js/postman": "^1.0.2",
+    "dayjs": "^1.11.10"
+  },
+  "devDependencies": {
+    "eslint": "^8.53.0",
+    "@typescript-eslint/eslint-plugin": "^6.11.0",
+    "@typescript-eslint/parser": "^6.11.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
+    "eslint-plugin-unused-imports": "^3.0.0",
+    "@mongez/huskier": "^2.0.0",
+    "prettier": "^3.2.5",
+    "prettier-plugin-organize-imports": "^3.2.4",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.8",
+    "vitest": "^1.5.0"
+  },
+  "huskier": {
+    "hooks": {
+      "pre-commit": [
+        "yarn format",
+        "yarn lint",
+        "yarn tsc"
+      ]
+    }
+  }
+}

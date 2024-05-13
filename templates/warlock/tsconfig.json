@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "downlevelIteration": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "baseUrl": "./",
+    "paths": {
+      "app/*": ["src/app/*"],
+      "src/*": ["./src/*"],
+      "@core/*": ["src/core/*"],
+      "config": ["src/config/index.ts"],
+      "config/*": ["src/config/*"]
+    },
+    "noEmit": true
+  },
+  "include": ["src", "warlock.config.ts"],
+  "exclude": ["node_modules"]
+}

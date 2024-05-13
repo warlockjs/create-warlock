@@ -1,0 +1,7 @@
+node_modules
+build
+dist
+storage/*
+.env
+.warlock/
+nohup.out
