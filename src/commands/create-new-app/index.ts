@@ -24,6 +24,11 @@ export default async function createNewApp() {
     placeholder: "warlock-app",
   });
 
+  if (isCancel(appName) || !appName.trim()) {
+    cancel("Application name is required to create a new app");
+    process.exit(0);
+  }
+
   const packageManager = await select({
     message: "Select package manager to use 📦 ",
     initialValue: getPackageManager(),
@@ -44,11 +49,6 @@ export default async function createNewApp() {
   });
 
   setPackageManager(packageManager);
-
-  if (isCancel(appName)) {
-    cancel("Application name is required to create a new app");
-    process.exit(0);
-  }
 
   appDetails.appName = appName;
   appDetails.appPath = getAppPath(appName);
