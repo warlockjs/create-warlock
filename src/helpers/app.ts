@@ -81,7 +81,7 @@ export class App {
   }
 
   public updateDotEnv() {
-    this.file(".env").replace("appName", this.name).save();
+    this.file(".env").replaceAll("appName", this.name).save();
 
     return this;
   }
