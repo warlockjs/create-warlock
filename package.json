@@ -1,11 +1,11 @@
 {
     "name": "create-warlock",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "main": "src/index.ts",
     "license": "MIT",
     "type": "module",
     "bin": {
-        "create-warlock": "./create-warlock.js"
+        "create-warlock": "./create-app.js"
     },
     "scripts": {
         "start": "npx tsx ./index.dev.ts",
