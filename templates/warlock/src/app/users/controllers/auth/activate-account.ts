@@ -1,5 +1,6 @@
 import type { Request, Response } from "@warlock.js/core";
-import { User } from "app/users/models/user";
+import usersRepository from "app/users/repositories/users-repository";
+
 
 export default async function activateAccount(
   request: Request,
@@ -31,11 +32,11 @@ activateAccount.validation = {
     email: ["required", "email"],
   },
   validate: async (request: Request, response: Response) => {
-    const user = await User.aggregate()
-      .where("email", String(request.input("email")).toLowerCase())
-      .where("isActive", false)
-      .where("activationCode", request.input("code"))
-      .first();
+    const user = await usersRepository.first({
+      isActive: false,
+      email: request.input("email"),
+      activationCode: request.int("code"),
+    });
 
     if (!user) {
       return response.notFound({

@@ -21,7 +21,7 @@ export default async function forgetPassword(
 
 forgetPassword.validation = {
   rules: {
-    email: ["required", "email", new UniqueRule(User)],
+    email: ["required", "email"],
   },
   validate: async (request: Request, response: Response) => {
     const user = await User.first({
