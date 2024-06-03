@@ -13,6 +13,7 @@ const appDetails: Required<AppType> = {
   appName: "",
   appType: "",
   appPath: "",
+  pkgManager: "",
   options: {},
 };
 
@@ -52,6 +53,7 @@ export default async function createNewApp() {
 
   appDetails.appName = appName;
   appDetails.appPath = getAppPath(appName);
+  appDetails.pkgManager = packageManager;
 
   if (!appDetails.appPath) return;
 

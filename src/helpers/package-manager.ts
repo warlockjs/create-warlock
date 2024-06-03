@@ -25,3 +25,11 @@ export function startCommand() {
 
   return `${getPackageManager()} start`;
 }
+
+export function runPackageManagerCommand(command: string) {
+  const packageManager = getPackageManager();
+
+  if (packageManager === "npm") return `npm run ${command}`;
+
+  return `${packageManager} ${command}`;
+}

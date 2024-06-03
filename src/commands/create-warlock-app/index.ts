@@ -1,5 +1,6 @@
 import { spinner } from "@clack/prompts";
 import { App } from "src/helpers/app";
+import { runPackageManagerCommand } from "../../helpers/package-manager";
 
 export async function createWarlockApp(application: App) {
   application.init().use("warlock").updatePackageJson().updateDotEnv();
@@ -23,7 +24,7 @@ export async function createWarlockApp(application: App) {
 
     loading.start("🔑 Generating JWT Secret");
 
-    await application.exec("npx jwt");
+    await application.exec(runPackageManagerCommand("jwt"));
 
     loading.stop("🔑 JWT Secret generated 🔒");
   }
