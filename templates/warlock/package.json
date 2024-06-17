@@ -29,7 +29,7 @@
     "@warlock.js/auth": "^1.0.2",
     "@warlock.js/cache": "^1.1.0",
     "@warlock.js/cascade": "^1.0.4",
-    "@warlock.js/core": "^1.0.18",
+    "@warlock.js/core": "^1.0.19",
     "@warlock.js/logger": "^1.0.6",
     "@warlock.js/postman": "^1.0.2",
     "dayjs": "^1.11.10"
