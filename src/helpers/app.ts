@@ -1,5 +1,6 @@
 import {
   copyDirectory,
+  copyFile,
   fileExists,
   getFile,
   getJsonFile,
@@ -32,7 +33,7 @@ export class App {
     copyDirectory(template(templateName), this.path);
 
     if (fileExists(this.path + "/.env.example")) {
-      renameFile(this.path + "/.env.example", this.path + "/.env");
+      copyFile(this.path + "/.env.example", this.path + "/.env");
     }
 
     renameFile(this.path + "/_.gitignore", this.path + "/.gitignore");

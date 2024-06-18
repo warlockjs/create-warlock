@@ -17,8 +17,10 @@ const appDetails: Required<AppType> = {
   options: {},
 };
 
-export default async function createNewApp() {
-  intro(`✨ Let's create a new ${colors.yellowBright("Warlock Js App")} ✨`);
+export default async function createNewApp(createWarlockVersion: string) {
+  intro(
+    `✨ Let's create a new ${colors.yellowBright("Warlock Js App")} ✨ ${`v` + colors.greenBright(createWarlockVersion)}`,
+  );
 
   const appName = await text({
     message: "Enter the app name",

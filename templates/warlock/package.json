@@ -25,6 +25,7 @@
     "@mongez/reinforcements": "^2.3.10",
     "@mongez/localization": "^2.2.4",
     "@mongez/dotenv": "^1.1.9",
+    "@mongez/config": "^1.0.26",
     "@mongez/supportive-is": "^2.0.3",
     "@warlock.js/auth": "^1.0.2",
     "@warlock.js/cache": "^1.1.0",

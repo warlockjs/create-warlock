@@ -2,8 +2,8 @@ import { env } from "@mongez/dotenv";
 import type { HttpConfigurations } from "@warlock.js/core";
 
 const httpConfigurations: HttpConfigurations = {
-  port: env("PORT", 3000),
-  host: env("HOST", "localhost"),
+  port: env("HTTP_PORT", 3000),
+  host: env("HTTP_HOST", "localhost"),
   log: true,
   fileUploadLimit: 20 * 1024 * 1024, // 20MB
   rateLimit: {
