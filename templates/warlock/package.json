@@ -29,10 +29,10 @@
     "@mongez/supportive-is": "^2.0.3",
     "@warlock.js/auth": "^1.0.2",
     "@warlock.js/cache": "^1.1.0",
-    "@warlock.js/cascade": "^1.0.4",
-    "@warlock.js/core": "^1.0.19",
+    "@warlock.js/cascade": "^1.0.5",
+    "@warlock.js/core": "^1.0.20",
     "@warlock.js/logger": "^1.0.6",
-    "@warlock.js/postman": "^1.0.2",
+    "@warlock.js/postman": "^1.0.4",
     "dayjs": "^1.11.10"
   },
   "devDependencies": {
