@@ -27,6 +27,7 @@ import {
   StringRule,
   UniqueRule,
   UploadableRule,
+  ImageRule,
   UrlRule,
 } from "@warlock.js/core";
 
@@ -64,6 +65,7 @@ const validationConfigurations: ValidationConfigurations = {
     scalar: ScalarRule,
     stringify: StringifyRule,
     file: FileRule,
+    image: ImageRule,
   },
   keys: {
     response: "messages",
