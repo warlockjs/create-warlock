@@ -1,4 +1,4 @@
-import type { Request, Response } from "@warlock.js/core";
+import { v, type Request, type Response } from "@warlock.js/core";
 import type { User } from "app/users/models/user";
 
 export default async function changePassword(
@@ -15,10 +15,10 @@ export default async function changePassword(
 }
 
 changePassword.validation = {
-  rules: {
-    currentPassword: ["required"],
-    password: ["required", "minLength:8", "confirmed"],
-  },
+  schema: v.object({
+    password: v.string().minLength(8).required(),
+    confirmPassword: v.string().required().matches("password"),
+  }),
   validate: (request: Request<User>, response: Response) => {
     const user = request.user;
 

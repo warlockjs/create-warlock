@@ -53,7 +53,7 @@ export const guardedGuest = (callback: RouterGroupCallback) => {
   return router.group(
     {
       name: "guarded.guest",
-      middleware: [authMiddleware("guest")],
+      middleware: [authMiddleware()],
     },
     callback,
   );
@@ -67,7 +67,7 @@ export const guardedGuestAdmin = (callback: RouterGroupCallback) => {
     router.group(
       {
         name: "guarded.guest",
-        middleware: [authMiddleware("guest")],
+        middleware: [authMiddleware()],
       },
       callback,
     );

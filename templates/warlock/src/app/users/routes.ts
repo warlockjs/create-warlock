@@ -1,7 +1,5 @@
-import { guestLogin } from "@warlock.js/auth";
 import { router } from "@warlock.js/core";
 import {
-  adminPath,
   guarded,
   guardedAdmin,
   guardedGuest,
@@ -20,11 +18,6 @@ import changePassword from "./controllers/profile/change-password";
 import myProfile from "./controllers/profile/my-profile";
 import updateProfile from "./controllers/profile/update-profile";
 import { restfulUsers } from "./controllers/restful-users";
-
-// guest login
-// If you are going to use guest as a user type, you can use this route
-// otherwise, you can remove this route, also you may remove the guest model from the src/config/auth.ts config file
-router.post([adminPath("/login/guests"), "/login/guests"], guestLogin);
 
 // admin auth
 guardedGuestAdmin(() => {
