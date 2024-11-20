@@ -1,5 +1,5 @@
 import type { FinalOutput } from "@warlock.js/core";
-import UserOutput from "app/users/output/user-output";
+import { UserOutput } from "app/users/output/user.output";
 
 /**
  * Merge the output with this function will return the base output details

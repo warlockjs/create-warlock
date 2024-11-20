@@ -9,7 +9,7 @@ import activateAccount from "./controllers/auth/activate-account";
 import adminLogin from "./controllers/auth/admin-login";
 import createAccount from "./controllers/auth/create-account";
 import forgetPassword from "./controllers/auth/forget-password";
-import login from "./controllers/auth/login";
+import login from "./controllers/auth/login.request";
 import logout from "./controllers/auth/logout";
 import resendActivationCode from "./controllers/auth/resend-activation-code";
 import resetPassword from "./controllers/auth/reset-password";

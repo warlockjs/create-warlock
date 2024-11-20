@@ -2,7 +2,7 @@ import { Auth, castPassword } from "@warlock.js/auth";
 import type { Casts, Document } from "@warlock.js/cascade";
 import { castEmail, expiresAfter } from "@warlock.js/cascade";
 import { uploadable } from "@warlock.js/core";
-import UserOutput from "../../output/user-output";
+import { UserOutput } from "../../output/user.output";
 
 export class User extends Auth {
   /**

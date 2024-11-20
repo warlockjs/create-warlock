@@ -1,5 +1,5 @@
 import { migrationOffice } from "@warlock.js/cascade";
-import { User } from "./user";
+import { User } from "../user.model";
 
 export default migrationOffice.register({
   name: "users",

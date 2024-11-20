@@ -1,7 +1,6 @@
-import type { RouteResource } from "@warlock.js/core";
-import { Restful, UniqueRule } from "@warlock.js/core";
+import { Restful, type RouteResource, UniqueRule } from "@warlock.js/core";
 import { User } from "../models/user";
-import usersRepository from "../repositories/users-repository";
+import { usersRepository } from "../repositories/users.repository";
 
 class RestfulUsers extends Restful<User> implements RouteResource {
   /**

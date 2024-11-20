@@ -1,6 +1,5 @@
 import type { Request, Response } from "@warlock.js/core";
-import usersRepository from "app/users/repositories/users-repository";
-
+import { usersRepository } from "app/users/repositories/users.repository";
 
 export default async function activateAccount(
   request: Request,

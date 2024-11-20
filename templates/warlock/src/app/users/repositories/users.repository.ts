@@ -20,10 +20,8 @@ export class UsersRepository extends RepositoryManager<User> {
   protected filterBy: FilterByOptions = this.withDefaultFilters({
     name: "like",
     isActive: "bool",
-    activationCode: '='
+    activationCode: "=",
   });
 }
 
-const usersRepository = new UsersRepository();
-
-export default usersRepository;
+export const usersRepository = new UsersRepository();

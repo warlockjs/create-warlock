@@ -8,6 +8,7 @@ import {
   EmailRule,
   FileRule,
   FloatRule,
+  ImageRule,
   InRule,
   IntRule,
   LengthRule,
@@ -27,7 +28,6 @@ import {
   StringRule,
   UniqueRule,
   UploadableRule,
-  ImageRule,
   UrlRule,
 } from "@warlock.js/core";
 
