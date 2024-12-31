@@ -10,7 +10,7 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "commonjs",
+    "module": "ESNext",
     "moduleResolution": "node",
     "jsx": "react-jsx",
     "resolveJsonModule": true,
