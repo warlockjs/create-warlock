@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "private": true,
     "scripts": {
-        "start": "warlock dev",
+        "dev": "warlock dev",
         "build": "tsc && warlock build",
         "prod": "warlock start",
         "postman": "warlock postman",
@@ -17,7 +17,8 @@
         "lint": "npx eslint --fix ./src --max-warnings=0",
         "format": "npx prettier --write ./src/**/*.{js,jsx,ts,tsx,css,md,json} --config ./.prettierrc.json",
         "tsc": "npx tsc --noEmit",
-        "prepare": "huskier-init && husky install"
+        "prepare": "huskier-init && husky install",
+        "lf": "find . -type d ( -name 'node_modules' -o -name '.git' ) -prune -o -type f -exec dos2unix {} ;"
     },
     "dependencies": {
         "@mongez/collection": "^1.2.0",
@@ -28,11 +29,12 @@
         "@mongez/dotenv": "^1.1.9",
         "@mongez/config": "^1.0.26",
         "@mongez/supportive-is": "^2.0.4",
-        "@warlock.js/auth": "2.6.2",
-        "@warlock.js/cache": "2.6.2",
-        "@warlock.js/cascade": "2.6.2",
-        "@warlock.js/core": "2.6.2",
-        "@warlock.js/logger": "2.6.2",
+        "@warlock.js/auth": "2.7.0",
+        "@warlock.js/cache": "2.7.0",
+        "@warlock.js/cascade": "2.7.0",
+        "@warlock.js/core": "2.7.0",
+        "@warlock.js/logger": "2.7.0",
+        "@faker-js/faker": "^9.2.0",
         "dayjs": "^1.11.13"
     },
     "devDependencies": {

@@ -1,49 +1,28 @@
-import { t, type Request, type Response } from "@warlock.js/core";
+import {
+  type Request,
+  type RequestHandler,
+  type Response,
+} from "@warlock.js/core";
 import { User } from "app/users/models/user";
 
-export default async function login(
-  request: Request<User>,
+export const loginRequest: RequestHandler = async (
+  request: Request,
   response: Response,
-) {
-  const user = request.user;
+) => {
+  const user = await User.attempt(request.only(["email", "password"]));
 
-  const auth = await user.generateAccessToken();
+  if (!user) {
+    return response.badRequest({
+      message: "Invalid credentials",
+    });
+  }
 
-  user.save({
-    lastLogin: new Date(),
-  });
+  // generate a JWT token for the logged-in user
+  const token = await user.generateAccessToken();
 
   return response.success({
-    user: {
-      ...(await user.toJSON()),
-      accessToken: auth,
-      userType: user.userType,
-    },
+    message: "User logged in successfully",
+    user,
+    accessToken: token,
   });
-}
-
-login.validation = {
-  rules: {
-    email: ["required", "email"],
-    password: ["required", "string"],
-  },
-  validate: async (request: Request, response: Response) => {
-    const user = await User.attempt(request.only(["email", "password"]));
-
-    if (!user) {
-      return response.badRequest({
-        error: t("auth.invalidCredentials"),
-      });
-    }
-
-    if (!user.isActive) {
-      // you can send the activation code again
-      // or just return a bad request with an error message
-      return response.forbidden({
-        error: t("auth.accountNotActivated"),
-      });
-    }
-
-    request.user = user;
-  },
 };

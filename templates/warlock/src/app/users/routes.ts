@@ -7,10 +7,10 @@ import {
 } from "app/utils/router";
 import activateAccount from "./controllers/auth/activate-account";
 import adminLogin from "./controllers/auth/admin-login";
-import createAccount from "./controllers/auth/create-account";
 import forgetPassword from "./controllers/auth/forget-password";
-import login from "./controllers/auth/login.request";
+import { loginRequest } from "./controllers/auth/login.request";
 import logout from "./controllers/auth/logout";
+import { registerRequest } from "./controllers/auth/register.request";
 import resendActivationCode from "./controllers/auth/resend-activation-code";
 import resetPassword from "./controllers/auth/reset-password";
 import verifyForgetPasswordCode from "./controllers/auth/verify-forget-password-code";
@@ -33,8 +33,8 @@ guardedAdmin(() => {
 
 // user auth
 guardedGuest(() => {
-  router.post("/login", login);
-  router.post("/register", createAccount);
+  router.post("/login", loginRequest);
+  router.post("/register", registerRequest);
   router.post("/register/verify", activateAccount);
   router.post("/resend-activation-code", resendActivationCode);
   router.post("/forget-password", forgetPassword);

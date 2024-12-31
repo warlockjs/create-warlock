@@ -9,6 +9,10 @@ const databaseConfigurations: DatabaseConfigurations = {
   database: env("DB_NAME"),
   dbAuth: env("DB_AUTH"),
   url: env("DB_URL"),
+  model: {
+    autoIncrementBy: 1,
+    initialId: 1,
+  },
 };
 
 export default databaseConfigurations;
