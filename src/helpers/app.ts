@@ -10,12 +10,11 @@ import {
 } from "@mongez/fs";
 import path from "path";
 import { Application } from "src/commands/create-new-app/types";
-import { executeCommand } from "src/helpers/exec";
+import { executeCommand, runCommand } from "src/helpers/exec";
 import { Template, template } from "src/helpers/paths";
 import {
   allDone,
   initializeGitRepository,
-  installDependencies,
 } from "src/helpers/project-builder-helpers";
 import { getPackageManager } from "./package-manager";
 
@@ -49,15 +48,12 @@ export class App {
     allDone(this.name);
   }
 
-  public async install() {
-    this.isInstalled = await installDependencies(this.path);
-
-    return this;
+  public install() {
+    return runCommand(getPackageManager(), ["install"], this.path);
   }
 
   public async exec(command: string) {
     const [commandName, ...optionsList] = command.split(" ");
-
     return await executeCommand(commandName, optionsList, this.path);
   }
 

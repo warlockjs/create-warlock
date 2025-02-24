@@ -32,6 +32,14 @@ export default async function createNewApp(createWarlockVersion: string) {
     process.exit(0);
   }
 
+  // Validate the nodejs version to be not less than 20
+  const [major] = process.versions.node.split(".").map(Number);
+
+  if (major < 20) {
+    cancel("Node.js version must be at least 20.0.0");
+    process.exit(0);
+  }
+
   const packageManager = await select({
     message: "Select package manager to use 📦 ",
     initialValue: getPackageManager(),

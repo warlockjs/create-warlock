@@ -1,4 +1,4 @@
-import { confirm, outro, spinner } from "@clack/prompts";
+import { outro } from "@clack/prompts";
 import { colors } from "@mongez/copper";
 import {
   copyDirectory,
@@ -9,23 +9,11 @@ import {
   renameFile,
 } from "@mongez/fs";
 import path from "path";
-import { executeCommand, runCommand } from "./exec";
-import { getPackageManager, startCommand } from "./package-manager";
+import { executeCommand } from "./exec";
+import { startCommand } from "./package-manager";
 import { Template, template } from "./paths";
 
 export async function initializeGitRepository(appPath: string) {
-  if (
-    (await confirm({
-      message: "Do you want to initialize a git repository?",
-      initialValue: true,
-    })) === false
-  )
-    return false;
-
-  const loading = spinner();
-
-  loading.start("📂 Initializing git repository 🚀");
-
   // initialize git repository
   await executeCommand(`git`, ["init"], appPath);
   // switching to `main` branch
@@ -36,33 +24,6 @@ export async function initializeGitRepository(appPath: string) {
 
   // commit files
   await executeCommand(`git`, ["commit", "-m", "Initial commit ⚡️"], appPath);
-
-  loading.stop("📂 Git initialized 🔗");
-
-  return true;
-}
-
-export async function installDependencies(appPath: string) {
-  const result = await runCommand(getPackageManager(), ["install"], appPath);
-
-  const confirmed = await confirm({
-    message: "Do you want to install the project dependencies?",
-    initialValue: true,
-  });
-
-  if (confirmed === false) {
-    result.abort();
-
-    return false;
-  }
-
-  const loading = spinner();
-
-  loading.start("📦 Installing dependencies ⏳");
-
-  await result.install;
-
-  loading.stop("📦 Dependencies installed successfully ✅");
 
   return true;
 }
@@ -119,19 +80,17 @@ export async function copyTemplateFiles(
 
 export async function allDone(appName: string) {
   outro(
-    "🌟 " +
-      colors.bgGreenBright("DONE") +
-      " now you're ready to go! Type the following or copy/paste it into your terminal to get started 🚀 ✅",
+    "🌟 Awesome! Your project is ready to rock! " +
+      "Run the following command to start development:",
   );
 
   console.log(colors.cyan(`cd ${appName} && ${startCommand()}`));
 
-  // make an empty line
   console.log();
 
   console.log(
-    `If you are using VSCode, it's recommended to install the 🛠️ ${colors.yellow(
-      `Generator Z`,
-    )} extension. It generates code snippets for you! 🚀`,
+    `💡 Pro tip: Install the ${colors.yellow(
+      "Generator Z",
+    )} extension in VSCode for helpful code snippets and productivity boosters! 🚀`,
   );
 }

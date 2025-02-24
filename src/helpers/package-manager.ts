@@ -21,9 +21,9 @@ export function installCommand() {
 }
 
 export function startCommand() {
-  if (getPackageManager() === "npm") return "npm run start";
+  if (getPackageManager() === "npm") return "npm run dev";
 
-  return `${getPackageManager()} start`;
+  return `${getPackageManager()} dev`;
 }
 
 export function runPackageManagerCommand(command: string) {
