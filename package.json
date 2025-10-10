@@ -1,6 +1,6 @@
 {
     "name": "create-warlock",
-    "version": "2.8.10",
+    "version": "2.8.11",
     "main": "src/index.ts",
     "license": "MIT",
     "type": "module",
@@ -20,6 +20,7 @@
         "@mongez/fs": "^3.0.5",
         "@mongez/reinforcements": "^2.3.10",
         "cross-spawn": "^7.0.3",
+        "rimraf": "^6.0.1",
         "which-pm-runs": "^1.1.0"
     },
     "devDependencies": {

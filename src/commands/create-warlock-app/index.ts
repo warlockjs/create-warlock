@@ -1,6 +1,6 @@
 import { confirm, spinner } from "@clack/prompts";
 import path from "path";
-import rimraf from "rimraf";
+import { rimraf } from "rimraf";
 import { App } from "src/helpers/app";
 import { runPackageManagerCommand } from "../../helpers/package-manager";
 
@@ -24,7 +24,7 @@ export async function createWarlockApp(application: App) {
     // Remove node_modules Asynchronously
     const nodeModulesPath = path.join(application.path, "node_modules");
 
-    rimraf(nodeModulesPath, () => {});
+    rimraf(nodeModulesPath);
   }
 
   const useGit =

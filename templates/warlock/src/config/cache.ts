@@ -3,6 +3,7 @@ import type { CacheConfigurations } from "@warlock.js/cache";
 import {
   FileCacheDriver,
   MemoryCacheDriver,
+  MemoryExtendedCacheDriver,
   RedisCacheDriver,
 } from "@warlock.js/cache";
 
@@ -15,11 +16,17 @@ const cacheConfigurations: CacheConfigurations = {
     file: FileCacheDriver,
     memory: MemoryCacheDriver,
     redis: RedisCacheDriver,
+    memoryExtended: MemoryExtendedCacheDriver,
   },
-  default: env("CACHE_DRIVER", "memory"),
+  default: env("CACHE_DRIVER", "memoryExtended"),
   options: {
     memory: {
       globalPrefix,
+      ttl: 3600 * 3, // 3 hours
+    },
+    memoryExtended: {
+      globalPrefix,
+      ttl: 3600 * 3, // 3 hours
     },
     redis: {
       host: env("REDIS_HOST"),
