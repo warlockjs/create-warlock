@@ -22,6 +22,6 @@
     },
     "noEmit": true
   },
-  "include": ["src", "warlock.config.ts"],
+  "include": ["src", "warlock.config.ts", ".warlock/**/*.d.ts"],
   "exclude": ["node_modules"]
 }

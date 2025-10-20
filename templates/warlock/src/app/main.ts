@@ -8,5 +8,5 @@ import { onceConnected } from "@warlock.js/cascade";
 // every time a file is changed
 // it could be useful to test some code or do small database modifications
 onceConnected(async () => {
-  // 
+  //
 });
