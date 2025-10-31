@@ -5,23 +5,23 @@ import {
   guardedGuest,
   guardedGuestAdmin,
 } from "app/utils/router";
-import activateAccount from "./controllers/auth/activate-account";
-import adminLogin from "./controllers/auth/admin-login";
-import forgetPassword from "./controllers/auth/forget-password";
-import { loginRequest } from "./controllers/auth/login.request";
-import logout from "./controllers/auth/logout";
-import { registerRequest } from "./controllers/auth/register.request";
-import resendActivationCode from "./controllers/auth/resend-activation-code";
-import resetPassword from "./controllers/auth/reset-password";
-import verifyForgetPasswordCode from "./controllers/auth/verify-forget-password-code";
-import changePassword from "./controllers/profile/change-password";
-import myProfile from "./controllers/profile/my-profile";
-import updateProfile from "./controllers/profile/update-profile";
-import { restfulUsers } from "./controllers/restful-users";
+import activateAccountController from "./controllers/auth/activate-account.controller";
+import adminLoginController from "./controllers/auth/admin-login.controller";
+import { createAccountController } from "./controllers/auth/create-account.controller";
+import forgetPassword from "./controllers/auth/forget-password.controller";
+import { loginController } from "./controllers/auth/login.controller";
+import logout from "./controllers/auth/logout.controller";
+import resendActivationCode from "./controllers/auth/resend-activation-code.controller";
+import resetPassword from "./controllers/auth/reset-password.controller";
+import verifyForgetPasswordCode from "./controllers/auth/verify-forget-password-code.controller";
+import changePassword from "./controllers/profile/change-password.controller";
+import myProfile from "./controllers/profile/my-profile.controller";
+import updateProfile from "./controllers/profile/update-profile.controller";
+import { restfulUsers } from "./controllers/users.restful";
 
 // admin auth
 guardedGuestAdmin(() => {
-  router.post("/login", adminLogin);
+  router.post("/login", adminLoginController);
   router.post("/forget-password", forgetPassword);
   router.post("/reset-password", resetPassword);
 });
@@ -33,9 +33,9 @@ guardedAdmin(() => {
 
 // user auth
 guardedGuest(() => {
-  router.post("/login", loginRequest);
-  router.post("/register", registerRequest);
-  router.post("/register/verify", activateAccount);
+  router.post("/login", loginController);
+  router.post("/register", createAccountController);
+  router.post("/register/verify", activateAccountController);
   router.post("/resend-activation-code", resendActivationCode);
   router.post("/forget-password", forgetPassword);
   router.post("/forget-password/verify-code", verifyForgetPasswordCode);
