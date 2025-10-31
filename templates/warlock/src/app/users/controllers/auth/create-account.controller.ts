@@ -1,16 +1,14 @@
 import type { Request, RequestHandler, Response } from "@warlock.js/core";
-import { createAccountService } from "app/users/services/account.service";
+import type { User } from "app/users/models/user";
+import { createAccountService } from "app/users/services/create-account.service";
 import { loginUserService } from "app/users/services/login.service";
-import {
-  createAccountSchema,
-  type CreateAccountData,
-} from "app/users/validation/create-account.validation";
+import { createAccountSchema } from "app/users/validation/create-account.validation";
 
 export const createAccountController: RequestHandler = async (
-  request: Request<CreateAccountData>,
+  request: Request<User>,
   response: Response,
 ) => {
-  const user = await createAccountService(request.validated());
+  const user = await createAccountService(request.validated()); //
 
   request.guest = request.user;
   request.user = user;

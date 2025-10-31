@@ -1,6 +1,6 @@
 import { Random } from "@mongez/reinforcements";
 import type { User } from "app/users/models/user";
-import usersRepository from "app/users/repositories/users-repository";
+import { usersRepository } from "app/users/repositories/users.repository";
 
 /**
  * Create a new user account

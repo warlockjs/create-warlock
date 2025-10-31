@@ -1,5 +1,5 @@
 import { Model, type Casts } from "@warlock.js/cascade";
-import { PostOutput } from "../output/post.output";
+import { PostOutput } from "../../output/post.output";
 
 export class Post extends Model {
   /**
@@ -13,10 +13,20 @@ export class Post extends Model {
   public static output = PostOutput;
 
   /**
+   * {@inheritDoc}
+   */
+  public syncWith = [];
+
+  /**
    * Casts
    */
   protected casts: Casts = {
     title: "string",
     content: "string",
   };
+
+  /**
+   * {@inheritDoc}
+   */
+  public embedded = ["id", "title"];
 }

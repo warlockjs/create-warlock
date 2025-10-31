@@ -17,7 +17,7 @@ export default async function changePassword(
 changePassword.validation = {
   schema: v.object({
     password: v.string().minLength(8).required(),
-    confirmPassword: v.string().required().matches("password"),
+    confirmPassword: v.string().required().sameAs("password").omit(),
   }),
   validate: (request: Request<User>, response: Response) => {
     const user = request.user;

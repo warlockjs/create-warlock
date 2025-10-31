@@ -1,12 +1,12 @@
 import { router } from "@warlock.js/core";
-import { guarded } from "../utils/router";
-import { createNewPostRequest } from "./controllers/create-new-post.request";
-import { getAllPostsRequest } from "./controllers/get-all-posts.request";
-import { getPostRequest } from "./controllers/get-post.request";
+import { guarded } from "app/utils/router";
+import { createPostController } from "./controllers/create-post.controller";
+import { getAllPostsController } from "./controllers/get-all-posts.controller";
+import { getPostController } from "./controllers/get-post.controller";
 
-router.get("/posts", getAllPostsRequest);
-router.get("/posts/:id", getPostRequest);
+router.get("/posts", getAllPostsController);
+router.get("/posts/:id", getPostController);
 
 guarded(() => {
-  router.post("/posts", createNewPostRequest);
+  router.post("/posts", createPostController);
 });

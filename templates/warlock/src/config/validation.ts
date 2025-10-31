@@ -68,7 +68,7 @@ const validationConfigurations: ValidationConfigurations = {
     image: ImageRule,
   },
   keys: {
-    response: "messages",
+    response: "errors",
     inputKey: "key",
     inputError: "error",
     inputErrors: "errors",
