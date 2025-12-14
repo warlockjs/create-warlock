@@ -1,6 +1,6 @@
 {
     "name": "create-warlock",
-    "version": "3.0.34",
+    "version": "3.0.35",
     "main": "src/index.ts",
     "license": "MIT",
     "type": "module",
