@@ -1,5 +1,4 @@
 import type { FinalOutput } from "@warlock.js/core";
-import { UserOutput } from "app/users/output/user.output";
 
 /**
  * Merge the output with this function will return the base output details
@@ -11,8 +10,8 @@ export function withBaseOutputDetails(moreOptions: FinalOutput): FinalOutput {
     isActive: "boolean",
     createdAt: "date",
     updatedAt: "date",
-    createdBy: UserOutput,
-    updatedBy: UserOutput,
+    createdBy: "object",
+    updatedBy: "object",
     ...moreOptions,
   };
 }
