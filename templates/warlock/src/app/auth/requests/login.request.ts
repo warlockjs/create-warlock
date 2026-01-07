@@ -1,7 +1,7 @@
 import { v, type Infer, type Request } from "@warlock.js/core";
 
 export const loginSchema = v.object({
-  email: v.string().email().required(),
+  email: v.email().required(),
   password: v.string().required(),
 });
 

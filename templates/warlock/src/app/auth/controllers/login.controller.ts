@@ -18,10 +18,7 @@ export const login: RequestHandler = async (request: LoginRequest, response: Res
     });
   }
 
-  return response.success({
-    user: result.user,
-    ...result.tokens,
-  });
+  return response.success(result);
 };
 
 login.description = "User Login";

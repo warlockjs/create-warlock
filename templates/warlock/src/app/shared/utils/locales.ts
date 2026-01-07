@@ -725,4 +725,8 @@ groupedTranslations("attributes", {
     en: "Name",
     ar: "الاسم",
   },
+  image: {
+    en: "Image",
+    ar: "الصورة",
+  },
 });

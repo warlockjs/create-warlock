@@ -13,8 +13,9 @@ export const forgotPassword: RequestHandler = async (request: Request, response:
   const user = await usersRepository.first({ email });
 
   if (!user) {
-    return response.notFound({
-      error: t("auth.userNotFound"),
+    // Silent success - don't reveal if email exists
+    return response.success({
+      message: t("auth.otpSent"),
     });
   }
 

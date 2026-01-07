@@ -1,22 +1,19 @@
-import { migrationOffice } from "@warlock.js/cascade";
+import { migrate } from "@warlock.js/cascade";
 import { OTP } from "../otp.model";
 
-const otpBlueprint = OTP.blueprint();
-
-export default migrationOffice.register({
+export default migrate(OTP, {
   name: "otp",
-  createdAt: "22-12-2025_10-30-20",
-  blueprint: otpBlueprint,
-  up: async () => {
-    await otpBlueprint.index("code");
-    await otpBlueprint.index(["target", "type"]);
-    await otpBlueprint.index("expiresAt");
-    await otpBlueprint.index("userId");
+  createdAt: "2025-12-22T10:30:20", // ISO Date
+  up() {
+    this.index("code");
+    this.index(["target", "type"]);
+    this.index("expiresAt");
+    this.index("userId");
   },
-  down: async () => {
-    await otpBlueprint.dropIndex("code");
-    await otpBlueprint.dropIndex("target", "type");
-    await otpBlueprint.dropIndex("expiresAt");
-    await otpBlueprint.dropIndex("userId");
+  down() {
+    this.dropIndex("code");
+    this.dropIndex(["target", "type"]);
+    this.dropIndex("expiresAt");
+    this.dropIndex("userId");
   },
 });

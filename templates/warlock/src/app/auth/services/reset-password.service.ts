@@ -25,7 +25,7 @@ export async function resetPasswordService(
   }
 
   // Update password
-  await user.save({ password: newPassword });
+  await user.set("password", newPassword).save();
 
   // Revoke all tokens (force re-login)
   // Or make it an option through user decision.

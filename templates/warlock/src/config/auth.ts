@@ -11,6 +11,8 @@ const authConfigurations: AuthConfigurations = {
     expiresIn: NO_EXPIRATION,
     refresh: {
       expiresIn: "7d",
+      enabled: false,
+      secret: env("JWT_REFRESH_SECRET"),
     },
   },
 };

@@ -1,35 +1,34 @@
-import { Model, type Casts, type Document } from "@warlock.js/cascade";
+import { Model, RegisterModel } from "@warlock.js/cascade";
+import { type Infer, v } from "@warlock.js/seal";
+import { globalColumnsSchema } from "app/shared/utils/global-columns-schema";
 
-export class OTP extends Model {
+const otpSchema = globalColumnsSchema.extend({
+  code: v.string().required(),
+  type: v.string().required(),
+  target: v.string().required(),
+  channel: v.string().required(),
+  userId: v.number().required(),
+  userType: v.string().required(),
+  expiresAt: v.date().required(),
+  usedAt: v.date().optional(),
+  attempts: v.number().default(0),
+  maxAttempts: v.number().default(5),
+  metadata: v.record(v.any()).optional(),
+});
+
+type OTPSchema = Infer<typeof otpSchema>;
+
+@RegisterModel()
+export class OTP extends Model<OTPSchema> {
   /**
-   * Collection name
+   * Table name
    */
-  public static collection = "otps";
+  public static table = "otps";
 
   /**
-   * Default value for model data
+   * Model schema
    */
-  public defaultValue: Document = {
-    attempts: 0,
-    maxAttempts: 5,
-  };
-
-  /**
-   * Cast data types before saving
-   */
-  protected casts: Casts = {
-    code: "string",
-    type: "string",
-    target: "string",
-    channel: "string",
-    userId: "number",
-    userType: "string",
-    expiresAt: "date",
-    usedAt: "date",
-    attempts: "number",
-    maxAttempts: "number",
-    metadata: "object",
-  };
+  public static schema = otpSchema;
 
   /**
    * Check if OTP is valid (not expired, not used, not max attempts)
@@ -59,17 +58,13 @@ export class OTP extends Model {
    * Mark OTP as used
    */
   public async markAsUsed(): Promise<this> {
-    return this.save({
-      usedAt: new Date(),
-    });
+    return this.set("usedAt", new Date()).save();
   }
 
   /**
    * Increment failed attempt
    */
   public async incrementAttempt(): Promise<this> {
-    return this.save({
-      attempts: this.get("attempts") + 1,
-    });
+    return this.set("attempts", this.get("attempts") + 1).save();
   }
 }

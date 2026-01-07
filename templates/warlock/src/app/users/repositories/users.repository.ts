@@ -1,27 +1,23 @@
-import { RepositoryManager, type FilterByOptions, type RepositoryOptions } from "@warlock.js/core";
-import { User } from "./../models/user";
+import type { FilterRules, RepositoryOptions } from "@warlock.js/core";
+import { RepositoryManager } from "@warlock.js/core";
+import { User } from "../models/user";
 
-export class UsersRepository extends RepositoryManager<User> {
-  /**
-   * {@inheritDoc}
-   */
-  public model = User;
+class UsersRepository extends RepositoryManager<User> {
+  public source = User;
 
-  /**
-   * Simple columns selections
-   * Set the columns that need to be selected when passing 'simple' option with 'true'
-   */
-  public simpleSelectColumns = ["id"];
+  public simpleSelectColumns: string[] = ["id", "name", "createdAt"];
 
-  /**
-   * List default options
-   */
-  protected defaultOptions: RepositoryOptions = this.withDefaultOptions({});
+  public filterBy: FilterRules = {
+    id: "int",
+    name: "like",
+    email: "=",
+  };
 
-  /**
-   * Filter By options
-   */
-  protected filterBy: FilterByOptions = this.withDefaultFilters({});
+  public defaultOptions: RepositoryOptions = {
+    orderBy: {
+      createdAt: "desc",
+    },
+  };
 }
 
 export const usersRepository = new UsersRepository();

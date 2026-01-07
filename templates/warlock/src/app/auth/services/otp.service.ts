@@ -120,14 +120,6 @@ export async function verifyOtpService(
     });
   }
 
-  // Verify code matches
-  if (otp.get("code") !== code) {
-    await otp.incrementAttempt();
-    throw new ForbiddenError(t("auth.otpInvalid"), {
-      errorCode: AuthErrorCode.OTP_INVALID,
-    });
-  }
-
   // Mark as used
   await otp.markAsUsed();
 
@@ -164,11 +156,9 @@ export async function resendOtpService(
  * Cleanup expired OTPs
  */
 export async function cleanupExpiredOtpsService(): Promise<number> {
-  const expiredOtps = await OTP.aggregate().where("expiresAt", "<", new Date()).get();
+  const expiredOtps = await OTP.query().where("expiresAt", "<", new Date()).get();
 
-  for (const otp of expiredOtps) {
-    await otp.destroy();
-  }
+  await Promise.all(expiredOtps.map((otp) => otp.destroy()));
 
   return expiredOtps.length;
 }

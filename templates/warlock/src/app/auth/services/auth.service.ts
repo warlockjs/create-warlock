@@ -1,16 +1,21 @@
 import type { Auth } from "@warlock.js/auth";
 import { authService, type DeviceInfo, type TokenPair } from "@warlock.js/auth";
-import { User } from "app/users/models/user";
+import { User } from "app/users/models/user/user.model";
 
 export type LoginCredentials = {
   email: string;
   password: string;
 };
 
-export type LoginResult = {
-  user: Auth;
-  tokens: TokenPair;
-};
+export type LoginResult =
+  | {
+      user: Auth;
+      tokens: TokenPair;
+    }
+  | {
+      user: Auth;
+      accessToken: string;
+    };
 
 /**
  * Login with email and password

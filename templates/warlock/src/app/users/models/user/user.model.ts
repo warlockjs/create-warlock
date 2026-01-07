@@ -1,46 +1,73 @@
 import { Auth } from "@warlock.js/auth";
-import { type Casts, type Document, type ModelSync } from "@warlock.js/cascade";
+import { RegisterModel } from "@warlock.js/cascade";
+import { defineResource, uploadedFileMetadataSchema, useHashedPassword } from "@warlock.js/core";
+import { type Infer, v } from "@warlock.js/seal";
+import { globalColumnsSchema } from "app/shared/utils/global-columns-schema";
 
-export class User extends Auth {
+const UserResource = defineResource({
+  schema: {
+    id: "number",
+    name: "string",
+    email: "string",
+    image: "storageUrl",
+    createdAt: "date",
+    updatedAt: "date",
+    isActive: "boolean",
+    type: () => "user",
+  },
+});
+
+export const userSchema = globalColumnsSchema.extend({
+  name: v.string().required().trim(),
+  email: v.email().requiredIfEmpty("id"),
+  image: v.string(),
+  imageMetadata: uploadedFileMetadataSchema,
+  password: v.string().min(6).requiredIfEmpty("id").addTransformer(useHashedPassword()),
+});
+
+export type UserSchema = Infer<typeof userSchema>;
+
+@RegisterModel()
+export class User extends Auth<UserSchema> {
   /**
    * Collection name
    */
-  public static collection = "users";
+  public static table = "users";
 
   /**
-   * List of models to sync with
-   * To sync with a single embedded document use: [User.sync("city")],
-   * this will update the city sub-document to all users when city model is updated.
-   * To sync with multiple embedded documents use: [Post.syncMany("keywords")],
-   * This will update the keywords sub-document to all posts when keywords model is updated.
+   * Model Schema
    */
-  public syncWith: ModelSync[] = [];
+  public static schema = userSchema;
 
   /**
-   * Default value for model data
-   * Works only when creating new records
+   * Embed fields when saving in another model
    */
-  public defaultValue: Document = {};
+  public static embed = ["id", "name"];
 
   /**
-   * User type
+   * Resource to be used when converting the model to JSON
    */
-  public userType = "user";
+  public static resource = UserResource;
 
   /**
-   * Cast data types before saving documents into database
+   * User type identifier
    */
-  protected casts: Casts = {
-    name: "string",
-    age: "number",
-    email: "string",
-    isActive: "boolean",
-  };
+  public get userType(): string {
+    return "user";
+  }
 
-  /**
-   * Define what columns should be used when model document is embedded in another document.
-   * Make sure to set only the needed columns to reduce the document size.
-   * This is useful for better performance when fetching data from database.
-   */
-  public embedded = ["id", "name"];
+  static {
+    // Local scopes
+    this.addScope("active", (query) => {
+      query.where("isActive", true);
+    });
+
+    this.addScope("admins", (query) => {
+      query.where("role", "admin");
+    });
+
+    this.addScope("verified", (query) => {
+      query.where("emailVerified", true);
+    });
+  }
 }

@@ -12,7 +12,7 @@ src/app/[module-name]/
 │   └── [module].restful.ts     # RESTful resource controller (optional)
 ├── services/                    # Business logic layer
 │   ├── *.service.ts
-│   └── mail/                   # Email services (optional, can be separate folder or files)
+├── mail/                    # Business logic layer
 │       └── *.ts
 ├── repositories/                # Data access layer
 │   └── [resource].repository.ts
@@ -22,11 +22,11 @@ src/app/[module-name]/
 │       ├── [model-name].model.ts
 │       └── migrations/
 │           └── [date]_[model-name].migration.ts
-├── validation/                  # Request validation schemas
+├── requests/                   # Request validation schemas
 │   ├── index.ts                # Simple validations (if all in one file)
-│   └── *.validation.ts         # Individual validation files
-├── output/                      # Response output transformers
-│   └── *.output.ts
+│   └── *.request.ts         # Individual validation files
+├── resources/                      # Response resource transformers
+│   └── *.resource.ts
 ├── events/                      # Event handlers/listeners (auto-imported by Warlock.js)
 │   └── *.ts
 ├── components/                  # Reusable components for use within mails
@@ -41,9 +41,11 @@ src/app/[module-name]/
 ## Directory Structure Details
 
 ### 1. main.ts (Auto-imported)
+
 Entry point file that is automatically imported by Warlock.js when the module loads. Use this for module initialization, event listeners, or setup code that should run when the module is loaded.
 
 **Example:**
+
 ```typescript
 import { onceConnected } from "@warlock.js/cascade";
 
@@ -56,9 +58,11 @@ onceConnected(async () => {
 ```
 
 ### 2. routes.ts (Auto-imported)
+
 Main routing file that defines all module endpoints. This file is automatically imported by Warlock.js. Use router guards (`guarded`, `guardedAdmin`, `guardedGuest`, etc.) to protect routes.
 
 **Example:**
+
 ```typescript
 import { router } from "@warlock.js/core";
 import { guarded, guardedGuest } from "app/utils/router";
@@ -75,28 +79,28 @@ guarded(() => {
 ```
 
 ### 3. controllers/
+
 Request handlers that process HTTP requests. Organize controllers by feature (e.g., `auth/`, `profile/`).
 
 **Controller Structure:**
+
 ```typescript
 import type { Request, RequestHandler, Response } from "@warlock.js/core";
 import { someService } from "app/[module]/services/some.service";
-import { someSchema } from "app/[module]/validation/some.validation";
+import { someRequestSchema, type SomeRequest } from "app/[module]/requests/some.request";
 
-export const someController: RequestHandler = async (
-  request: Request,
-  response: Response,
-) => {
+export const someController: RequestHandler = async (request: SomeRequest, response: Response) => {
   const data = await someService(request.validated());
   return response.success({ data });
 };
 
 someController.validation = {
-  schema: someSchema,
+  schema: someRequestSchema,
 };
 ```
 
 **For RESTful Resources:**
+
 ```typescript
 import { Restful, type RouteResource, v } from "@warlock.js/core";
 import { SomeModel } from "../models/some";
@@ -104,7 +108,7 @@ import { someRepository } from "../repositories/some.repository";
 
 class RestfulSome extends Restful<SomeModel> implements RouteResource {
   protected repository = someRepository;
-  
+
   public validation: RouteResource["validation"] = {
     create: {
       schema: v.object({
@@ -118,31 +122,33 @@ export const restfulSome = new RestfulSome();
 ```
 
 ### 4. services/
+
 Business logic layer. Services handle the core functionality and interact with repositories.
 
 **Service Structure:**
+
 ```typescript
 import type { SomeModel } from "app/[module]/models/some";
 import { someRepository } from "app/[module]/repositories/some.repository";
 
-export async function someService(
-  data: Record<string, any>,
-): Promise<SomeModel> {
+export async function someService(data: Record<string, any>): Promise<SomeModel> {
   return await someRepository.create(data);
 }
 ```
 
 ### 5. repositories/
+
 Data access layer that extends `RepositoryManager`. Handles database queries and filtering.
 
 **Repository Structure:**
+
 ```typescript
 import type { FilterByOptions, RepositoryOptions } from "@warlock.js/core";
 import { RepositoryManager } from "@warlock.js/core";
 import { SomeModel } from "../models/some";
 
 export class SomeRepository extends RepositoryManager<SomeModel> {
-  public model = SomeModel;
+  public source = SomeModel;
 
   protected defaultOptions: RepositoryOptions = this.withDefaultOptions({});
 
@@ -156,46 +162,69 @@ export const someRepository = new SomeRepository();
 ```
 
 ### 6. models/
+
 Database models that extend base model classes (e.g., `Model`, `Auth`). Include migrations in the `migrations/` subdirectory.
 
 **Model Structure:**
+
 ```typescript
 import { Model } from "@warlock.js/core";
-import type { Casts, Document } from "@warlock.js/core";
-import { SomeOutput } from "../../output/some.output";
+import type { StrictMode } from "@warlock.js/cascade";
+import { SomeResource } from "../../resources/some.resource";
+import { v, type Infer } from "@warlock.js/seal";
 
-export class SomeModel extends Model {
-  public static collection = "somes";
-  public static output = SomeOutput;
-  
-  public syncWith = [];
+const someModelSchema = v.object({
+  name: v.string().required(),
+  email: v.email().required(),
+});
 
-  public defaultValue: Document = {
-    isActive: true,
-  };
+type SomeModelType = Infer<typeof someModelSchema>;
 
-  protected casts: Casts = {
-    name: "string",
-    isActive: "boolean",
-  };
+export class SomeModel extends Model<SomeModelType> {
+  public static table = "somes";
+  public static strictMode: StrictMode = "fail";
+  public static resource = SomeResource;
 
-  public embedded = ["id", "name"];
+  public static schema = someModelSchema;
+
+  public embed = ["id", "name"];
 }
 ```
 
-### 7. validation/
-Validation schemas using the `@warlock.js/core` validation system. **All validation schemas must be in the validation folder** to be used with `request.validated()` and TypeScript type inference.
+### 7. requests/
+
+Request handlers that process HTTP requests. Organize controllers by feature (e.g., `auth/`, `profile/`).
+
+**Request Structure:**
+
+```typescript
+import type { Request, RequestHandler, Response } from "@warlock.js/core";
+import { someService } from "app/[module]/services/some.service";
+import { someRequestSchema, type SomeRequest } from "app/[module]/requests/some.request";
+
+export const someController: RequestHandler = async (request: SomeRequest, response: Response) => {
+  const data = await someService(request.validated());
+  return response.success({ data });
+};
+
+someController.validation = {
+  schema: someRequestSchema,
+};
+```
 
 **Important Rules:**
+
 - If a module has simple validations, use `index.ts` to export all schemas
-- If validations are complex or numerous, use separate `.validation.ts` files
+- If requests are complex or numerous, use separate `.request.ts` files
 - Always export the schema and its inferred type
-- Pass the inferred type as generic to `Request<Model, ValidationType>`
 - Use `Infer<typeof schema>` (similar to Zod) to generate TypeScript types
 
 **Simple Validation (index.ts):**
+
 ```typescript
-import { v, type Infer } from "@warlock.js/core";
+import { v, type Infer } from "@warlock.js/seal";
+import { type Request } from "@warlock.js/core";
+import { type User } from "app/users/models/user";
 
 export const createSchema = v.object({
   name: v.string().minLength(2).required(),
@@ -207,30 +236,41 @@ export const updateSchema = v.object({
 
 export type CreateData = Infer<typeof createSchema>;
 export type UpdateData = Infer<typeof updateSchema>;
+
+export type CreatePostRequest<User, CreateData>;
+export type UpdatePostRequest<User, UpdateData>;
 ```
 
 **Individual Validation Files:**
+
 ```typescript
-// validation/create-account.validation.ts
-import { v, type Infer } from "@warlock.js/core";
+// requests/create-account.request.ts
+import { v, type Infer } from "@warlock.js/seal";
+import { type Request } from "@warlock.js/core";
 
 export const createAccountSchema = v.object({
   name: v.string().minLength(2).required(),
-  email: v.string().email().required(),
-  password: v.string().minLength(8).required().strongPassword(),
+  email: vemail().required(),
+  password: v.string().required().strongPassword(),
 });
 
 export type CreateAccountData = Infer<typeof createAccountSchema>;
+
+export type CreateAccountRequest<undefined, CreateAccountData>;
 ```
 
 **Usage in Controller:**
+
 ```typescript
 import type { Request, RequestHandler, Response } from "@warlock.js/core";
 import type { User } from "app/[module]/models/user";
-import { createAccountSchema, type CreateAccountData } from "app/[module]/validation/create-account.validation";
+import {
+  createAccountSchema,
+  type CreateAccountRequest,
+} from "app/[module]/requests/create-account.request";
 
 export const createAccountController: RequestHandler = async (
-  request: Request<User, CreateAccountData>,
+  request: CreateAccountRequest,
   response: Response,
 ) => {
   // request.validated() is now typed as CreateAccountData
@@ -243,26 +283,34 @@ createAccountController.validation = {
 };
 ```
 
-### 8. output/
-Response output transformers that define what data is returned to clients.
+### 8. resources/
 
-**Output Structure:**
+Resources define how data is transformed before being sent to clients.
+
+**Resource Structure:**
+
 ```typescript
-import { Output, type FinalOutput } from "@warlock.js/core";
-import { withBaseOutputDetails } from "app/utils/output";
+import { Resource } from "@warlock.js/core";
+import {} from "app/utils/output";
 
-export class SomeOutput extends Output {
-  protected output: FinalOutput = withBaseOutputDetails({
+export class SomeResource extends Resource {
+  public schema = {
     name: "string",
-    email: "string",
-  });
+    id: "int",
+    type: () => "user", // custom output value
+    image: (value) => (value.startsWith("/") ? value : "/" + value),
+  };
 }
 ```
 
 ### 9. events/ (Auto-imported)
+
 Event handlers and listeners for model events or application events. **All files in this folder are automatically imported by Warlock.js** - no need to manually import them elsewhere.
 
+> During development server, It's very important to use export const cleanup for events unbinding to prevent duplicate events registery on hmr.
+
 **Event Structure:**
+
 ```typescript
 import { Response } from "@warlock.js/core";
 
@@ -270,21 +318,28 @@ export function someEventHandler(response: Response) {
   // Event handling logic
 }
 
-Response.on("sending", someEventHandler);
+const event = Response.on("sending", someEventHandler);
+
+export const cleanup = [event];
+// or use a callback if the event is not an unsubscribe function
+export const cleanup = () => event.unsbcribe();
 ```
 
 **Note:** Files in the `events/` folder are auto-imported, similar to `routes.ts`, `main.ts`, and `utils/locales.ts`. Just create the file and it will be loaded automatically.
 
 ### 10. services/mail/ (or separate mail/ folder)
+
 Email service functions for sending notifications. **Mail files should be suffixed with `.mail.ts`** (e.g., `welcome.mail.ts`, `reset-password.mail.ts`).
 
 You can organize mail services either as:
+
 - Files in `services/mail/` folder (if you have multiple mail-related services) - **Recommended**
 - Individual files in `services/` folder (if you have few mail services)
 - A separate `mail/` folder at module root (legacy pattern, still supported)
 
 **Mail Structure:**
-```typescript
+
+```tsx
 // services/mail/welcome.mail.ts
 import { sendMail } from "@warlock.js/core";
 import type { SomeModel } from "../models/some";
@@ -294,7 +349,7 @@ export default async function sendWelcomeEmail(model: SomeModel) {
   await sendMail({
     to: model.get("email"),
     subject: "Subject",
-    html: SomeEmailComponent({ name: model.get("name") }),
+    component: <SomeEmailComponent name={model.get("name")} />,
   });
 }
 ```
@@ -302,10 +357,12 @@ export default async function sendWelcomeEmail(model: SomeModel) {
 **Recommendation:** Use `services/mail/` folder for better organization when you have multiple mail templates, and always suffix mail files with `.mail.ts`.
 
 ### 11. components/
+
 Reusable components for use within email templates. These are typically functions that return HTML strings or React-like components that can be used in mail services.
 
 **Component Structure:**
-```typescript
+
+```tsx
 export function WelcomeEmailComponent(data: { name: string; email: string }) {
   return `
     <div>
@@ -317,7 +374,8 @@ export function WelcomeEmailComponent(data: { name: string; email: string }) {
 ```
 
 **Usage in Mail:**
-```typescript
+
+```tsx
 import { sendMail } from "@warlock.js/core";
 import { WelcomeEmailComponent } from "../components/welcome-email.component";
 
@@ -325,22 +383,22 @@ export default async function sendWelcomeEmail(user: User) {
   await sendMail({
     to: user.get("email"),
     subject: "Welcome",
-    html: WelcomeEmailComponent({ 
-      name: user.get("name"), 
-      email: user.get("email") 
-    }),
+    component: <WelcomeEmailComponent name={user.get("name")} email={user.get("email")} />,
   });
 }
 ```
 
 ### 12. types/
+
 TypeScript type definitions specific to the module. Use this folder for:
+
 - Request/response types
 - Service parameter types
 - Module-specific interfaces
 - Type utilities
 
 **Types Structure:**
+
 ```typescript
 // types/user.types.ts
 export interface UserPreferences {
@@ -352,9 +410,11 @@ export type UserRole = "admin" | "user" | "guest";
 ```
 
 ### 13. utils/
+
 Module-specific utility functions. **Must include `locales.ts`** which is automatically imported by Warlock.js.
 
 **utils/locales.ts (Auto-imported):**
+
 ```typescript
 import { groupedTranslations } from "@mongez/localization";
 
@@ -371,6 +431,7 @@ groupedTranslations("moduleName", {
 ```
 
 **utils/flags.ts (Constants):**
+
 ```typescript
 // Module-specific constants and flags
 export const USER_STATUS = {
@@ -387,6 +448,7 @@ export const USER_ROLES = {
 ```
 
 **Other Utilities:**
+
 ```typescript
 // utils/helpers.ts or similar
 export function formatUserName(user: User): string {
