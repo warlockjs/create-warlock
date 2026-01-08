@@ -1,6 +1,6 @@
 {
     "name": "create-warlock",
-    "version": "4.0.59",
+    "version": "4.0.60",
     "main": "./esm/index.js",
     "license": "MIT",
     "type": "module",
