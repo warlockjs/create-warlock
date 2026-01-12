@@ -4,6 +4,7 @@ import { Post } from "../models/post/psot.model";
 export const createNewPostController: RequestHandler = async (request, response) => {
   const post = await Post.create({
     ...request.validated(),
+    authorId: request.user.id,
   });
 
   return response.success({

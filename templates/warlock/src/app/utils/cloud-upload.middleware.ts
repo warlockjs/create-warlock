@@ -10,5 +10,5 @@ export async function cloudUploadMiddleware(request: Request, _response: Respons
   });
 
   // Example 2: Or just set prefix for same driver
-  // storageDriverContext.setPrefix(`tenant-${request.user?.id}`);
+  storageDriverContext.setPrefix(`tenant-${request.user?.id}`);
 }

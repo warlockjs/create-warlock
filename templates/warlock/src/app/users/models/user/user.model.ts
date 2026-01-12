@@ -1,7 +1,8 @@
 import { Auth } from "@warlock.js/auth";
-import { RegisterModel } from "@warlock.js/cascade";
+import { hasMany, RegisterModel } from "@warlock.js/cascade";
 import { defineResource, uploadedFileMetadataSchema, useHashedPassword } from "@warlock.js/core";
 import { type Infer, v } from "@warlock.js/seal";
+import { type Post } from "app/posts/models/post/psot.model";
 import { globalColumnsSchema } from "app/shared/utils/global-columns-schema";
 
 const UserResource = defineResource({
@@ -19,7 +20,7 @@ const UserResource = defineResource({
 
 export const userSchema = globalColumnsSchema.extend({
   name: v.string().required().trim(),
-  email: v.email().requiredIfEmpty("id"),
+  email: v.email().requiredIfEmpty("id").unique("User"),
   image: v.string(),
   imageMetadata: uploadedFileMetadataSchema,
   password: v.string().min(6).requiredIfEmpty("id").addTransformer(useHashedPassword()),
@@ -38,6 +39,12 @@ export class User extends Auth<UserSchema> {
    * Model Schema
    */
   public static schema = userSchema;
+
+  public static relations = {
+    posts: hasMany("Post", { foreignKey: "authorId" }),
+  };
+
+  public posts?: Post[];
 
   /**
    * Embed fields when saving in another model
@@ -69,5 +76,9 @@ export class User extends Auth<UserSchema> {
     this.addScope("verified", (query) => {
       query.where("emailVerified", true);
     });
+
+    // this.addGlobalScope("active", (query) => {
+    //   query.where("isActive", true);
+    // });
   }
 }
