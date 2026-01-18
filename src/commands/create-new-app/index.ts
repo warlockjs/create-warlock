@@ -1,73 +1,147 @@
-import { cancel, intro, isCancel, select, text } from "@clack/prompts";
+import {
+  cancel,
+  confirm,
+  isCancel,
+  multiselect,
+  select,
+  text,
+} from "@clack/prompts";
 import { colors } from "@mongez/copper";
+import { getJsonFile } from "@mongez/fs";
+import {
+  getDatabaseDriver,
+  getDatabaseDriverOptions,
+} from "../../features/database-drivers";
+import { getFeatureOptions } from "../../features/features-map";
 import { App } from "../../helpers/app";
 import {
+  detectPackageManagers,
   getPackageManager,
+  getPreferredPackageManager,
+  getSystemPackageManagers,
   setPackageManager,
 } from "../../helpers/package-manager";
+import { packageRoot } from "../../helpers/paths";
+import { showIntroBanner } from "../../ui/banner";
 import { createWarlockApp } from "../create-warlock-app";
 import getAppPath from "./get-app-path";
 import { App as AppType } from "./types";
 
-const appDetails: Required<AppType> = {
-  appName: "",
-  appType: "",
-  appPath: "",
-  pkgManager: "",
-  options: {},
-};
+export default async function createNewApp() {
+  // Start detecting package managers in the background to avoid delay later
+  const pmDetectionPromise = detectPackageManagers();
 
-export default async function createNewApp(createWarlockVersion: string) {
-  intro(
-    `✨ Let's create a new ${colors.yellowBright("Warlock Js App")} ✨ ${colors.greenBright(`v` + createWarlockVersion)}`,
-  );
+  // Get version from package.json
+  const packageJson: any = getJsonFile(packageRoot("package.json"));
+  const createWarlockVersion = packageJson.version;
 
-  const appName = await text({
-    message: "Enter the app name",
-    placeholder: "warlock-app",
-  });
+  // Show the intro banner
+  showIntroBanner(createWarlockVersion);
 
-  if (isCancel(appName) || !appName.trim()) {
-    cancel("Application name is required to create a new app");
-    process.exit(0);
-  }
+  console.log(colors.cyan("✨ Let's create something magical! ✨\n"));
 
-  // Validate the nodejs version to be not less than 20
+  // Validate Node.js version (minimum v20)
   const [major] = process.versions.node.split(".").map(Number);
-
   if (major < 20) {
     cancel("Node.js version must be at least 20.0.0");
     process.exit(0);
   }
 
-  const packageManager = await select({
-    message: "Select package manager to use 📦 ",
-    initialValue: getPackageManager(),
-    options: [
-      {
-        label: "Npm",
-        value: "npm",
-      },
-      {
-        label: "Yarn",
-        value: "yarn",
-      },
-      {
-        label: "Pnpm",
-        value: "pnpm",
-      },
-    ],
+  // Step 1: Project name
+  const appName = await text({
+    message: "What shall we call your project?",
+    placeholder: "my-warlock-app",
   });
 
-  setPackageManager(packageManager);
+  if (isCancel(appName) || !appName.trim()) {
+    cancel("A project name is required to continue");
+    process.exit(0);
+  }
 
-  appDetails.appName = appName;
-  appDetails.appPath = getAppPath(appName);
-  appDetails.pkgManager = packageManager;
+  const appPath = getAppPath(appName);
+  if (!appPath) return;
 
-  if (!appDetails.appPath) return;
+  // Step 2: Package Manager selection
+  await pmDetectionPromise; // Ensure detection is complete
 
-  appDetails.appType = "warlock";
+  const packageManager = await select({
+    message: "Which package manager do you want to use?",
+    options: getSystemPackageManagers().map(pm => ({
+      value: pm,
+      label: pm,
+    })),
+    initialValue: getPreferredPackageManager(),
+  });
 
-  createWarlockApp(new App(appDetails));
+  if (isCancel(packageManager)) {
+    cancel("Package manager selection cancelled");
+    process.exit(0);
+  }
+
+  setPackageManager(packageManager as string);
+
+  // Step 3: Database driver selection
+  const databaseDriver = await select({
+    message: "Choose your database driver 🗄️",
+    options: getDatabaseDriverOptions(),
+  });
+
+  if (isCancel(databaseDriver)) {
+    cancel("Database selection cancelled");
+    process.exit(0);
+  }
+
+  const selectedDriver = getDatabaseDriver(databaseDriver as string);
+
+  // Step 4: Features selection
+  const selectedFeatures = await multiselect({
+    message: "Select optional features to include ✨",
+    options: getFeatureOptions(),
+    required: false,
+  });
+
+  if (isCancel(selectedFeatures)) {
+    cancel("Feature selection cancelled");
+    process.exit(0);
+  }
+
+  // Step 5: Git initialization
+  const useGit =
+    (await confirm({
+      message: "Initialize a Git repository? 📂",
+    })) === true;
+
+  if (isCancel(useGit)) {
+    cancel("Setup cancelled");
+    process.exit(0);
+  }
+
+  // Step 6: JWT secret generation
+  const useJWT =
+    (await confirm({
+      message: "Generate JWT secret keys? 🔐",
+    })) === true;
+
+  if (isCancel(useJWT)) {
+    cancel("Setup cancelled");
+    process.exit(0);
+  }
+
+  // Build app details
+  const appDetails: Required<AppType> = {
+    appName: appName,
+    appType: "warlock",
+    appPath: appPath,
+    pkgManager: getPackageManager(),
+    options: {
+      databaseDriver: databaseDriver as string,
+      databasePort: selectedDriver?.defaultPort || 27017,
+      features: selectedFeatures as string[],
+      useGit,
+      useJWT,
+    },
+  };
+
+  // Create the app
+  await createWarlockApp(new App(appDetails));
 }

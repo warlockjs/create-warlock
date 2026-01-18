@@ -1,4 +1,3 @@
-import { env } from "@mongez/dotenv";
 import {
   FileCacheDriver,
   MemoryCacheDriver,
@@ -6,7 +5,7 @@ import {
   RedisCacheDriver,
   type CacheConfigurations,
 } from "@warlock.js/cache";
-import { DatabaseCacheDriver, useRequestStore } from "@warlock.js/core";
+import { env, DatabaseCacheDriver, useRequestStore } from "@warlock.js/core";
 
 const globalPrefix = () => {
   const { request } = useRequestStore();

@@ -1,4 +1,4 @@
-import { env } from "@mongez/dotenv";
+import { env } from "@warlock.js/core";
 import type { HttpConfigurations } from "@warlock.js/core";
 
 const httpConfigurations: HttpConfigurations = {

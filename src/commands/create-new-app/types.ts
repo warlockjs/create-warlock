@@ -1,8 +1,16 @@
+export type AppOptions = {
+  databaseDriver: string;
+  databasePort: number;
+  features: string[];
+  useGit: boolean;
+  useJWT: boolean;
+};
+
 export type App = {
   appName?: string;
   appType?: string;
   appPath?: string;
-  options?: any;
+  options?: AppOptions;
   pkgManager?: string;
 };
 

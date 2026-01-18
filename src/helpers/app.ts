@@ -9,14 +9,18 @@ import {
   renameFile,
 } from "@mongez/fs";
 import path from "path";
-import { Application } from "src/commands/create-new-app/types";
-import { executeCommand, runCommand } from "src/helpers/exec";
-import { Template, template } from "src/helpers/paths";
+import { AppOptions, Application } from "../commands/create-new-app/types";
 import {
-  allDone,
-  initializeGitRepository,
-} from "src/helpers/project-builder-helpers";
+  getDatabaseDependency,
+  getDatabaseDriver,
+} from "../features/database-drivers";
+import {
+  getFeatureConfigStubs,
+  getFeatureDependencies,
+} from "../features/features-map";
+import { executeCommand, runCommand } from "./exec";
 import { getPackageManager } from "./package-manager";
+import { Template, template } from "./paths";
 
 export class App {
   /**
@@ -24,9 +28,18 @@ export class App {
    */
   protected files: Record<string, FileManager> = {};
 
+  /**
+   * Resolved JSON files
+   */
+  protected jsonFiles: Record<string, JsonFileManager> = {};
+
   public isInstalled = false;
 
   public constructor(protected app: Application) {}
+
+  public get options(): AppOptions {
+    return this.app.options;
+  }
 
   public use(templateName: Template) {
     copyDirectory(template(templateName), this.path);
@@ -45,7 +58,7 @@ export class App {
   }
 
   public terminate() {
-    allDone(this.name);
+    // No longer using outro, using showSuccessScreen instead
   }
 
   public install() {
@@ -58,6 +71,8 @@ export class App {
   }
 
   public async git() {
+    const { initializeGitRepository } =
+      await import("./project-builder-helpers");
     return await initializeGitRepository(this.path);
   }
 
@@ -66,6 +81,96 @@ export class App {
       .replace("name", this.name.replaceAll("/", "-"))
       .replaceAll("yarn", getPackageManager())
       .save();
+
+    return this;
+  }
+
+  /**
+   * Add database driver dependency to package.json
+   */
+  public addDatabaseDriver(driverValue: string) {
+    const dependency = getDatabaseDependency(driverValue);
+    const driver = getDatabaseDriver(driverValue);
+
+    // Add dependency
+    const packageJson = this.package;
+    for (const [pkg, version] of Object.entries(dependency)) {
+      packageJson.content.dependencies[pkg] = version;
+    }
+    packageJson.save();
+
+    // Update .env with DB_DRIVER and DB_PORT
+    if (driver) {
+      let envContent = getFile(this.path + "/.env") as string;
+      envContent = envContent.replace(
+        /DB_PORT=\d+/,
+        `DB_PORT=${driver.defaultPort}`,
+      );
+
+      // Add DB_DRIVER if not present, or update it
+      if (envContent.includes("DB_DRIVER=")) {
+        envContent = envContent.replace(
+          /DB_DRIVER=\w*/,
+          `DB_DRIVER=${driver.value}`,
+        );
+      } else {
+        // Add after DB_PORT line
+        envContent = envContent.replace(
+          /DB_PORT=\d+/,
+          `DB_PORT=${driver.defaultPort}\nDB_DRIVER=${driver.value}`,
+        );
+      }
+
+      putFile(this.path + "/.env", envContent);
+    }
+
+    return this;
+  }
+
+  /**
+   * Add selected features' dependencies to package.json
+   */
+  public addFeatures(features: string[]) {
+    if (features.length === 0) return this;
+
+    const { dependencies, devDependencies } = getFeatureDependencies(features);
+    const packageJson = this.package;
+
+    // Merge dependencies
+    for (const [pkg, version] of Object.entries(dependencies)) {
+      packageJson.content.dependencies[pkg] = version;
+    }
+
+    // Merge devDependencies
+    for (const [pkg, version] of Object.entries(devDependencies)) {
+      packageJson.content.devDependencies[pkg] = version;
+    }
+
+    packageJson.save();
+
+    return this;
+  }
+
+  /**
+   * Copy config stubs for features that require them
+   */
+  public copyConfigStubs() {
+    const features = this.options.features || [];
+    const stubs = getFeatureConfigStubs(features);
+
+    for (const stub of stubs) {
+      const configPath = path.join(
+        this.path,
+        "src",
+        "config",
+        `${stub.name}.ts`,
+      );
+
+      // Only create if doesn't exist
+      if (!fileExists(configPath)) {
+        putFile(configPath, stub.content);
+      }
+    }
 
     return this;
   }
@@ -108,14 +213,14 @@ export class App {
     return this.files[fullPath];
   }
 
-  public json(relativePath: string) {
+  public json(relativePath: string): JsonFileManager {
     const fullPath = path.resolve(this.path, relativePath);
 
-    if (!this.files[fullPath]) {
-      this.files[fullPath] = jsonFile(fullPath);
+    if (!this.jsonFiles[fullPath]) {
+      this.jsonFiles[fullPath] = jsonFile(fullPath);
     }
 
-    return this.files[fullPath];
+    return this.jsonFiles[fullPath];
   }
 }
 
@@ -125,7 +230,7 @@ export function app(app: Application) {
 
 export class FileManager {
   public content!: string;
-  public constructor(protected filePath) {
+  public constructor(protected filePath: string) {
     this.parseContent();
   }
 
@@ -151,6 +256,8 @@ export class FileManager {
 }
 
 export class JsonFileManager extends FileManager {
+  public content: any;
+
   protected parseContent() {
     this.content = getJsonFile(this.filePath);
   }

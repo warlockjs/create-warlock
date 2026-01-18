@@ -1,5 +1,4 @@
-import { env } from "@mongez/dotenv";
-import { type StorageConfigurations, storageConfigurations, uploadsPath } from "@warlock.js/core";
+import { type StorageConfigurations, storageConfigurations, uploadsPath, env } from "@warlock.js/core";
 
 const storageOptions: StorageConfigurations = {
   default: "local",

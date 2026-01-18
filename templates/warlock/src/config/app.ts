@@ -1,4 +1,4 @@
-import { env } from "@mongez/dotenv";
+import { env } from "@warlock.js/core";
 import type { AppConfigurations } from "@warlock.js/core";
 
 const appConfigurations: AppConfigurations = {
