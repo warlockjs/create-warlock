@@ -1,5 +1,8 @@
 import { t, type Response } from "@warlock.js/core";
-import { resetPasswordSchema, type ResetPasswordRequest } from "../requests/reset-password.request";
+import {
+  resetPasswordSchema,
+  type ResetPasswordRequest,
+} from "../requests/reset-password.request";
 import { resetPasswordService } from "../services/reset-password.service";
 
 /**

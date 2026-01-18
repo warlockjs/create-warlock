@@ -80,7 +80,6 @@ export class App {
   }
 
   public updatePackageJson() {
-    console.log("Updating package.json", this.package);
     this.package
       .replace("name", this.name.replaceAll("/", "-"))
       .replaceAll("yarn", getPackageManager())

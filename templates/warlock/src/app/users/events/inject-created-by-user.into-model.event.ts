@@ -19,7 +19,7 @@ const saveSubscription = globalEvents.onSaving(async (model, { isInsert }) => {
   }
 });
 
-const deleteSubscription = globalEvents.onDeleting(async (model) => {
+const deleteSubscription = globalEvents.onDeleting(async model => {
   const user = useCurrentUser();
 
   if (!user) return;

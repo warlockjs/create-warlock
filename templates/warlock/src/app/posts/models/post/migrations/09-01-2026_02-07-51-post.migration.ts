@@ -1,5 +1,5 @@
 import { Migration } from "@warlock.js/cascade";
-import { Post } from "../psot.model";
+import { Post } from "../post.model";
 
 export default class PostsMigration extends Migration.for(Post) {
   public up() {

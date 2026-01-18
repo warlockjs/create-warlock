@@ -1,5 +1,5 @@
 import { router } from "@warlock.js/core";
-import { guarded } from "app/utils/router";
+import { guarded } from "app/shared/utils/router";
 import { forgotPassword } from "./controllers/forgot-password.controller";
 import { login } from "./controllers/login.controller";
 import { logoutAll } from "./controllers/logout-all.controller";

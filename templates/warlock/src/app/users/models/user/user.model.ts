@@ -1,8 +1,12 @@
 import { Auth } from "@warlock.js/auth";
 import { hasMany, RegisterModel } from "@warlock.js/cascade";
-import { defineResource, uploadedFileMetadataSchema, useHashedPassword } from "@warlock.js/core";
+import {
+  defineResource,
+  uploadedFileMetadataSchema,
+  useHashedPassword,
+} from "@warlock.js/core";
 import { type Infer, v } from "@warlock.js/seal";
-import { type Post } from "app/posts/models/post/psot.model";
+import { type Post } from "app/posts/models/post/post.model";
 import { globalColumnsSchema } from "app/shared/utils/global-columns-schema";
 
 const UserResource = defineResource({
@@ -23,7 +27,11 @@ export const userSchema = globalColumnsSchema.extend({
   email: v.email().requiredIfEmpty("id").unique("User"),
   image: v.string(),
   imageMetadata: uploadedFileMetadataSchema,
-  password: v.string().min(6).requiredIfEmpty("id").addTransformer(useHashedPassword()),
+  password: v
+    .string()
+    .min(6)
+    .requiredIfEmpty("id")
+    .addTransformer(useHashedPassword()),
 });
 
 export type UserSchema = Infer<typeof userSchema>;
@@ -65,15 +73,15 @@ export class User extends Auth<UserSchema> {
 
   static {
     // Local scopes
-    this.addScope("active", (query) => {
+    this.addScope("active", query => {
       query.where("isActive", true);
     });
 
-    this.addScope("admins", (query) => {
+    this.addScope("admins", query => {
       query.where("role", "admin");
     });
 
-    this.addScope("verified", (query) => {
+    this.addScope("verified", query => {
       query.where("emailVerified", true);
     });
 

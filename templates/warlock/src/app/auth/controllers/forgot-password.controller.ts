@@ -1,4 +1,10 @@
-import { t, v, type Request, type RequestHandler, type Response } from "@warlock.js/core";
+import {
+  t,
+  v,
+  type Request,
+  type RequestHandler,
+  type Response,
+} from "@warlock.js/core";
 import { usersRepository } from "app/users/repositories/users.repository";
 import { createOtpService } from "../services/otp.service";
 
@@ -6,7 +12,10 @@ import { createOtpService } from "../services/otp.service";
  * Forgot password controller
  * POST /auth/forgot-password
  */
-export const forgotPassword: RequestHandler = async (request: Request, response: Response) => {
+export const forgotPassword: RequestHandler = async (
+  request: Request,
+  response: Response,
+) => {
   const { email } = request.validated();
 
   // Find user by email (silent fail for security)

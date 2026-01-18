@@ -1,7 +1,10 @@
 import { v, type RequestHandler } from "@warlock.js/core";
 import { User } from "../models/user";
 
-export const createNewUserController: RequestHandler = async (request, response) => {
+export const createNewUserController: RequestHandler = async (
+  request,
+  response,
+) => {
   const file = request.file("image")!;
 
   const output = await file.save("images");

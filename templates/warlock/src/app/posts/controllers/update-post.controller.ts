@@ -1,7 +1,11 @@
-import { type RequestHandler, v } from "@warlock.js/core";
-import { Post } from "../models/post/psot.model";
+import { type RequestHandler } from "@warlock.js/core";
+import { v } from "@warlock.js/seal";
+import { Post } from "../models/post/post.model";
 
-export const updatePostController: RequestHandler = async (request, response) => {
+export const updatePostController: RequestHandler = async (
+  request,
+  response,
+) => {
   const post = await Post.find(request.int("id"));
 
   if (!post) {

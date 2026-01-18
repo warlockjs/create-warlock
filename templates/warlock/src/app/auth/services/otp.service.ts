@@ -35,7 +35,10 @@ export type CreateOTPOptions = {
 /**
  * Generate OTP code
  */
-function generateCode(length: number = 6, alphanumeric: boolean = false): string {
+function generateCode(
+  length: number = 6,
+  alphanumeric: boolean = false,
+): string {
   if (alphanumeric) {
     // Generate alphanumeric code
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -54,7 +57,9 @@ function generateCode(length: number = 6, alphanumeric: boolean = false): string
 /**
  * Create a new OTP
  */
-export async function createOtpService(options: CreateOTPOptions): Promise<OTP> {
+export async function createOtpService(
+  options: CreateOTPOptions,
+): Promise<OTP> {
   const {
     target,
     channel,
@@ -126,7 +131,10 @@ export async function verifyOtpService(
   return otp;
 }
 
-export async function cleanupOtpService(target: string, type: OTPType): Promise<void> {
+export async function cleanupOtpService(
+  target: string,
+  type: OTPType,
+): Promise<void> {
   await OTP.delete({
     target,
     type,
@@ -156,9 +164,11 @@ export async function resendOtpService(
  * Cleanup expired OTPs
  */
 export async function cleanupExpiredOtpsService(): Promise<number> {
-  const expiredOtps = await OTP.query().where("expiresAt", "<", new Date()).get();
+  const expiredOtps = await OTP.query()
+    .where("expiresAt", "<", new Date())
+    .get();
 
-  await Promise.all(expiredOtps.map((otp) => otp.destroy()));
+  await Promise.all(expiredOtps.map(otp => otp.destroy()));
 
   return expiredOtps.length;
 }

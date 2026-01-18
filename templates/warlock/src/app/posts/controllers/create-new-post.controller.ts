@@ -1,7 +1,10 @@
 import { type RequestHandler, v } from "@warlock.js/core";
-import { Post } from "../models/post/psot.model";
+import { Post } from "../models/post/post.model";
 
-export const createNewPostController: RequestHandler = async (request, response) => {
+export const createNewPostController: RequestHandler = async (
+  request,
+  response,
+) => {
   const post = await Post.create({
     ...request.validated(),
     authorId: request.user.id,

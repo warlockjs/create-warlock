@@ -1,4 +1,9 @@
-import { type StorageConfigurations, storageConfigurations, uploadsPath, env } from "@warlock.js/core";
+import {
+  env,
+  type StorageConfigurations,
+  storageConfigurations,
+  uploadsPath,
+} from "@warlock.js/core";
 
 const storageOptions: StorageConfigurations = {
   default: "local",

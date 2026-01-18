@@ -5,7 +5,7 @@ import {
   RedisCacheDriver,
   type CacheConfigurations,
 } from "@warlock.js/cache";
-import { env, DatabaseCacheDriver, useRequestStore } from "@warlock.js/core";
+import { DatabaseCacheDriver, env, useRequestStore } from "@warlock.js/core";
 
 const globalPrefix = () => {
   const { request } = useRequestStore();
@@ -20,7 +20,8 @@ const globalPrefix = () => {
     return cachePrefix;
   }
 
-  const domain = request.originDomain || request.header("domain") || request.input("domain");
+  const domain =
+    request.originDomain || request.header("domain") || request.input("domain");
 
   if (!domain) return cachePrefix;
 

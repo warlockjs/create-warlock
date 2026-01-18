@@ -6,7 +6,10 @@ import { loginService } from "../services/auth.service";
  * Login controller
  * POST /auth/login
  */
-export const login: RequestHandler = async (request: LoginRequest, response: Response) => {
+export const login: RequestHandler = async (
+  request: LoginRequest,
+  response: Response,
+) => {
   const result = await loginService(request.validated(), {
     userAgent: request.userAgent,
     ip: request.ip,

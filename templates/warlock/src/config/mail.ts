@@ -1,5 +1,5 @@
-import { env } from "@warlock.js/core";
 import type { MailConfigurations } from "@warlock.js/core";
+import { env } from "@warlock.js/core";
 
 const mailConfigurations: MailConfigurations = {
   host: env("MAIL_HOST"),

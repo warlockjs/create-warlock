@@ -1,5 +1,5 @@
-import { env } from "@warlock.js/core";
 import { NO_EXPIRATION, type AuthConfigurations } from "@warlock.js/auth";
+import { env } from "@warlock.js/core";
 import { User } from "app/users/models/user";
 
 const authConfigurations: AuthConfigurations = {

@@ -5,8 +5,12 @@ import { cleanupExpiredOtpsService } from "./services/otp.service";
 
 onceConnected(() => {
   // Cleanup expired OTPs every hour
-  scheduler.newJob("cleanup-expired-otps", cleanupExpiredOtpsService).everyHour();
+  scheduler
+    .newJob("cleanup-expired-otps", cleanupExpiredOtpsService)
+    .everyHour();
 
   // Cleanup expired refresh tokens every hour
-  scheduler.newJob("cleanup-expired-tokens", () => authService.cleanupExpiredTokens()).everyHour();
+  scheduler
+    .newJob("cleanup-expired-tokens", () => authService.cleanupExpiredTokens())
+    .everyHour();
 });

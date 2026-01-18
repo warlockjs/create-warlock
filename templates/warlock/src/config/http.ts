@@ -1,5 +1,5 @@
-import { env } from "@warlock.js/core";
 import type { HttpConfigurations } from "@warlock.js/core";
+import { env } from "@warlock.js/core";
 
 const httpConfigurations: HttpConfigurations = {
   port: env("HTTP_PORT", 3000),
