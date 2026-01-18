@@ -35,7 +35,9 @@ export class App {
 
   public isInstalled = false;
 
-  public constructor(protected app: Application) {}
+  public constructor(protected app: Application) {
+    //
+  }
 
   public get options(): AppOptions {
     return this.app.options;
@@ -71,12 +73,14 @@ export class App {
   }
 
   public async git() {
-    const { initializeGitRepository } =
-      await import("./project-builder-helpers");
+    const { initializeGitRepository } = await import(
+      "./project-builder-helpers"
+    );
     return await initializeGitRepository(this.path);
   }
 
   public updatePackageJson() {
+    console.log("Updating package.json", this.package);
     this.package
       .replace("name", this.name.replaceAll("/", "-"))
       .replaceAll("yarn", getPackageManager())
@@ -95,7 +99,7 @@ export class App {
     // Add dependency
     const packageJson = this.package;
     for (const [pkg, version] of Object.entries(dependency)) {
-      packageJson.content.dependencies[pkg] = version;
+      (packageJson.content as Record<string, any>).dependencies[pkg] = version;
     }
     packageJson.save();
 
@@ -138,12 +142,13 @@ export class App {
 
     // Merge dependencies
     for (const [pkg, version] of Object.entries(dependencies)) {
-      packageJson.content.dependencies[pkg] = version;
+      (packageJson.content as Record<string, any>).dependencies[pkg] = version;
     }
 
     // Merge devDependencies
     for (const [pkg, version] of Object.entries(devDependencies)) {
-      packageJson.content.devDependencies[pkg] = version;
+      (packageJson.content as Record<string, any>).devDependencies[pkg] =
+        version;
     }
 
     packageJson.save();
@@ -229,7 +234,7 @@ export function app(app: Application) {
 }
 
 export class FileManager {
-  public content!: string;
+  public content!: string | Record<string, any>;
   public constructor(protected filePath: string) {
     this.parseContent();
   }
@@ -251,13 +256,11 @@ export class FileManager {
   }
 
   public save() {
-    putFile(this.filePath, this.content);
+    putFile(this.filePath, this.content as string);
   }
 }
 
 export class JsonFileManager extends FileManager {
-  public content: any;
-
   protected parseContent() {
     this.content = getJsonFile(this.filePath);
   }

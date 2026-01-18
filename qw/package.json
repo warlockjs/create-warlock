@@ -1,5 +1,5 @@
 {
-    "name": "app-name",
+    "name": "qw",
     "version": "1.0.0",
     "private": true,
     "type": "module",
@@ -24,14 +24,15 @@
         "@mongez/reinforcements": "^2.3.17",
         "@mongez/localization": "^3.2.1",
         "@mongez/supportive-is": "^2.0.4",
-        "@warlock.js/auth": "4.0.116",
-        "@warlock.js/cache": "4.0.116",
-        "@warlock.js/cascade": "4.0.116",
-        "@warlock.js/scheduler": "4.0.116",
-        "@warlock.js/core": "4.0.116",
-        "@warlock.js/logger": "4.0.116",
-        "@warlock.js/seal": "4.0.116",
-        "dayjs": "^1.11.19"
+        "@warlock.js/auth": "4.0.115",
+        "@warlock.js/cache": "4.0.115",
+        "@warlock.js/cascade": "4.0.115",
+        "@warlock.js/scheduler": "4.0.115",
+        "@warlock.js/core": "4.0.115",
+        "@warlock.js/logger": "4.0.115",
+        "@warlock.js/seal": "4.0.115",
+        "dayjs": "^1.11.19",
+        "mongodb": "^7.0.0"
     },
     "devDependencies": {
         "@mongez/huskier": "^3.0.0",
@@ -48,7 +49,8 @@
         "prettier": "^3.7.4",
         "prettier-plugin-organize-imports": "^4.3.0",
         "tsx": "^4.21.0",
-        "typescript": "^5.9.3"
+        "typescript": "^5.9.3",
+        "husky": "^8.0.0"
     },
     "huskier": {
         "hooks": {
