@@ -71,8 +71,9 @@ export class App {
   }
 
   public async git() {
-    const { initializeGitRepository } =
-      await import("./project-builder-helpers");
+    const { initializeGitRepository } = await import(
+      "./project-builder-helpers"
+    );
     return await initializeGitRepository(this.path);
   }
 
@@ -256,8 +257,6 @@ export class FileManager {
 }
 
 export class JsonFileManager extends FileManager {
-  public content: any;
-
   protected parseContent() {
     this.content = getJsonFile(this.filePath);
   }
