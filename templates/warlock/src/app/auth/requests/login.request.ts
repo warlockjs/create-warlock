@@ -7,4 +7,4 @@ export const loginSchema = v.object({
 
 export type LoginSchema = Infer<typeof loginSchema>;
 
-export type LoginRequest = Request<undefined, LoginSchema>;
+export type LoginRequest = Request<LoginSchema>;

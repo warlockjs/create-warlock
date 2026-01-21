@@ -8,4 +8,4 @@ export const resetPasswordSchema = v.object({
 
 export type ResetPasswordSchema = Infer<typeof resetPasswordSchema>;
 
-export type ResetPasswordRequest = Request<undefined, ResetPasswordSchema>;
+export type ResetPasswordRequest = Request<ResetPasswordSchema>;

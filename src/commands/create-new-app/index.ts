@@ -97,6 +97,7 @@ export default async function createNewApp() {
   const selectedFeatures = await multiselect({
     message: "Select optional features to include ✨",
     options: getFeatureOptions(),
+    initialValues: ["react"], // React pre-selected by default
     required: false,
   });
 

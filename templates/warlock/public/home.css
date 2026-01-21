@@ -38,9 +38,21 @@ body {
   width: 200%;
   height: 200%;
   background:
-    radial-gradient(circle at 20% 50%, rgba(234, 179, 8, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(34, 197, 94, 0.06) 0%, transparent 50%),
-    radial-gradient(circle at 40% 20%, rgba(234, 179, 8, 0.05) 0%, transparent 50%);
+    radial-gradient(
+      circle at 20% 50%,
+      rgba(234, 179, 8, 0.08) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 80%,
+      rgba(34, 197, 94, 0.06) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 40% 20%,
+      rgba(234, 179, 8, 0.05) 0%,
+      transparent 50%
+    );
   animation: backgroundFloat 20s ease-in-out infinite;
   z-index: 0;
 }

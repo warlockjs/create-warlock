@@ -134,8 +134,8 @@ export function getFeatureDependencies(selectedFeatures: string[]): {
  */
 export function getFeatureConfigStubs(
   selectedFeatures: string[],
-): Array<{ name: string; content: string }> {
-  const stubs: Array<{ name: string; content: string }> = [];
+): Array<FeatureConfig> {
+  const stubs: Array<FeatureConfig> = [];
 
   for (const feature of selectedFeatures) {
     const config = featuresMap[feature];

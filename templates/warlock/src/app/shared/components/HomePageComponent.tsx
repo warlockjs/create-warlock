@@ -1,4 +1,4 @@
-import { publicUrl } from "@warlock.js/core";
+import { Application, publicUrl } from "@warlock.js/core";
 
 export function HomePageComponent() {
   return (
@@ -13,7 +13,11 @@ export function HomePageComponent() {
         />
         <link rel="stylesheet" href={publicUrl("home.css")} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
           rel="stylesheet"
@@ -29,13 +33,22 @@ export function HomePageComponent() {
               <span>Warlock.js</span>
             </a>
             <nav className="warlock-nav">
-              <a href="https://warlock.js.org" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://warlock.js.org"
+                target="_blank"
+                rel="noopener noreferrer">
                 Docs
               </a>
-              <a href="https://github.com/warlockjs" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://github.com/warlockjs"
+                target="_blank"
+                rel="noopener noreferrer">
                 GitHub
               </a>
-              <a href="https://discord.gg/x3W9SN2jvx" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://discord.gg/x3W9SN2jvx"
+                target="_blank"
+                rel="noopener noreferrer">
                 Discord
               </a>
             </nav>
@@ -49,15 +62,20 @@ export function HomePageComponent() {
               with Confidence
             </h1>
             <p>
-              A powerful, elegant TypeScript framework designed for developers who demand
-              excellence. Ship faster, scale better, and enjoy the journey.
+              A powerful, elegant TypeScript framework designed for developers
+              who demand excellence. Ship faster, scale better, and enjoy the
+              journey.
             </p>
             <div className="warlock-cta">
-              <a href="https://warlock.js.org" className="warlock-btn warlock-btn-primary">
+              <a
+                href="https://warlock.js.org"
+                className="warlock-btn warlock-btn-primary">
                 <span>Get Started</span>
                 <span>→</span>
               </a>
-              <a href="https://github.com/warlockjs" className="warlock-btn warlock-btn-secondary">
+              <a
+                href="https://github.com/warlockjs"
+                className="warlock-btn warlock-btn-secondary">
                 <span>View on GitHub</span>
               </a>
             </div>
@@ -75,8 +93,8 @@ export function HomePageComponent() {
                 <span className="warlock-feature-icon">🚀</span>
                 <h3>Lightning Fast</h3>
                 <p>
-                  Blazing fast development server with instant hot reload. Build and deploy
-                  optimized production bundles in seconds.
+                  Blazing fast development server with instant hot reload. Build
+                  and deploy optimized production bundles in seconds.
                 </p>
               </div>
 
@@ -84,8 +102,9 @@ export function HomePageComponent() {
                 <span className="warlock-feature-icon">🎯</span>
                 <h3>Type-Safe</h3>
                 <p>
-                  Built with TypeScript from the ground up. Enjoy full type safety across your
-                  entire application with intelligent auto-completion.
+                  Built with TypeScript from the ground up. Enjoy full type
+                  safety across your entire application with intelligent
+                  auto-completion.
                 </p>
               </div>
 
@@ -93,8 +112,8 @@ export function HomePageComponent() {
                 <span className="warlock-feature-icon">🏗️</span>
                 <h3>Battle-Tested Architecture</h3>
                 <p>
-                  Proven patterns and best practices baked in. From routing to database management,
-                  we've got you covered.
+                  Proven patterns and best practices baked in. From routing to
+                  database management, we've got you covered.
                 </p>
               </div>
 
@@ -102,8 +121,9 @@ export function HomePageComponent() {
                 <span className="warlock-feature-icon">🔌</span>
                 <h3>Powerful CLI</h3>
                 <p>
-                  Scaffold components, run migrations, manage seeds, and more with an intuitive
-                  command-line interface that boosts productivity.
+                  Scaffold components, run migrations, manage seeds, and more
+                  with an intuitive command-line interface that boosts
+                  productivity.
                 </p>
               </div>
 
@@ -111,8 +131,8 @@ export function HomePageComponent() {
                 <span className="warlock-feature-icon">🎨</span>
                 <h3>Flexible & Extensible</h3>
                 <p>
-                  Plugin architecture allows you to extend core functionality. Build your own tools
-                  or use community packages.
+                  Plugin architecture allows you to extend core functionality.
+                  Build your own tools or use community packages.
                 </p>
               </div>
 
@@ -120,8 +140,8 @@ export function HomePageComponent() {
                 <span className="warlock-feature-icon">🌍</span>
                 <h3>Multi-Tenant Ready</h3>
                 <p>
-                  Built-in support for multi-tenancy. Scale from single to multi-tenant applications
-                  without architectural changes.
+                  Built-in support for multi-tenancy. Scale from single to
+                  multi-tenant applications without architectural changes.
                 </p>
               </div>
             </div>
@@ -130,7 +150,9 @@ export function HomePageComponent() {
           {/* Quick Start Section */}
           <section className="warlock-quickstart">
             <h2 className="warlock-section-title">Get Started in Seconds</h2>
-            <p className="warlock-section-subtitle">One command to rule them all</p>
+            <p className="warlock-section-subtitle">
+              One command to rule them all
+            </p>
 
             <div className="warlock-code-block">
               <div className="warlock-code-header">
@@ -140,15 +162,19 @@ export function HomePageComponent() {
               </div>
               <div className="warlock-code-content">
                 <code className="warlock-code-line">
-                  <span className="warlock-code-comment"># Create a new Warlock.js project</span>
+                  <span className="warlock-code-comment">
+                    # Create a new Warlock.js project
+                  </span>
                 </code>
                 <code className="warlock-code-line">
-                  <span className="warlock-code-command">npx</span> create-warlock@latest{" "}
-                  <span className="warlock-code-flag">my-app</span>
+                  <span className="warlock-code-command">npx</span>{" "}
+                  create-warlock@latest{" "}
                 </code>
                 <code className="warlock-code-line">&nbsp;</code>
                 <code className="warlock-code-line">
-                  <span className="warlock-code-comment"># Navigate to your project</span>
+                  <span className="warlock-code-comment">
+                    # Navigate to your project
+                  </span>
                 </code>
                 <code className="warlock-code-line">
                   <span className="warlock-code-command">cd</span>{" "}
@@ -156,7 +182,9 @@ export function HomePageComponent() {
                 </code>
                 <code className="warlock-code-line">&nbsp;</code>
                 <code className="warlock-code-line">
-                  <span className="warlock-code-comment"># Start the development server</span>
+                  <span className="warlock-code-comment">
+                    # Start the development server
+                  </span>
                 </code>
                 <code className="warlock-code-line">
                   <span className="warlock-code-command">yarn</span> start
@@ -164,7 +192,7 @@ export function HomePageComponent() {
                 <code className="warlock-code-line">&nbsp;</code>
                 <code className="warlock-code-line">
                   <span className="warlock-code-comment">
-                    # 🚀 Server ready at http://localhost:3000
+                    # 🚀 Server ready at http://localhost:2030
                   </span>
                 </code>
               </div>
@@ -178,8 +206,7 @@ export function HomePageComponent() {
                 href="https://discord.gg/x3W9SN2jvx"
                 className="warlock-social-link"
                 target="_blank"
-                rel="noopener noreferrer"
-              >
+                rel="noopener noreferrer">
                 <span className="warlock-social-icon">💬</span>
                 <span>Join Discord</span>
               </a>
@@ -187,8 +214,7 @@ export function HomePageComponent() {
                 href="https://github.com/warlockjs"
                 className="warlock-social-link"
                 target="_blank"
-                rel="noopener noreferrer"
-              >
+                rel="noopener noreferrer">
                 <span className="warlock-social-icon">⭐</span>
                 <span>Star on GitHub</span>
               </a>
@@ -196,17 +222,21 @@ export function HomePageComponent() {
                 href="https://warlock.js.org"
                 className="warlock-social-link"
                 target="_blank"
-                rel="noopener noreferrer"
-              >
+                rel="noopener noreferrer">
                 <span className="warlock-social-icon">📚</span>
                 <span>Read Docs</span>
               </a>
             </div>
             <p className="warlock-footer-text">
               Built with ⚡ by the{" "}
-              <a href="https://github.com/warlockjs" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://github.com/warlockjs"
+                target="_blank"
+                rel="noopener noreferrer">
                 Warlock.js Team
               </a>
+              {" · "}
+              <span>v{Application.version}</span>
             </p>
           </footer>
         </div>
