@@ -1,0 +1,511 @@
+/* Warlock.js Homepage Styles */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    sans-serif;
+  background: #0a0a0f;
+  color: #e4e4e7;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+.warlock-home {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animated Background */
+.warlock-home::before {
+  content: "";
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(234, 179, 8, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(34, 197, 94, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(234, 179, 8, 0.05) 0%, transparent 50%);
+  animation: backgroundFloat 20s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes backgroundFloat {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  33% {
+    transform: translate(30px, -30px) rotate(1deg);
+  }
+  66% {
+    transform: translate(-20px, 20px) rotate(-1deg);
+  }
+}
+
+/* Container */
+.warlock-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Header */
+.warlock-header {
+  padding: 2rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.warlock-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fbbf24;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+.warlock-logo:hover {
+  transform: scale(1.05);
+}
+
+.warlock-logo-icon {
+  font-size: 2rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+.warlock-nav {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.warlock-nav a {
+  color: #a1a1aa;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.warlock-nav a::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #fbbf24, #22c55e);
+  transition: width 0.3s ease;
+}
+
+.warlock-nav a:hover {
+  color: #fbbf24;
+}
+
+.warlock-nav a:hover::after {
+  width: 100%;
+}
+
+/* Hero Section */
+.warlock-hero {
+  padding: 8rem 0;
+  text-align: center;
+}
+
+.warlock-hero h1 {
+  font-size: 4.5rem;
+  font-weight: 900;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #fbbf24 0%, #22c55e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.warlock-hero p {
+  font-size: 1.5rem;
+  color: #a1a1aa;
+  margin-bottom: 3rem;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.warlock-cta {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+.warlock-btn {
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.warlock-btn::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s ease,
+    height 0.6s ease;
+}
+
+.warlock-btn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.warlock-btn-primary {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #0a0a0f;
+  box-shadow: 0 10px 30px rgba(251, 191, 36, 0.3);
+}
+
+.warlock-btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(251, 191, 36, 0.4);
+}
+
+.warlock-btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: #e4e4e7;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.warlock-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(251, 191, 36, 0.3);
+  transform: translateY(-3px);
+}
+
+/* Features Section */
+.warlock-features {
+  padding: 6rem 0;
+}
+
+.warlock-section-title {
+  text-align: center;
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #fbbf24 0%, #22c55e 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.warlock-section-subtitle {
+  text-align: center;
+  font-size: 1.25rem;
+  color: #71717a;
+  margin-bottom: 4rem;
+}
+
+.warlock-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.warlock-feature-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 2.5rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.warlock-feature-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #fbbf24, #22c55e);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.warlock-feature-card:hover::before {
+  transform: scaleX(1);
+}
+
+.warlock-feature-card:hover {
+  transform: translateY(-8px);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(251, 191, 36, 0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.warlock-feature-icon {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  display: block;
+}
+
+.warlock-feature-card h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #fbbf24;
+}
+
+.warlock-feature-card p {
+  color: #a1a1aa;
+  line-height: 1.8;
+}
+
+/* Quick Start Section */
+.warlock-quickstart {
+  padding: 6rem 0;
+  background: rgba(255, 255, 255, 0.01);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.warlock-code-block {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-top: 2rem;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+}
+
+.warlock-code-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.warlock-code-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.warlock-code-dot:nth-child(1) {
+  background: #ef4444;
+}
+.warlock-code-dot:nth-child(2) {
+  background: #f59e0b;
+}
+.warlock-code-dot:nth-child(3) {
+  background: #22c55e;
+}
+
+.warlock-code-content {
+  font-family: "Fira Code", "Courier New", monospace;
+  font-size: 1rem;
+  line-height: 2;
+  color: #e4e4e7;
+}
+
+.warlock-code-line {
+  display: block;
+  transition: background 0.2s ease;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.warlock-code-line:hover {
+  background: rgba(251, 191, 36, 0.1);
+}
+
+.warlock-code-comment {
+  color: #71717a;
+}
+
+.warlock-code-command {
+  color: #22c55e;
+}
+
+.warlock-code-flag {
+  color: #fbbf24;
+}
+
+.warlock-code-string {
+  color: #06b6d4;
+}
+
+/* Footer */
+.warlock-footer {
+  padding: 4rem 0 2rem;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.warlock-social-links {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.warlock-social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #e4e4e7;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.warlock-social-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(251, 191, 36, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.warlock-social-icon {
+  font-size: 1.5rem;
+}
+
+.warlock-footer-text {
+  color: #71717a;
+  font-size: 0.95rem;
+}
+
+.warlock-footer-text a {
+  color: #fbbf24;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.warlock-footer-text a:hover {
+  color: #f59e0b;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .warlock-hero h1 {
+    font-size: 3rem;
+  }
+
+  .warlock-hero p {
+    font-size: 1.25rem;
+  }
+
+  .warlock-section-title {
+    font-size: 2.25rem;
+  }
+
+  .warlock-features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .warlock-nav {
+    display: none;
+  }
+
+  .warlock-social-links {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .warlock-cta {
+    flex-direction: column;
+  }
+
+  .warlock-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Smooth Scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection */
+::selection {
+  background: rgba(251, 191, 36, 0.3);
+  color: #fbbf24;
+}
