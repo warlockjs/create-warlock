@@ -1,4 +1,4 @@
-import { groupedTranslations } from "@mongez/localization";
+import { groupedTranslations } from "@warlock.js/core";
 
 groupedTranslations("validation", {
   required: {

@@ -13,13 +13,10 @@
     "typeRoots": ["./src/typings.d.ts"],
     "noFallthroughCasesInSwitch": true,
     "module": "ESNext",
-    "moduleResolution": "node",
     "jsx": "react-jsx",
-    "resolveJsonModule": true,
     "isolatedModules": true,
-    "baseUrl": "./",
     "paths": {
-      "app/*": ["src/app/*"]
+      "app/*": ["./src/app/*"]
     },
     "noEmit": true
   },
