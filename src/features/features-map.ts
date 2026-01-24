@@ -26,9 +26,9 @@ export default communicatorsConfigurations;
 
 export const featuresMap: Record<string, FeatureConfig> = {
   react: {
-    label: "React (SSR for mails)",
+    label: "React (rendering & mails)",
     description:
-      "React and ReactDOM for server-side rendering, useful for email templates",
+      "React and ReactDOM for rendering React components (non-interactive), useful for email templates and HTML generation",
     dependencies: {
       react: "^19.0.0",
       "react-dom": "^19.0.0",

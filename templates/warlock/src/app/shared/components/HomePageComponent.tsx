@@ -148,9 +148,9 @@ export function HomePageComponent() {
 
             {/* Quick Start Section */}
             <section className="warlock-quickstart">
-              <h2 className="warlock-section-title">Get Started in Seconds</h2>
+              <h2 className="warlock-section-title">Extend with Features</h2>
               <p className="warlock-section-subtitle">
-                One command to rule them all
+                Add powerful features to your project instantly
               </p>
 
               <div className="warlock-code-block">
@@ -162,36 +162,41 @@ export function HomePageComponent() {
                 <div className="warlock-code-content">
                   <code className="warlock-code-line">
                     <span className="warlock-code-comment">
-                      # Create a new Warlock.js project
+                      # Add React for rendering & email templates
                     </span>
                   </code>
                   <code className="warlock-code-line">
-                    <span className="warlock-code-command">npx</span>{" "}
-                    create-warlock@latest{" "}
+                    <span className="warlock-code-command">npx</span> warlock
+                    add <span className="warlock-code-flag">react</span>
                   </code>
                   <code className="warlock-code-line">&nbsp;</code>
                   <code className="warlock-code-line">
                     <span className="warlock-code-comment">
-                      # Navigate to your project
+                      # Add MongoDB, Redis & testing support
                     </span>
                   </code>
                   <code className="warlock-code-line">
-                    <span className="warlock-code-command">cd</span>{" "}
-                    <span className="warlock-code-flag">my-app</span>
+                    <span className="warlock-code-command">npx</span> warlock
+                    add{" "}
+                    <span className="warlock-code-flag">
+                      mongodb redis test
+                    </span>
                   </code>
                   <code className="warlock-code-line">&nbsp;</code>
                   <code className="warlock-code-line">
                     <span className="warlock-code-comment">
-                      # Start the development server
+                      # List all available features
                     </span>
                   </code>
                   <code className="warlock-code-line">
-                    <span className="warlock-code-command">yarn</span> dev
+                    <span className="warlock-code-command">npx</span> warlock
+                    add <span className="warlock-code-flag">--list</span>
                   </code>
                   <code className="warlock-code-line">&nbsp;</code>
                   <code className="warlock-code-line">
                     <span className="warlock-code-comment">
-                      # 🚀 Server ready at http://localhost:2030
+                      # ✨ Features: react, mongodb, postgres, mysql, redis, s3,
+                      mail, image, test, swagger, scheduler & more
                     </span>
                   </code>
                 </div>
