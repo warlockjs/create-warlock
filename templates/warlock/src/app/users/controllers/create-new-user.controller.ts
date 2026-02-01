@@ -1,5 +1,6 @@
-import { v, type RequestHandler } from "@warlock.js/core";
+import { type RequestHandler } from "@warlock.js/core";
 import { User } from "../models/user";
+import { createUserSchema } from "../validation/create-user.schema";
 
 export const createNewUserController: RequestHandler = async (
   request,
@@ -22,10 +23,5 @@ export const createNewUserController: RequestHandler = async (
 };
 
 createNewUserController.validation = {
-  schema: v.object({
-    name: v.string().required(),
-    email: v.email().required().unique(User),
-    password: v.string().min(6),
-    image: v.file().image().required().maxSize({ unit: "MB", size: 1.5 }),
-  }),
+  schema: createUserSchema,
 };

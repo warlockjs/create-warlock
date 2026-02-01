@@ -1,5 +1,11 @@
 # Create a new module
 
+You can create a new module using the following command:
+
+```bash
+warlock create.module <module-name>
+```
+
 Each module should consist of the following structure:
 
 ```
@@ -22,9 +28,11 @@ src/app/[module-name]/
 │       ├── [model-name].model.ts
 │       └── migrations/
 │           └── [date]_[model-name].migration.ts
-├── requests/                   # Request validation schemas
+├── requests/                   # Request type definitions
+│   └── *.request.ts         # Individual request types
+├── validation/                 # Validation schemas
 │   ├── index.ts                # Simple validations (if all in one file)
-│   └── *.request.ts         # Individual validation files
+│   └── *.schema.ts          # Individual validation schema files
 ├── resources/                      # Response resource transformers
 │   └── *.resource.ts
 ├── events/                      # Event handlers/listeners (auto-imported by Warlock.js)
@@ -87,9 +95,13 @@ Request handlers that process HTTP requests. Organize controllers by feature (e.
 ```typescript
 import type { Request, RequestHandler, Response } from "@warlock.js/core";
 import { someService } from "app/[module]/services/some.service";
-import { someRequestSchema, type SomeRequest } from "app/[module]/requests/some.request";
+import { someRequestSchema } from "app/[module]/validation/some.schema";
+import { type SomeRequest } from "app/[module]/requests/some.request";
 
-export const someController: RequestHandler = async (request: SomeRequest, response: Response) => {
+export const someController: RequestHandler = async (
+  request: SomeRequest,
+  response: Response,
+) => {
   const data = await someService(request.validated());
   return response.success({ data });
 };
@@ -131,7 +143,9 @@ Business logic layer. Services handle the core functionality and interact with r
 import type { SomeModel } from "app/[module]/models/some";
 import { someRepository } from "app/[module]/repositories/some.repository";
 
-export async function someService(data: Record<string, any>): Promise<SomeModel> {
+export async function someService(
+  data: Record<string, any>,
+): Promise<SomeModel> {
   return await someRepository.create(data);
 }
 ```
@@ -143,19 +157,19 @@ Data access layer that extends `RepositoryManager`. Handles database queries and
 **Repository Structure:**
 
 ```typescript
-import type { FilterByOptions, RepositoryOptions } from "@warlock.js/core";
+import type { FilterRules, RepositoryOptions } from "@warlock.js/core";
 import { RepositoryManager } from "@warlock.js/core";
 import { SomeModel } from "../models/some";
 
 export class SomeRepository extends RepositoryManager<SomeModel> {
   public source = SomeModel;
 
-  protected defaultOptions: RepositoryOptions = this.withDefaultOptions({});
+  protected defaultOptions: RepositoryOptions = {};
 
-  protected filterBy: FilterByOptions = this.withDefaultFilters({
+  protected filterBy: FilterRules = {
     name: "like",
     isActive: "bool",
-  });
+  };
 }
 
 export const someRepository = new SomeRepository();
@@ -191,31 +205,28 @@ export class SomeModel extends Model<SomeModelType> {
 }
 ```
 
-### 7. requests/
+### 7. validation/
 
-Request handlers that process HTTP requests. Organize controllers by feature (e.g., `auth/`, `profile/`).
+Validation schemas should be defined here.
 
-**Request Structure:**
+**Validation Structure:**
 
 ```typescript
-import type { Request, RequestHandler, Response } from "@warlock.js/core";
-import { someService } from "app/[module]/services/some.service";
-import { someRequestSchema, type SomeRequest } from "app/[module]/requests/some.request";
+import { v, type Infer } from "@warlock.js/seal";
 
-export const someController: RequestHandler = async (request: SomeRequest, response: Response) => {
-  const data = await someService(request.validated());
-  return response.success({ data });
-};
+export const createAccountSchema = v.object({
+  name: v.string().minLength(2).required(),
+  email: v.email().required(),
+  password: v.string().required().strongPassword(),
+});
 
-someController.validation = {
-  schema: someRequestSchema,
-};
+export type CreateAccountSchema = Infer<typeof createAccountSchema>;
 ```
 
 **Important Rules:**
 
 - If a module has simple validations, use `index.ts` to export all schemas
-- If requests are complex or numerous, use separate `.request.ts` files
+- If requests are complex or numerous, use separate `.schema.ts` files
 - Always export the schema and its inferred type
 - Use `Infer<typeof schema>` (similar to Zod) to generate TypeScript types
 
@@ -223,8 +234,6 @@ someController.validation = {
 
 ```typescript
 import { v, type Infer } from "@warlock.js/seal";
-import { type Request } from "@warlock.js/core";
-import { type User } from "app/users/models/user";
 
 export const createSchema = v.object({
   name: v.string().minLength(2).required(),
@@ -236,45 +245,48 @@ export const updateSchema = v.object({
 
 export type CreateData = Infer<typeof createSchema>;
 export type UpdateData = Infer<typeof updateSchema>;
-
-export type CreatePostRequest<User, CreateData>;
-export type UpdatePostRequest<User, UpdateData>;
 ```
 
 **Individual Validation Files:**
 
 ```typescript
-// requests/create-account.request.ts
+// validation/create-account.schema.ts
 import { v, type Infer } from "@warlock.js/seal";
-import { type Request } from "@warlock.js/core";
 
 export const createAccountSchema = v.object({
   name: v.string().minLength(2).required(),
-  email: vemail().required(),
+  email: v.email().required(),
   password: v.string().required().strongPassword(),
 });
 
-export type CreateAccountData = Infer<typeof createAccountSchema>;
+export type CreateAccountSchema = Infer<typeof createAccountSchema>;
+```
 
-export type CreateAccountRequest<undefined, CreateAccountData>;
+### 8. requests/
+
+High level Request types that link validation schemas to the Request object.
+
+**Request Structure:**
+
+```typescript
+import type { Request } from "@warlock.js/core";
+import { type CreateAccountSchema } from "app/[module]/validation/create-account.schema";
+
+export type CreateAccountRequest = Request<CreateAccountSchema>;
 ```
 
 **Usage in Controller:**
 
 ```typescript
-import type { Request, RequestHandler, Response } from "@warlock.js/core";
-import type { User } from "app/[module]/models/user";
-import {
-  createAccountSchema,
-  type CreateAccountRequest,
-} from "app/[module]/requests/create-account.request";
+import type { RequestHandler, Response } from "@warlock.js/core";
+import { type CreateAccountRequest } from "app/[module]/requests/create-account.request";
+import { createAccountSchema } from "app/[module]/validation/create-account.schema";
 
 export const createAccountController: RequestHandler = async (
   request: CreateAccountRequest,
   response: Response,
 ) => {
-  // request.validated() is now typed as CreateAccountData
-  const data = request.validated();
+  const data = request.validated(); // data is typed as CreateAccountSchema
   // ...
 };
 
@@ -283,27 +295,42 @@ createAccountController.validation = {
 };
 ```
 
-### 8. resources/
+### 9. resources/
 
 Resources define how data is transformed before being sent to clients.
 
 **Resource Structure:**
 
 ```typescript
-import { Resource } from "@warlock.js/core";
-import {} from "app/utils/output";
+**import** { Resource, RegisterResource } from "@warlock.js/core";
 
+@RegisterResource()
 export class SomeResource extends Resource {
-  public schema = {
+  public static schema = {
     name: "string",
     id: "int",
     type: () => "user", // custom output value
-    image: (value) => (value.startsWith("/") ? value : "/" + value),
+    image: value => (value.startsWith("/") ? value : "/" + value),
   };
 }
 ```
 
-### 9. events/ (Auto-imported)
+Or even making it simpler by using `defineResource` function (FP style, recommended for most resources)
+
+```typescript
+import { defineResource } from "@warlock.js/core";
+
+export const SomeResource = defineResource({
+  schema: {
+    name: "string",
+    id: "int",
+    type: () => "user", // custom output value
+    image: value => (value.startsWith("/") ? value : "/" + value),
+  },
+});
+```
+
+### 10. events/ (Auto-imported)
 
 Event handlers and listeners for model events or application events. **All files in this folder are automatically imported by Warlock.js** - no need to manually import them elsewhere.
 
@@ -327,7 +354,7 @@ export const cleanup = () => event.unsbcribe();
 
 **Note:** Files in the `events/` folder are auto-imported, similar to `routes.ts`, `main.ts`, and `utils/locales.ts`. Just create the file and it will be loaded automatically.
 
-### 10. services/mail/ (or separate mail/ folder)
+### 11. services/mail/ (or separate mail/ folder)
 
 Email service functions for sending notifications. **Mail files should be suffixed with `.mail.ts`** (e.g., `welcome.mail.ts`, `reset-password.mail.ts`).
 
@@ -356,7 +383,7 @@ export default async function sendWelcomeEmail(model: SomeModel) {
 
 **Recommendation:** Use `services/mail/` folder for better organization when you have multiple mail templates, and always suffix mail files with `.mail.ts`.
 
-### 11. components/
+### 12. components/
 
 Reusable components for use within email templates. These are typically functions that return HTML strings or React-like components that can be used in mail services.
 
@@ -383,12 +410,17 @@ export default async function sendWelcomeEmail(user: User) {
   await sendMail({
     to: user.get("email"),
     subject: "Welcome",
-    component: <WelcomeEmailComponent name={user.get("name")} email={user.get("email")} />,
+    component: (
+      <WelcomeEmailComponent
+        name={user.get("name")}
+        email={user.get("email")}
+      />
+    ),
   });
 }
 ```
 
-### 12. types/
+### 13. types/
 
 TypeScript type definitions specific to the module. Use this folder for:
 
@@ -409,7 +441,7 @@ export interface UserPreferences {
 export type UserRole = "admin" | "user" | "guest";
 ```
 
-### 13. utils/
+### 14. utils/
 
 Module-specific utility functions. **Must include `locales.ts`** which is automatically imported by Warlock.js.
 
@@ -461,41 +493,51 @@ export function formatUserName(user: User): string {
 ## Best Practices
 
 1. **Naming Conventions:**
+
    - Use kebab-case for file names
    - Use PascalCase for class names
    - Use camelCase for functions and variables
 
 2. **Controller Organization:**
+
    - Group related controllers in subdirectories (e.g., `auth/`, `profile/`)
    - Keep controllers thin - delegate business logic to services
 
 3. **Service Layer:**
+
    - Services should contain reusable business logic
    - Services interact with repositories, not directly with models
 
 4. **Repository Pattern:**
+
    - All database operations should go through repositories
    - Define filter options in the repository class
 
 5. **Validation:**
+
    - **All validation schemas must be in the `validation/` folder**
+   - **All request types must be in the `requests/` folder**
    - Always attach validation to controllers using `controller.validation = { schema }`
    - Export TypeScript types from validation files using `Infer<typeof schema>`
-   - Use the inferred type as a generic parameter in `Request<Model, ValidationType>`
-   - Use `index.ts` for simple validations, separate `.validation.ts` files for complex ones
+   - Import validation schema in controller from `validation/` folder
+   - Import request type in controller from `requests/` folder
+   - Use `index.ts` for simple validations, separate `.schema.ts` files for complex ones
 
 6. **Models:**
+
    - Define casts for all fields
    - Specify embedded fields for performance
    - Include default values when needed
 
 7. **Routes:**
+
    - Use appropriate guards (`guarded`, `guardedAdmin`, `guardedGuest`)
    - Group related routes together
    - Use RESTful resources when appropriate
    - Routes file is auto-imported by Warlock.js
 
 8. **Auto-imported Files:**
+
    - `main.ts` - Module entry point
    - `routes.ts` - Route definitions
    - `utils/locales.ts` - Translations

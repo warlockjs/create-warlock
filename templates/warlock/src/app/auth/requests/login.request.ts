@@ -1,10 +1,4 @@
-import { v, type Infer, type Request } from "@warlock.js/core";
-
-export const loginSchema = v.object({
-  email: v.email().required(),
-  password: v.string().required(),
-});
-
-export type LoginSchema = Infer<typeof loginSchema>;
+import type { Request } from "@warlock.js/core";
+import { type LoginSchema } from "../validation/login.schema";
 
 export type LoginRequest = Request<LoginSchema>;

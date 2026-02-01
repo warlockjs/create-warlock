@@ -1,9 +1,10 @@
 import { type RequestHandler } from "@warlock.js/core";
-import { v } from "@warlock.js/seal";
 import { Post } from "../models/post/post.model";
+import { type UpdatePostRequest } from "../requests/update-post.request";
+import { updatePostSchema } from "../validation/update-post.schema";
 
 export const updatePostController: RequestHandler = async (
-  request,
+  request: UpdatePostRequest,
   response,
 ) => {
   const post = await Post.find(request.int("id"));
@@ -20,9 +21,5 @@ export const updatePostController: RequestHandler = async (
 };
 
 updatePostController.validation = {
-  schema: v.object({
-    title: v.string().required(),
-    description: v.string(),
-    image: v.file().image().maxSize({ size: 2, unit: "MB" }).saveTo("posts"),
-  }),
+  schema: updatePostSchema,
 };

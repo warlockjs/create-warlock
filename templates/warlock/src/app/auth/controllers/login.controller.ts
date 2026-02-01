@@ -1,6 +1,7 @@
 import { t, type RequestHandler, type Response } from "@warlock.js/core";
-import { loginSchema, type LoginRequest } from "../requests/login.request";
+import { type LoginRequest } from "../requests/login.request";
 import { loginService } from "../services/auth.service";
+import { loginSchema } from "../validation/login.schema";
 
 /**
  * Login controller

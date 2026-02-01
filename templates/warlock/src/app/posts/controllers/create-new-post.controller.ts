@@ -1,8 +1,10 @@
-import { type RequestHandler, v } from "@warlock.js/core";
+import { type RequestHandler } from "@warlock.js/core";
 import { Post } from "../models/post/post.model";
+import { type CreatePostRequest } from "../requests/create-post.request";
+import { createPostSchema } from "../validation/create-post.schema";
 
 export const createNewPostController: RequestHandler = async (
-  request,
+  request: CreatePostRequest,
   response,
 ) => {
   const post = await Post.create({
@@ -16,9 +18,5 @@ export const createNewPostController: RequestHandler = async (
 };
 
 createNewPostController.validation = {
-  schema: v.object({
-    title: v.string().required(),
-    description: v.string(),
-    image: v.file().image().maxSize({ size: 2, unit: "MB" }).saveTo("posts"),
-  }),
+  schema: createPostSchema,
 };

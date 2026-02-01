@@ -1,9 +1,7 @@
 import { t, type Response } from "@warlock.js/core";
-import {
-  resetPasswordSchema,
-  type ResetPasswordRequest,
-} from "../requests/reset-password.request";
+import { type ResetPasswordRequest } from "../requests/reset-password.request";
 import { resetPasswordService } from "../services/reset-password.service";
+import { resetPasswordSchema } from "../validation/reset-password.schema";
 
 /**
  * Reset password controller
