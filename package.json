@@ -1,6 +1,6 @@
 {
     "name": "create-warlock",
-    "version": "4.0.133",
+    "version": "4.0.134",
     "main": "./esm/index.js",
     "license": "MIT",
     "type": "module",
@@ -18,7 +18,7 @@
         "@clack/prompts": "^0.7.0",
         "@mongez/copper": "^1.0.1",
         "@mongez/fs": "^3.0.5",
-        "@mongez/reinforcements": "^2.3.10",
+        "@mongez/reinforcements": "^2.3.17",
         "cross-spawn": "^7.0.3",
         "rimraf": "^6.0.1",
         "which-pm-runs": "^1.1.0"
