@@ -10,7 +10,7 @@ import { logoutService } from "../services/auth.service";
  * Logout controller
  * POST /auth/logout
  */
-export const logout: RequestHandler = async (
+export const logoutController: RequestHandler = async (
   request: Request,
   response: Response,
 ) => {
@@ -21,4 +21,4 @@ export const logout: RequestHandler = async (
   });
 };
 
-logout.description = "User Logout";
+logoutController.description = "User Logout";

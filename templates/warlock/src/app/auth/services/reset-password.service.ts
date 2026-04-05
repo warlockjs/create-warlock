@@ -4,14 +4,20 @@ import { User } from "app/users/models/user";
 import { AuthErrorCode } from "../utils/auth-error-code";
 import { verifyOtpService } from "./otp.service";
 
+type ResetPasswordOptions = {
+  email: string;
+  code: string;
+  newPassword: string;
+};
+
 /**
  * Reset user password using OTP verification
  */
 export async function resetPasswordService(
-  email: string,
-  code: string,
-  newPassword: string,
+  options: ResetPasswordOptions,
 ): Promise<User> {
+  const { email, code, newPassword } = options;
+
   // Verify OTP
   const otp = await verifyOtpService(code, email, "password-reset");
 

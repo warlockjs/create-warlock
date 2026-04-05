@@ -10,7 +10,7 @@ import { logoutAllService } from "../services/auth.service";
  * Logout from all devices controller
  * POST /auth/logout-all
  */
-export const logoutAll: RequestHandler = async (
+export const logoutAllController: RequestHandler = async (
   request: Request,
   response: Response,
 ) => {
@@ -21,4 +21,4 @@ export const logoutAll: RequestHandler = async (
   });
 };
 
-logoutAll.description = "Logout from all devices";
+logoutAllController.description = "Logout from all devices";

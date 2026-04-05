@@ -8,7 +8,7 @@ import {
  * Get current user controller
  * GET /auth/me
  */
-export const me: RequestHandler = async (
+export const meController: RequestHandler = async (
   request: Request,
   response: Response,
 ) => {
@@ -17,4 +17,4 @@ export const me: RequestHandler = async (
   });
 };
 
-me.description = "Get Current User";
+meController.description = "Get Current User";

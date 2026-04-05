@@ -23,7 +23,7 @@ export type CreateOTPOptions = {
   target: string;
   channel: OTPChannel;
   type: OTPType;
-  userId?: number;
+  userId?: number | string;
   userType?: string;
   expiresIn?: Duration;
   length?: number;

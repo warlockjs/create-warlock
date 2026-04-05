@@ -1,22 +1,22 @@
 import { router } from "@warlock.js/core";
 import { guarded } from "app/shared/utils/router";
-import { forgotPassword } from "./controllers/forgot-password.controller";
-import { login } from "./controllers/login.controller";
-import { logoutAll } from "./controllers/logout-all.controller";
-import { logout } from "./controllers/logout.controller";
-import { me } from "./controllers/me.controller";
-import { refreshToken } from "./controllers/refresh-token.controller";
+import { forgotPasswordController } from "./controllers/forgot-password.controller";
+import { loginController } from "./controllers/login.controller";
+import { logoutAllController } from "./controllers/logout-all.controller";
+import { logoutController } from "./controllers/logout.controller";
+import { meController } from "./controllers/me.controller";
+import { refreshTokenController } from "./controllers/refresh-token.controller";
 import { resetPasswordController } from "./controllers/reset-password.controller";
 
 // Auth routes
 router.prefix("/auth", () => {
-  router.post("/login", login);
-  router.post("/refresh-token", refreshToken);
-  router.post("/forgot-password", forgotPassword);
+  router.post("/login", loginController);
+  router.post("/refresh-token", refreshTokenController);
+  router.post("/forgot-password", forgotPasswordController);
   router.post("/reset-password", resetPasswordController);
   guarded(() => {
-    router.post("/logout", logout);
-    router.post("/logout-all", logoutAll);
-    router.get("/me", me);
+    router.post("/logout", logoutController);
+    router.post("/logout-all", logoutAllController);
+    router.get("/me", meController);
   });
 });

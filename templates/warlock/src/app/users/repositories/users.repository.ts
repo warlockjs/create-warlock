@@ -2,21 +2,21 @@ import type { FilterRules, RepositoryOptions } from "@warlock.js/core";
 import { RepositoryManager } from "@warlock.js/core";
 import { User } from "../models/user";
 
-class UsersRepository extends RepositoryManager<User> {
+export type UserFilter = {
+  email?: string;
+  name?: string;
+  id?: string;
+};
+
+export type UsersListOptions = RepositoryOptions & UserFilter;
+
+class UsersRepository extends RepositoryManager<User, UserFilter> {
   public source = User;
 
-  public simpleSelectColumns: string[] = ["id", "name", "createdAt"];
-
   public filterBy: FilterRules = {
-    id: "int",
+    id: "=",
     name: "like",
     email: "=",
-  };
-
-  public defaultOptions: RepositoryOptions = {
-    orderBy: {
-      createdAt: "desc",
-    },
   };
 }
 

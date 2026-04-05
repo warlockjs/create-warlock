@@ -5,13 +5,12 @@ import {
 } from "@warlock.js/core";
 import { usersRepository } from "../repositories/users.repository";
 
-export const getUsersController: RequestHandler = async (
+export const listUsersController: RequestHandler = async (
   request: Request,
   response: Response,
 ) => {
   const users = await usersRepository.listCached({
     ...request.all(),
-    simpleSelect: true,
   });
 
   return response.success({
@@ -19,4 +18,4 @@ export const getUsersController: RequestHandler = async (
   });
 };
 
-getUsersController.description = "Get Users Controller";
+listUsersController.description = "List Users Controller";

@@ -1,5 +1,4 @@
 import {
-  t,
   v,
   type Request,
   type RequestHandler,
@@ -11,7 +10,7 @@ import { refreshTokensService } from "../services/auth.service";
  * Refresh token controller
  * POST /auth/refresh-token
  */
-export const refreshToken: RequestHandler = async (
+export const refreshTokenController: RequestHandler = async (
   request: Request,
   response: Response,
 ) => {
@@ -22,18 +21,12 @@ export const refreshToken: RequestHandler = async (
     ip: request.ip,
   });
 
-  if (!result) {
-    return response.unauthorized({
-      error: t("auth.invalidRefreshToken"),
-    });
-  }
-
   return response.success(result);
 };
 
-refreshToken.description = "Refresh Access Token";
+refreshTokenController.description = "Refresh Access Token";
 
-refreshToken.validation = {
+refreshTokenController.validation = {
   schema: v.object({
     refreshToken: v.string().required(),
   }),

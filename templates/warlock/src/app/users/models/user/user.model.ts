@@ -1,32 +1,14 @@
 import { Auth } from "@warlock.js/auth";
-import { hasMany, RegisterModel } from "@warlock.js/cascade";
-import {
-  defineResource,
-  uploadedFileMetadataSchema,
-  useHashedPassword,
-} from "@warlock.js/core";
+import { RegisterModel } from "@warlock.js/cascade";
+import { useHashedPassword } from "@warlock.js/core";
 import { type Infer, v } from "@warlock.js/seal";
-import { type Post } from "app/posts/models/post/post.model";
 import { globalColumnsSchema } from "app/shared/utils/global-columns-schema";
-
-const UserResource = defineResource({
-  schema: {
-    id: "number",
-    name: "string",
-    email: "string",
-    image: "storageUrl",
-    createdAt: "date",
-    updatedAt: "date",
-    isActive: "boolean",
-    type: () => "user",
-  },
-});
+import { UserResource } from "app/users/resources/user.resource";
 
 export const userSchema = globalColumnsSchema.extend({
-  name: v.string().required().trim(),
-  email: v.email().requiredIfEmpty("id").unique("User"),
+  name: v.string().required(),
+  email: v.email().requiredIfEmpty("id"),
   image: v.string(),
-  imageMetadata: uploadedFileMetadataSchema,
   password: v
     .string()
     .min(6)
@@ -47,12 +29,6 @@ export class User extends Auth<UserSchema> {
    * Model Schema
    */
   public static schema = userSchema;
-
-  public static relations = {
-    posts: hasMany("Post", { foreignKey: "authorId" }),
-  };
-
-  public posts?: Post[];
 
   /**
    * Embed fields when saving in another model

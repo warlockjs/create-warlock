@@ -1,5 +1,6 @@
-import type { Auth } from "@warlock.js/auth";
+import type { AccessTokenOutput, Auth } from "@warlock.js/auth";
 import { authService, type DeviceInfo, type TokenPair } from "@warlock.js/auth";
+import { t, UnAuthorizedError } from "@warlock.js/core";
 import { User } from "app/users/models/user/user.model";
 
 export type LoginCredentials = {
@@ -9,12 +10,13 @@ export type LoginCredentials = {
 
 export type LoginResult =
   | {
-      user: Auth;
+      user: User;
       tokens: TokenPair;
     }
+  | null
   | {
-      user: Auth;
-      accessToken: string;
+      user: User;
+      accessToken: AccessTokenOutput;
     };
 
 /**
@@ -23,8 +25,14 @@ export type LoginResult =
 export async function loginService(
   credentials: LoginCredentials,
   deviceInfo?: DeviceInfo,
-): Promise<LoginResult | null> {
-  return authService.login(User, credentials, deviceInfo);
+): Promise<LoginResult> {
+  const result = await authService.login(User, credentials, deviceInfo);
+
+  if (!result) {
+    throw new UnAuthorizedError(t("auth.invalidCredentials"));
+  }
+
+  return result;
 }
 
 /**
@@ -47,6 +55,12 @@ export async function logoutAllService(user: Auth): Promise<void> {
 export async function refreshTokensService(
   refreshToken: string,
   deviceInfo?: DeviceInfo,
-): Promise<TokenPair | null> {
-  return authService.refreshTokens(refreshToken, deviceInfo);
+): Promise<TokenPair> {
+  const result = await authService.refreshTokens(refreshToken, deviceInfo);
+
+  if (!result) {
+    throw new UnAuthorizedError(t("auth.invalidRefreshToken"));
+  }
+
+  return result;
 }
