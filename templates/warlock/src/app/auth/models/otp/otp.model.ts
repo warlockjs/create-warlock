@@ -1,8 +1,7 @@
 import { Model, RegisterModel } from "@warlock.js/cascade";
-import { type Infer, v } from "@warlock.js/seal";
-import { globalColumnsSchema } from "app/shared/utils/global-columns-schema";
+import { v, type Infer } from "@warlock.js/seal";
 
-const otpSchema = globalColumnsSchema.extend({
+const otpSchema = v.object({
   code: v.string().required(),
   type: v.string().required(),
   target: v.string().required(),
