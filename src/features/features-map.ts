@@ -12,16 +12,16 @@ export type FeatureConfig = {
   };
 };
 
-export const communicatorConfigStub = `import { CommunicatorsConfigurations } from "@warlock.js/herald";
+export const heraldConfigStub = `import { HeraldConfigurations } from "@warlock.js/herald";
 
-const communicatorsConfigurations: CommunicatorsConfigurations = {
+const heraldConfigurations: HeraldConfigurations = {
   host: process.env.RABBITMQ_HOST || "localhost",
   port: Number(process.env.RABBITMQ_PORT) || 5672,
   username: process.env.RABBITMQ_USER || "guest",
   password: process.env.RABBITMQ_PASSWORD || "guest",
 };
 
-export default communicatorsConfigurations;
+export default heraldConfigurations;
 `;
 
 export const featuresMap: Record<string, FeatureConfig> = {
@@ -89,8 +89,8 @@ export const featuresMap: Record<string, FeatureConfig> = {
       "@types/amqplib": "^0.10.0",
     },
     configStub: {
-      name: "communicator",
-      content: communicatorConfigStub,
+      name: "herald",
+      content: heraldConfigStub,
     },
   },
 };
