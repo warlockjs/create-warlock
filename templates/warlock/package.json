@@ -26,7 +26,7 @@
     "format": "npx prettier --write ./src/**/*.{js,jsx,ts,tsx,css,md,json} --config ./.prettierrc.json",
     "tsc": "npx tsc --noEmit",
     "prepare": "huskier-init && husky install",
-    "postinstall": "agent-kit sync",
+    "postinstall": "agent-kit sync || echo skills-sync-skipped",
     "skills:sync": "agent-kit sync",
     "skills:watch": "agent-kit watch",
     "lf": "find . -type d ( -name 'node_modules' -o -name '.git' ) -prune -o -type f -exec dos2unix {} ;"
