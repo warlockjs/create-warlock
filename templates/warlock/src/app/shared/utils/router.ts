@@ -14,7 +14,7 @@ export function guardedAdmin(callback: () => void) {
   router.group(
     {
       prefix: "/admin",
-      middleware: [authMiddleware()],
+      middleware: [authMiddleware([])],
     },
     callback,
   );

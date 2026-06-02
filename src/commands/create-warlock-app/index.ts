@@ -9,7 +9,7 @@ import { spinnerMessages } from "../../ui/spinners";
 
 export async function createWarlockApp(application: App) {
   const options = application.options;
-  const { useGit, useJWT, features, databaseDriver } = options;
+  const { useGit, useJWT, features, aiProviders, databaseDriver } = options;
 
   // Step 1: Initialize and copy template
   const templateSpinner = spinner();
@@ -20,28 +20,35 @@ export async function createWarlockApp(application: App) {
     .use("warlock")
     .updatePackageJson()
     .updateDotEnv()
-    .addDatabaseDriver(databaseDriver)
-    .addFeatures(features);
+    .configureDatabaseEnv(databaseDriver);
 
   templateSpinner.stop(spinnerMessages.templateCopied);
 
-  // Step 2: Install dependencies
+  // Step 2: Install base dependencies (so the `warlock` binary is available)
   const installSpinner = spinner();
   installSpinner.start(spinnerMessages.installingDeps);
 
-  const installProcess = application.install();
-  await installProcess.install;
+  await application.install().install;
 
   installSpinner.stop(spinnerMessages.depsInstalled);
 
-  // Step 3: Configure features (copy config stubs)
-  if (features.length > 0) {
-    const configSpinner = spinner();
-    configSpinner.start(spinnerMessages.configuringFeatures);
+  // Step 3: Add features via `warlock add --no-install`, then one batched install.
+  // The DB driver, optional features, and AI providers all go through the single
+  // source of truth (core's feature map) so versions never drift.
+  const selectedFeatures = [databaseDriver, ...features, ...aiProviders];
 
-    application.copyConfigStubs();
+  if (selectedFeatures.length > 0) {
+    const featuresSpinner = spinner();
+    featuresSpinner.start(spinnerMessages.addingFeatures);
 
-    configSpinner.stop(spinnerMessages.featuresConfigured);
+    const added = await application.installFeatures(selectedFeatures);
+
+    if (added) {
+      await application.install().install;
+      featuresSpinner.stop(spinnerMessages.featuresAdded);
+    } else {
+      featuresSpinner.stop(spinnerMessages.featuresFailed);
+    }
   }
 
   // Step 4: Initialize Git repository if requested
@@ -75,7 +82,7 @@ export async function createWarlockApp(application: App) {
   showSuccessScreen({
     projectName: application.name,
     database: databaseDriver === "mongodb" ? "MongoDB" : "PostgreSQL",
-    features: features,
+    features: [...features, ...aiProviders],
     packageManager: getPackageManager(),
   });
 }

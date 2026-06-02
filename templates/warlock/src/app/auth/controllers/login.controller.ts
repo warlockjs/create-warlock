@@ -1,15 +1,14 @@
-import { type RequestHandler, type Response } from "@warlock.js/core";
-import { type LoginRequest } from "../requests/login.request";
-import { loginSchema } from "../schema/login.schema";
+import { type Request, type RequestHandler } from "@warlock.js/core";
+import { type LoginSchema, loginSchema } from "../schema/login.schema";
 import { loginService } from "../services/auth.service";
 
 /**
  * Login controller
  * POST /auth/login
  */
-export const loginController: RequestHandler = async (
-  request: LoginRequest,
-  response: Response,
+export const loginController: RequestHandler<Request<LoginSchema>> = async (
+  request,
+  response,
 ) => {
   const result = await loginService(request.validated(), {
     userAgent: request.userAgent,

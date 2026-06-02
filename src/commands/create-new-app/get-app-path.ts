@@ -1,11 +1,11 @@
 import { colors } from "@mongez/copper";
-import { isDirectory } from "@mongez/fs";
+import { directoryExists } from "@warlock.js/fs";
 import * as path from "path";
 
 export default function getAppPath(appName: string) {
   const appPath: string = path.resolve(process.cwd(), appName);
 
-  if (isDirectory(appPath)) {
+  if (directoryExists(appPath)) {
     console.log(
       colors.redBright(
         `${process.cwd()} has an existing directory \`${colors.cyan(

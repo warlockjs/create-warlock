@@ -7,7 +7,7 @@ import {
   putFile,
   putJsonFile,
   renameFile,
-} from "@mongez/fs";
+} from "@warlock.js/fs";
 import path from "path";
 import { executeCommand } from "./exec";
 import { startCommand } from "./package-manager";
@@ -23,7 +23,7 @@ export async function initializeGitRepository(appPath: string) {
   await executeCommand(`git`, ["add", "."], appPath);
 
   // commit files
-  await executeCommand(`git`, ["commit", "-m", "Initial commit ⚡️"], appPath);
+  await executeCommand(`git`, ["commit", "-m", "Initial commit âš¡ï¸"], appPath);
 
   return true;
 }
@@ -80,7 +80,7 @@ export async function copyTemplateFiles(
 
 export async function allDone(appName: string) {
   outro(
-    "🌟 Awesome! Your project is ready to rock! " +
+    "ðŸŒŸ Awesome! Your project is ready to rock! " +
       "Run the following command to start development:",
   );
 
@@ -89,8 +89,8 @@ export async function allDone(appName: string) {
   console.log();
 
   console.log(
-    `💡 Pro tip: Install the ${colors.yellow(
+    `ðŸ’¡ Pro tip: Install the ${colors.yellow(
       "Generator Z",
-    )} extension in VSCode for helpful code snippets and productivity boosters! 🚀`,
+    )} extension in VSCode for helpful code snippets and productivity boosters! ðŸš€`,
   );
 }

@@ -699,6 +699,40 @@ groupedTranslations("validation", {
   },
 });
 
+// HTTP middleware error messages — surfaced by @warlock.js/core's built-in
+// middleware (rateLimit, concurrencyLimit, maxBodySize, idempotency, maintenance,
+// ipFilter). Keys are flat under the "http" group, mirroring the validation group.
+groupedTranslations("http", {
+  rateLimitExceeded: {
+    en: "Too many requests. Please slow down and try again shortly.",
+    ar: "عدد كبير من الطلبات. يرجى التمهل وإعادة المحاولة قريباً.",
+  },
+  concurrencyLimitReached: {
+    en: "This endpoint is busy. Please retry in a moment.",
+    ar: "هذه النقطة الطرفية مشغولة. يرجى إعادة المحاولة بعد قليل.",
+  },
+  bodyTooLarge: {
+    en: "Request body is too large.",
+    ar: "حجم الطلب كبير جداً.",
+  },
+  idempotencyKeyInvalid: {
+    en: "Idempotency-Key header is malformed.",
+    ar: "ترويسة Idempotency-Key غير صالحة.",
+  },
+  idempotencyKeyConflict: {
+    en: "Idempotency-Key was reused with a different request body.",
+    ar: "تم إعادة استخدام Idempotency-Key مع طلب مختلف.",
+  },
+  ipForbidden: {
+    en: "Access denied for your IP address.",
+    ar: "تم رفض الوصول من عنوان IP الخاص بك.",
+  },
+  maintenance: {
+    en: "Service is temporarily unavailable for maintenance.",
+    ar: "الخدمة غير متاحة مؤقتاً للصيانة.",
+  },
+});
+
 // Attributes translations
 groupedTranslations("attributes", {
   email: {

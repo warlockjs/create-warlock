@@ -1,4 +1,4 @@
-import { v, type Infer } from "@warlock.js/core";
+import { type Infer, v } from "@warlock.js/seal";
 
 export const updatePostSchema = v.object({
   title: v.string().required(),

@@ -1,10 +1,9 @@
-import { type RequestHandler } from "@warlock.js/core";
+import { type GuardedRequestHandler } from "app/auth/requests/guarded.request";
 import { Post } from "../models/post/post.model";
-import { type CreatePostRequest } from "../requests/create-post.request";
-import { createPostSchema } from "../validation/create-post.schema";
+import { type CreatePostSchema, createPostSchema } from "../schema/create-post.schema";
 
-export const createNewPostController: RequestHandler = async (
-  request: CreatePostRequest,
+export const createNewPostController: GuardedRequestHandler<CreatePostSchema> = async (
+  request,
   response,
 ) => {
   const post = await Post.create({
@@ -12,7 +11,7 @@ export const createNewPostController: RequestHandler = async (
     authorId: request.user.id,
   });
 
-  return response.success({
+  return response.successCreate({
     post,
   });
 };

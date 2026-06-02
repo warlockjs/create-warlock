@@ -7,17 +7,10 @@ import {
   putFile,
   putJsonFile,
   renameFile,
-} from "@mongez/fs";
+} from "@warlock.js/fs";
 import path from "path";
 import { AppOptions, Application } from "../commands/create-new-app/types";
-import {
-  getDatabaseDependency,
-  getDatabaseDriver,
-} from "../features/database-drivers";
-import {
-  getFeatureConfigStubs,
-  getFeatureDependencies,
-} from "../features/features-map";
+import { getDatabaseDriver } from "../features/database-drivers";
 import { executeCommand, runCommand } from "./exec";
 import { getPackageManager } from "./package-manager";
 import { Template, template } from "./paths";
@@ -87,93 +80,49 @@ export class App {
   }
 
   /**
-   * Add database driver dependency to package.json
+   * Wire DB_DRIVER and DB_PORT into .env.
+   *
+   * The driver's npm package is installed via `warlock add` (single source for
+   * versions), so this only touches environment configuration — not deps.
    */
-  public addDatabaseDriver(driverValue: string) {
-    const dependency = getDatabaseDependency(driverValue);
+  public configureDatabaseEnv(driverValue: string) {
     const driver = getDatabaseDriver(driverValue);
 
-    // Add dependency
-    const packageJson = this.package;
-    for (const [pkg, version] of Object.entries(dependency)) {
-      packageJson.content.dependencies[pkg] = version;
-    }
-    packageJson.save();
+    if (!driver) return this;
 
-    // Update .env with DB_DRIVER and DB_PORT
-    if (driver) {
-      let envContent = getFile(this.path + "/.env") as string;
+    let envContent = getFile(this.path + "/.env") as string;
+
+    envContent = envContent.replace(/DB_PORT=\d+/, `DB_PORT=${driver.defaultPort}`);
+
+    if (envContent.includes("DB_DRIVER=")) {
+      envContent = envContent.replace(/DB_DRIVER=\w*/, `DB_DRIVER=${driver.value}`);
+    } else {
       envContent = envContent.replace(
         /DB_PORT=\d+/,
-        `DB_PORT=${driver.defaultPort}`,
+        `DB_PORT=${driver.defaultPort}\nDB_DRIVER=${driver.value}`,
       );
-
-      // Add DB_DRIVER if not present, or update it
-      if (envContent.includes("DB_DRIVER=")) {
-        envContent = envContent.replace(
-          /DB_DRIVER=\w*/,
-          `DB_DRIVER=${driver.value}`,
-        );
-      } else {
-        // Add after DB_PORT line
-        envContent = envContent.replace(
-          /DB_PORT=\d+/,
-          `DB_PORT=${driver.defaultPort}\nDB_DRIVER=${driver.value}`,
-        );
-      }
-
-      putFile(this.path + "/.env", envContent);
     }
+
+    putFile(this.path + "/.env", envContent);
 
     return this;
   }
 
   /**
-   * Add selected features' dependencies to package.json
+   * Install the selected optional features by delegating to the project's own
+   * `warlock add`. `--no-install` records every dependency in package.json and
+   * ejects configs / scripts / setup hooks WITHOUT installing — the caller runs
+   * one batched install afterwards. Versions come from core's feature map, so
+   * the scaffolder never duplicates them.
+   *
+   * `--no-install` is passed LAST on purpose: the CLI parser treats the
+   * positional after a bare flag as that flag's value, so it must follow the
+   * feature list, not precede it.
    */
-  public addFeatures(features: string[]) {
-    if (features.length === 0) return this;
+  public async installFeatures(features: string[]) {
+    if (features.length === 0) return true;
 
-    const { dependencies, devDependencies } = getFeatureDependencies(features);
-    const packageJson = this.package;
-
-    // Merge dependencies
-    for (const [pkg, version] of Object.entries(dependencies)) {
-      packageJson.content.dependencies[pkg] = version;
-    }
-
-    // Merge devDependencies
-    for (const [pkg, version] of Object.entries(devDependencies)) {
-      packageJson.content.devDependencies[pkg] = version;
-    }
-
-    packageJson.save();
-
-    return this;
-  }
-
-  /**
-   * Copy config stubs for features that require them
-   */
-  public copyConfigStubs() {
-    const features = this.options.features || [];
-    const stubs = getFeatureConfigStubs(features);
-
-    for (const stub of stubs) {
-      const configPath = path.join(
-        this.path,
-        "src",
-        "config",
-        `${stub.name}.ts`,
-      );
-
-      // Only create if doesn't exist
-      if (!fileExists(configPath)) {
-        putFile(configPath, stub.content);
-      }
-    }
-
-    return this;
+    return this.exec(`npx warlock add ${features.join(" ")} --no-install`);
   }
 
   /**

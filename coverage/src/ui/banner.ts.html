@@ -1,0 +1,634 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for src/ui/banner.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/ui</a> banner.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>39/39</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>9/9</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>7/7</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>38/38</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line high'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a>
+<a name='L143'></a><a href='#L143'>143</a>
+<a name='L144'></a><a href='#L144'>144</a>
+<a name='L145'></a><a href='#L145'>145</a>
+<a name='L146'></a><a href='#L146'>146</a>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a>
+<a name='L157'></a><a href='#L157'>157</a>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a>
+<a name='L166'></a><a href='#L166'>166</a>
+<a name='L167'></a><a href='#L167'>167</a>
+<a name='L168'></a><a href='#L168'>168</a>
+<a name='L169'></a><a href='#L169'>169</a>
+<a name='L170'></a><a href='#L170'>170</a>
+<a name='L171'></a><a href='#L171'>171</a>
+<a name='L172'></a><a href='#L172'>172</a>
+<a name='L173'></a><a href='#L173'>173</a>
+<a name='L174'></a><a href='#L174'>174</a>
+<a name='L175'></a><a href='#L175'>175</a>
+<a name='L176'></a><a href='#L176'>176</a>
+<a name='L177'></a><a href='#L177'>177</a>
+<a name='L178'></a><a href='#L178'>178</a>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { colors } from "@mongez/copper";
+&nbsp;
+export const warlockTextAnsi = `
+\x1b[49m
+\x1b[49m   \x1b[38;2;252;238;36m██╗    ██╗ █████╗ ██████╗ ██╗      ██████╗  ██████╗██╗  ██╗   \x1b[38;2;252;238;36m     ██╗ ███████╗\x1b[m
+\x1b[49m   \x1b[38;2;250;235;34m██║    ██║██╔══██╗██╔══██╗██║     ██╔═══██╗██╔════╝██║ ██╔╝   \x1b[38;2;250;235;34m     ██║ ██╔════╝\x1b[m
+\x1b[49m   \x1b[38;2;248;233;32m██║ █╗ ██║███████║██████╔╝██║     ██║   ██║██║     █████╔╝    \x1b[38;2;248;233;32m     ██║ ███████╗\x1b[m
+\x1b[49m   \x1b[38;2;246;231;30m██║███╗██║██╔══██║██╔══██╗██║     ██║   ██║██║     ██╔═██╗    \x1b[38;2;246;231;30m██   ██║ ╚════██║\x1b[m
+\x1b[49m   \x1b[38;2;244;229;28m╚███╔███╔╝██║  ██║██║  ██║███████╗╚██████╔╝╚██████╗██║  ██╗   \x1b[38;2;244;229;28m╚█████╔╝ ███████║\x1b[m
+\x1b[49m   \x1b[38;2;242;227;26m ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝   \x1b[38;2;242;227;26m ╚════╝  ╚══════╝\x1b[m
+\x1b[49m
+`;
+&nbsp;
+export const warlockLogoAnsi = `\x1b[49m                                                \x1b[38;2;247;232;77;49m▄\x1b[38;2;235;228;105;49m▄\x1b[49m \x1b[m
+\x1b[49m                                       \x1b[38;2;247;241;62;49m▄\x1b[38;2;251;243;29;48;2;245;240;69m▄\x1b[38;2;224;224;112;48;2;246;238;52m▄\x1b[49m    \x1b[38;2;246;240;65;49m▄\x1b[38;2;252;238;32;48;2;250;237;68m▄\x1b[38;2;246;236;76;48;2;246;237;52m▄\x1b[49m  \x1b[m
+\x1b[49m                        \x1b[38;2;245;234;80;49m▄\x1b[38;2;246;238;58;49m▄\x1b[49m             \x1b[49;38;2;240;232;72m▀\x1b[49;38;2;237;237;100m▀\x1b[49m  \x1b[38;2;236;236;132;49m▄\x1b[38;2;253;244;30;48;2;255;235;78m▄\x1b[38;2;254;233;21;48;2;247;240;49m▄\x1b[38;2;249;206;52;48;2;253;234;25m▄\x1b[49;38;2;246;212;65m▀\x1b[49m   \x1b[m
+\x1b[49m                     \x1b[38;2;246;233;50;49m▄\x1b[38;2;250;235;26;48;2;237;228;118m▄\x1b[38;2;251;232;21;48;2;249;237;38m▄\x1b[38;2;249;231;20;48;2;251;234;21m▄\x1b[38;2;248;230;21;48;2;252;232;20m▄\x1b[38;2;248;230;21;48;2;248;233;25m▄\x1b[38;2;248;231;22;48;2;245;236;68m▄\x1b[38;2;247;233;32;49m▄\x1b[38;2;242;226;87;49m▄\x1b[49m          \x1b[38;2;227;227;99;49m▄\x1b[38;2;250;235;43;49m▄\x1b[38;2;253;235;28;48;2;244;233;69m▄\x1b[38;2;254;226;25;48;2;252;237;25m▄\x1b[38;2;253;199;25;48;2;253;229;24m▄\x1b[38;2;247;205;73;48;2;253;201;27m▄\x1b[49;38;2;235;206;88m▀\x1b[49m    \x1b[m
+\x1b[49m                 \x1b[38;2;239;226;86;49m▄\x1b[38;2;250;235;34;49m▄\x1b[38;2;252;234;19;48;2;243;231;71m▄\x1b[38;2;251;233;19;48;2;251;234;28m▄\x1b[38;2;250;233;19;48;2;251;233;20m▄\x1b[38;2;251;233;20;48;2;250;232;20m▄\x1b[38;2;253;235;25;48;2;251;231;20m▄\x1b[38;2;245;232;53;48;2;251;232;20m▄\x1b[38;2;245;228;57;48;2;250;232;22m▄\x1b[38;2;247;229;39;48;2;248;231;22m▄\x1b[38;2;247;232;22;48;2;248;229;21m▄\x1b[38;2;247;231;21;48;2;248;229;20m▄\x1b[38;2;247;230;20;48;2;247;230;22m▄\x1b[38;2;248;230;20;48;2;246;234;38m▄\x1b[38;2;250;232;28;48;2;239;230;123m▄\x1b[38;2;250;231;49;49m▄\x1b[38;2;235;216;78;49m▄\x1b[49m    \x1b[38;2;246;235;53;49m▄\x1b[38;2;251;236;23;48;2;244;232;75m▄\x1b[38;2;252;233;21;48;2;252;236;27m▄\x1b[38;2;253;227;26;48;2;253;233;23m▄\x1b[38;2;253;201;29;48;2;253;228;30m▄\x1b[38;2;253;199;27;48;2;253;201;26m▄\x1b[38;2;232;197;104;48;2;249;201;47m▄\x1b[49m      \x1b[m
+\x1b[49m              \x1b[38;2;247;232;50;49m▄\x1b[38;2;250;233;28;48;2;245;226;98m▄\x1b[38;2;252;232;20;48;2;249;234;40m▄\x1b[38;2;251;231;20;48;2;253;236;23m▄\x1b[38;2;251;232;20;48;2;252;233;19m▄\x1b[38;2;252;234;22;48;2;250;233;19m▄\x1b[38;2;250;235;38;48;2;251;233;20m▄\x1b[38;2;241;231;68;48;2;252;235;24m▄\x1b[49;38;2;249;234;47m▀\x1b[49;38;2;242;229;78m▀\x1b[49m   \x1b[49;38;2;247;229;54m▀\x1b[38;2;241;227;99;48;2;247;231;33m▄\x1b[38;2;248;233;50;48;2;247;232;22m▄\x1b[38;2;250;229;28;48;2;249;230;22m▄\x1b[38;2;254;226;26;48;2;253;224;23m▄\x1b[38;2;235;221;94;48;2;249;221;35m▄\x1b[49m  \x1b[38;2;243;237;61;49m▄\x1b[38;2;251;237;28;48;2;243;236;87m▄\x1b[38;2;251;234;20;48;2;250;236;36m▄\x1b[38;2;252;232;21;48;2;252;234;21m▄\x1b[38;2;251;225;23;48;2;251;232;21m▄\x1b[38;2;250;198;26;48;2;251;225;24m▄\x1b[38;2;253;197;26;48;2;251;199;27m▄\x1b[38;2;252;200;38;48;2;255;199;28m▄\x1b[49;38;2;245;202;65m▀\x1b[49m       \x1b[m
+\x1b[49m  \x1b[38;2;244;235;52;48;2;219;219;128m▄\x1b[38;2;247;234;53;49m▄\x1b[38;2;235;216;118;49m▄\x1b[49m      \x1b[38;2;246;236;50;49m▄\x1b[38;2;253;238;21;48;2;249;234;58m▄\x1b[38;2;251;234;20;48;2;250;236;33m▄\x1b[38;2;251;233;19;48;2;252;234;21m▄\x1b[38;2;252;233;21;48;2;251;232;19m▄\x1b[38;2;252;233;26;48;2;251;231;20m▄\x1b[38;2;249;233;43;48;2;253;233;21m▄\x1b[49;38;2;252;236;30m▀\x1b[49;38;2;246;236;57m▀\x1b[49m     \x1b[38;2;242;235;87;49m▄\x1b[49m    \x1b[49;38;2;246;229;106m▀\x1b[49;38;2;247;227;62m▀\x1b[49m   \x1b[49;38;2;248;237;47m▀\x1b[38;2;245;232;62;48;2;247;234;35m▄\x1b[38;2;253;231;26;48;2;252;234;23m▄\x1b[38;2;253;204;27;48;2;253;226;23m▄\x1b[38;2;252;199;34;48;2;252;200;26m▄\x1b[38;2;247;203;52;48;2;253;197;26m▄\x1b[49;38;2;251;199;35m▀\x1b[49;38;2;241;207;96m▀\x1b[49m   \x1b[38;2;246;238;65;49m▄\x1b[38;2;250;226;39;49m▄\x1b[38;2;238;221;59;49m▄\x1b[49m  \x1b[m
+\x1b[49m  \x1b[38;2;242;235;52;48;2;248;235;48m▄\x1b[38;2;251;234;24;48;2;251;234;23m▄\x1b[38;2;251;232;21;48;2;250;237;38m▄\x1b[38;2;248;233;20;48;2;244;236;69m▄\x1b[38;2;246;236;44;49m▄\x1b[38;2;243;238;64;49m▄\x1b[49m   \x1b[49;38;2;235;228;87m▀\x1b[49;38;2;247;231;40m▀\x1b[38;2;242;230;96;48;2;248;234;24m▄\x1b[38;2;239;226;78;48;2;252;235;23m▄\x1b[49;38;2;250;234;35m▀\x1b[49;38;2;239;233;98m▀\x1b[49m       \x1b[38;2;252;242;36;48;2;246;243;65m▄\x1b[38;2;252;240;31;48;2;251;245;46m▄\x1b[38;2;248;241;106;49m▄\x1b[49m       \x1b[38;2;241;241;85;49m▄\x1b[38;2;250;238;34;48;2;244;234;69m▄\x1b[38;2;246;216;49;48;2;253;234;31m▄\x1b[38;2;228;215;121;48;2;252;210;33m▄\x1b[49;38;2;248;205;53m▀\x1b[49m   \x1b[38;2;238;238;85;49m▄\x1b[38;2;243;233;63;49m▄\x1b[38;2;251;237;23;48;2;246;237;79m▄\x1b[38;2;253;234;22;48;2;247;234;52m▄\x1b[38;2;253;214;24;48;2;254;233;26m▄\x1b[38;2;249;210;44;48;2;252;212;31m▄\x1b[49m   \x1b[m
+\x1b[49m  \x1b[49;38;2;228;228;67m▀\x1b[38;2;250;235;32;48;2;252;237;25m▄\x1b[38;2;252;223;25;48;2;250;227;23m▄\x1b[38;2;250;213;27;48;2;248;230;19m▄\x1b[38;2;247;224;25;48;2;247;230;19m▄\x1b[38;2;247;229;19;48;2;246;233;20m▄\x1b[38;2;248;231;22;48;2;243;234;51m▄\x1b[38;2;247;233;22;48;2;236;227;76m▄\x1b[38;2;243;233;67;49m▄\x1b[49m            \x1b[38;2;250;238;38;48;2;240;235;82m▄\x1b[38;2;251;235;20;48;2;253;240;20m▄\x1b[38;2;252;232;22;48;2;253;235;23m▄\x1b[38;2;252;237;34;48;2;250;242;52m▄\x1b[49m       \x1b[49;38;2;242;234;57m▀\x1b[49;38;2;233;233;78m▀\x1b[49m   \x1b[38;2;244;233;98;49m▄\x1b[38;2;251;236;35;49m▄\x1b[38;2;252;236;22;48;2;243;232;72m▄\x1b[38;2;252;235;25;48;2;252;239;28m▄\x1b[38;2;251;233;21;48;2;250;234;20m▄\x1b[38;2;252;220;25;48;2;251;234;21m▄\x1b[38;2;251;203;25;48;2;253;229;23m▄\x1b[38;2;253;205;26;48;2;253;206;25m▄\x1b[38;2;248;209;53;48;2;250;211;51m▄\x1b[49m   \x1b[m
+\x1b[49m   \x1b[49;38;2;242;230;81m▀\x1b[49;38;2;249;218;33m▀\x1b[38;2;242;212;73;48;2;250;214;26m▄\x1b[38;2;248;210;32;48;2;251;212;26m▄\x1b[38;2;248;213;26;48;2;249;210;26m▄\x1b[38;2;251;214;26;48;2;248;228;27m▄\x1b[38;2;250;214;27;48;2;250;231;20m▄\x1b[38;2;248;226;24;48;2;248;232;19m▄\x1b[38;2;247;231;19;48;2;245;234;26m▄\x1b[38;2;247;232;20;48;2;240;230;78m▄\x1b[38;2;245;236;35;49m▄\x1b[38;2;241;234;86;49m▄\x1b[49m       \x1b[38;2;250;237;45;49m▄\x1b[38;2;251;234;20;48;2;251;237;25m▄\x1b[38;2;248;231;21;48;2;249;233;22m▄\x1b[38;2;247;230;20;48;2;248;231;21m▄\x1b[38;2;249;230;21;48;2;252;233;22m▄\x1b[38;2;252;238;35;48;2;249;239;60m▄\x1b[49m       \x1b[38;2;223;207;143;49m▄\x1b[38;2;248;232;43;49m▄\x1b[38;2;250;233;21;48;2;237;219;109m▄\x1b[38;2;251;232;20;48;2;249;232;44m▄\x1b[38;2;252;232;21;48;2;251;233;22m▄\x1b[38;2;252;230;21;48;2;252;233;20m▄\x1b[38;2;253;215;26;48;2;253;233;20m▄\x1b[38;2;253;200;29;48;2;253;228;27m▄\x1b[38;2;254;203;28;48;2;252;203;26m▄\x1b[38;2;249;207;48;48;2;252;203;26m▄\x1b[38;2;242;215;74;48;2;253;204;27m▄\x1b[49;38;2;249;209;50m▀\x1b[49;38;2;241;213;99m▀\x1b[49m   \x1b[m
+\x1b[49m       \x1b[49;38;2;243;213;61m▀\x1b[38;2;231;219;85;48;2;248;216;32m▄\x1b[38;2;245;214;58;48;2;250;215;26m▄\x1b[38;2;248;214;32;48;2;252;212;27m▄\x1b[38;2;250;215;26;48;2;249;217;27m▄\x1b[38;2;250;215;27;48;2;247;227;23m▄\x1b[38;2;247;220;28;48;2;246;231;20m▄\x1b[38;2;246;230;21;48;2;246;234;23m▄\x1b[38;2;251;235;24;48;2;247;237;45m▄\x1b[38;2;242;237;101;49m▄\x1b[49m    \x1b[38;2;248;239;63;49m▄\x1b[38;2;252;235;20;48;2;252;237;26m▄\x1b[48;2;249;232;20m \x1b[38;2;250;231;22;48;2;247;230;20m▄\x1b[38;2;248;232;34;48;2;247;230;21m▄\x1b[38;2;248;232;22;48;2;248;231;21m▄\x1b[38;2;249;233;21;48;2;253;235;25m▄\x1b[38;2;251;240;38;48;2;246;241;79m▄\x1b[49m     \x1b[38;2;252;237;26;48;2;244;236;59m▄\x1b[38;2;252;233;20;48;2;250;233;23m▄\x1b[48;2;251;232;20m \x1b[38;2;252;230;22;48;2;251;231;20m▄\x1b[38;2;253;214;24;48;2;251;231;20m▄\x1b[38;2;253;200;28;48;2;252;225;22m▄\x1b[38;2;250;203;41;48;2;252;203;26m▄\x1b[38;2;248;205;64;48;2;253;198;28m▄\x1b[49;38;2;249;202;46m▀\x1b[49;38;2;246;207;62m▀\x1b[49m       \x1b[m
+\x1b[49m          \x1b[49;38;2;245;216;88m▀\x1b[49;38;2;246;216;52m▀\x1b[38;2;242;216;78;48;2;248;216;31m▄\x1b[38;2;249;217;38;48;2;250;215;27m▄\x1b[38;2;250;222;30;48;2;247;227;26m▄\x1b[48;2;248;232;23m \x1b[38;2;252;237;28;48;2;251;241;41m▄\x1b[38;2;238;238;119;49m▄\x1b[49m  \x1b[38;2;243;235;85;49m▄\x1b[38;2;252;238;21;48;2;252;240;29m▄\x1b[38;2;252;234;23;48;2;251;234;22m▄\x1b[38;2;254;234;22;48;2;252;233;22m▄\x1b[38;2;248;227;59;48;2;251;232;38m▄\x1b[38;2;244;234;96;48;2;248;235;51m▄\x1b[38;2;251;238;32;48;2;249;235;24m▄\x1b[38;2;250;236;23;48;2;249;234;21m▄\x1b[38;2;252;234;22;48;2;253;236;25m▄\x1b[38;2;251;244;44;48;2;246;246;103m▄\x1b[49m   \x1b[38;2;251;240;33;48;2;238;232;81m▄\x1b[38;2;249;233;21;48;2;251;236;19m▄\x1b[38;2;253;227;24;48;2;252;231;21m▄\x1b[38;2;254;204;26;48;2;252;224;23m▄\x1b[38;2;248;206;55;48;2;253;206;27m▄\x1b[49;38;2;250;204;40m▀\x1b[49;38;2;246;207;60m▀\x1b[49m           \x1b[m
+\x1b[49m     \x1b[38;2;246;215;54;48;2;242;211;53m▄\x1b[38;2;253;217;20;48;2;248;216;35m▄\x1b[38;2;250;221;23;48;2;246;219;57m▄\x1b[38;2;245;232;39;49m▄\x1b[38;2;245;234;65;49m▄\x1b[49m   \x1b[38;2;243;219;121;48;2;250;221;50m▄\x1b[38;2;252;221;33;48;2;251;222;30m▄\x1b[38;2;250;228;31;48;2;248;231;26m▄\x1b[38;2;249;232;23;48;2;251;234;23m▄\x1b[38;2;253;238;29;48;2;249;242;63m▄\x1b[49m \x1b[38;2;235;235;112;49m▄\x1b[38;2;251;236;21;48;2;251;240;34m▄\x1b[38;2;250;232;23;48;2;251;234;21m▄\x1b[38;2;253;230;24;48;2;252;233;23m▄\x1b[38;2;250;222;52;48;2;251;227;36m▄\x1b[49m  \x1b[38;2;248;241;69;48;2;248;238;48m▄\x1b[38;2;251;239;28;48;2;250;238;25m▄\x1b[38;2;250;236;24;48;2;251;235;23m▄\x1b[38;2;252;234;23;48;2;252;238;26m▄\x1b[38;2;248;240;59;48;2;239;239;128m▄\x1b[49m \x1b[38;2;247;239;52;48;2;244;233;100m▄\x1b[38;2;249;234;20;48;2;252;238;23m▄\x1b[38;2;252;231;22;48;2;250;232;22m▄\x1b[38;2;253;207;25;48;2;253;216;26m▄\x1b[38;2;250;208;54;48;2;252;207;37m▄\x1b[49m   \x1b[38;2;241;227;71;49m▄\x1b[38;2;247;213;44;49m▄\x1b[38;2;253;208;29;48;2;237;211;88m▄\x1b[38;2;254;205;28;48;2;248;213;47m▄\x1b[49m       \x1b[m
+\x1b[49m     \x1b[38;2;245;230;60;48;2;242;224;49m▄\x1b[38;2;249;236;23;48;2;249;233;21m▄\x1b[38;2;252;235;26;48;2;250;231;20m▄\x1b[38;2;249;234;30;48;2;249;233;21m▄\x1b[38;2;254;236;27;48;2;252;236;25m▄\x1b[38;2;249;238;49;48;2;247;241;52m▄\x1b[49m   \x1b[38;2;245;216;64;48;2;250;222;59m▄\x1b[38;2;252;220;31;48;2;252;223;33m▄\x1b[38;2;249;229;27;48;2;248;231;24m▄\x1b[38;2;248;230;21;48;2;251;233;22m▄\x1b[38;2;248;235;29;48;2;242;235;85m▄\x1b[38;2;251;235;24;48;2;250;242;49m▄\x1b[38;2;250;231;23;48;2;250;233;22m▄\x1b[38;2;253;225;23;48;2;252;230;24m▄\x1b[38;2;250;215;49;48;2;253;222;28m▄\x1b[49;38;2;244;222;89m▀\x1b[49m   \x1b[38;2;247;234;63;48;2;248;238;46m▄\x1b[38;2;251;238;25;48;2;250;237;25m▄\x1b[38;2;250;233;22;48;2;250;234;21m▄\x1b[38;2;251;233;21;48;2;252;237;26m▄\x1b[38;2;244;232;62;49m▄\x1b[38;2;249;232;21;48;2;252;239;24m▄\x1b[38;2;250;231;22;48;2;249;231;22m▄\x1b[38;2;252;212;25;48;2;252;225;23m▄\x1b[38;2;251;209;55;48;2;253;204;27m▄\x1b[49;38;2;239;206;99m▀\x1b[49m   \x1b[38;2;250;237;49;48;2;250;242;50m▄\x1b[38;2;251;234;22;48;2;252;231;25m▄\x1b[38;2;253;227;27;48;2;253;212;26m▄\x1b[38;2;254;206;26;48;2;254;204;25m▄\x1b[49m       \x1b[m
+\x1b[49m        \x1b[38;2;253;239;29;48;2;238;230;84m▄\x1b[38;2;254;234;24;48;2;253;238;23m▄\x1b[38;2;253;209;29;48;2;254;233;26m▄\x1b[38;2;244;216;71;48;2;241;220;99m▄\x1b[49m   \x1b[38;2;247;217;53;48;2;250;218;44m▄\x1b[38;2;251;217;31;48;2;250;222;31m▄\x1b[38;2;247;228;24;48;2;245;229;20m▄\x1b[48;2;245;229;19m \x1b[38;2;246;229;19;48;2;247;229;20m▄\x1b[38;2;253;224;24;48;2;251;229;23m▄\x1b[38;2;249;211;52;48;2;253;213;27m▄\x1b[49;38;2;244;210;68m▀\x1b[49m     \x1b[38;2;249;234;57;48;2;249;237;39m▄\x1b[38;2;250;235;23;48;2;250;234;24m▄\x1b[38;2;247;231;19;48;2;247;230;19m▄\x1b[38;2;244;229;16;48;2;247;230;18m▄\x1b[38;2;246;229;18;48;2;246;230;19m▄\x1b[38;2;253;223;23;48;2;252;228;21m▄\x1b[38;2;253;206;37;48;2;253;208;26m▄\x1b[49;38;2;251;211;57m▀\x1b[49m    \x1b[38;2;250;239;47;48;2;250;239;50m▄\x1b[38;2;250;236;23;48;2;249;235;22m▄\x1b[38;2;254;231;28;48;2;254;229;26m▄\x1b[38;2;255;209;26;48;2;254;209;27m▄\x1b[49m       \x1b[m
+\x1b[49m      \x1b[38;2;245;239;70;49m▄\x1b[38;2;253;241;21;48;2;250;243;39m▄\x1b[38;2;251;208;32;48;2;254;237;23m▄\x1b[38;2;248;210;82;48;2;252;208;31m▄\x1b[49;38;2;245;213;78m▀\x1b[49m     \x1b[38;2;246;218;70;48;2;252;217;33m▄\x1b[38;2;250;220;29;48;2;248;225;27m▄\x1b[38;2;248;229;24;48;2;245;229;20m▄\x1b[38;2;253;223;23;48;2;251;228;21m▄\x1b[38;2;252;209;33;48;2;253;211;26m▄\x1b[49;38;2;242;208;64m▀\x1b[49m      \x1b[49;38;2;237;237;91m▀\x1b[38;2;246;235;64;48;2;251;237;29m▄\x1b[38;2;248;237;24;48;2;248;233;23m▄\x1b[38;2;247;233;21;48;2;245;231;18m▄\x1b[38;2;253;230;23;48;2;249;230;19m▄\x1b[38;2;253;206;30;48;2;253;209;24m▄\x1b[38;2;239;223;96;48;2;249;207;58m▄\x1b[49m     \x1b[38;2;247;239;50;48;2;247;239;47m▄\x1b[38;2;249;236;23;48;2;250;236;23m▄\x1b[48;2;254;230;27m \x1b[38;2;254;209;27;48;2;254;209;26m▄\x1b[49m       \x1b[m
+\x1b[49m    \x1b[38;2;235;235;78;49m▄\x1b[38;2;253;240;32;48;2;234;234;90m▄\x1b[38;2;249;224;34;48;2;253;242;25m▄\x1b[38;2;245;214;92;48;2;251;215;32m▄\x1b[49;38;2;240;209;85m▀\x1b[49m  \x1b[38;2;245;235;64;49m▄\x1b[38;2;253;239;32;48;2;239;231;112m▄\x1b[38;2;246;239;82;49m▄\x1b[49m  \x1b[49;38;2;246;219;73m▀\x1b[38;2;249;221;48;48;2;252;220;29m▄\x1b[38;2;254;222;27;48;2;253;228;27m▄\x1b[38;2;253;208;28;48;2;254;210;24m▄\x1b[38;2;237;219;73;48;2;244;208;63m▄\x1b[49m  \x1b[38;2;249;236;42;49m▄\x1b[38;2;250;234;23;49m▄\x1b[38;2;249;231;24;49m▄\x1b[38;2;248;228;34;49m▄\x1b[38;2;243;226;99;49m▄\x1b[49m \x1b[49;38;2;242;242;67m▀\x1b[38;2;248;238;57;48;2;252;238;26m▄\x1b[38;2;253;236;26;48;2;251;235;23m▄\x1b[38;2;253;213;26;48;2;253;227;24m▄\x1b[38;2;247;209;62;48;2;247;209;61m▄\x1b[49m      \x1b[38;2;247;239;49;48;2;247;239;47m▄\x1b[38;2;250;234;23;48;2;250;235;22m▄\x1b[38;2;254;228;28;48;2;254;230;28m▄\x1b[38;2;254;207;26;48;2;254;208;26m▄\x1b[49m       \x1b[m
+\x1b[49m   \x1b[38;2;246;237;59;49m▄\x1b[38;2;249;236;35;48;2;249;240;43m▄\x1b[49;38;2;249;233;39m▀\x1b[49;38;2;237;219;109m▀\x1b[49m \x1b[38;2;239;234;80;49m▄\x1b[38;2;251;241;38;49m▄\x1b[38;2;252;239;32;48;2;252;242;48m▄\x1b[38;2;249;237;37;48;2;253;239;24m▄\x1b[38;2;245;233;57;48;2;254;236;21m▄\x1b[38;2;237;237;128;48;2;251;239;47m▄\x1b[49m   \x1b[49;38;2;244;221;68m▀\x1b[38;2;252;216;33;48;2;254;216;24m▄\x1b[38;2;244;211;78;48;2;245;211;57m▄\x1b[49m  \x1b[38;2;250;238;31;48;2;250;239;49m▄\x1b[38;2;249;233;20;48;2;251;235;20m▄\x1b[38;2;246;232;19;48;2;249;232;19m▄\x1b[38;2;246;231;19;48;2;248;231;19m▄\x1b[38;2;251;232;21;48;2;251;230;20m▄\x1b[38;2;253;217;25;48;2;250;222;34m▄\x1b[38;2;243;225;103;49m▄\x1b[49m \x1b[49;38;2;238;230;85m▀\x1b[38;2;251;237;40;48;2;253;238;27m▄\x1b[38;2;237;219;83;48;2;250;212;43m▄\x1b[49m      \x1b[38;2;248;238;53;49m▄\x1b[38;2;252;234;34;48;2;250;237;49m▄\x1b[38;2;253;220;26;48;2;252;233;23m▄\x1b[38;2;252;202;28;48;2;253;225;29m▄\x1b[38;2;254;204;26;48;2;254;205;26m▄\x1b[49m       \x1b[m
+\x1b[49m  \x1b[38;2;240;229;56;48;2;247;232;62m▄\x1b[49;38;2;249;238;37m▀\x1b[49m   \x1b[49;38;2;231;231;110m▀\x1b[49;38;2;244;241;45m▀\x1b[49;38;2;239;239;63m▀\x1b[49m        \x1b[49;38;2;241;217;88m▀\x1b[49m   \x1b[38;2;249;236;52;48;2;249;237;33m▄\x1b[38;2;250;237;24;48;2;248;234;22m▄\x1b[38;2;250;234;21;48;2;246;233;19m▄\x1b[38;2;251;230;21;48;2;247;233;19m▄\x1b[38;2;253;210;26;48;2;252;230;22m▄\x1b[38;2;251;207;36;48;2;253;209;27m▄\x1b[49;38;2;243;219;95m▀\x1b[49m  \x1b[49;38;2;241;223;96m▀\x1b[49m   \x1b[38;2;242;233;67;49m▄\x1b[38;2;249;236;41;49m▄\x1b[38;2;253;237;23;48;2;245;232;63m▄\x1b[38;2;253;226;24;48;2;251;238;38m▄\x1b[38;2;251;201;26;48;2;252;234;23m▄\x1b[38;2;251;198;26;48;2;251;210;25m▄\x1b[38;2;253;202;29;48;2;251;199;25m▄\x1b[38;2;251;203;42;48;2;253;201;28m▄\x1b[38;2;229;211;123;48;2;253;203;32m▄\x1b[49m       \x1b[m
+\x1b[38;2;222;222;144;49m▄\x1b[38;2;229;220;123;48;2;234;225;98m▄\x1b[49;38;2;228;215;121m▀\x1b[49m         \x1b[38;2;248;236;46;49m▄\x1b[38;2;252;236;21;48;2;243;230;66m▄\x1b[38;2;251;233;20;48;2;249;234;38m▄\x1b[38;2;251;231;20;48;2;248;234;33m▄\x1b[38;2;248;231;20;48;2;244;229;67m▄\x1b[38;2;244;233;47;49m▄\x1b[38;2;236;236;70;49m▄\x1b[49m    \x1b[49;38;2;247;212;46m▀\x1b[49;38;2;250;209;30m▀\x1b[38;2;240;225;150;48;2;251;202;30m▄\x1b[49;38;2;252;203;36m▀\x1b[49;38;2;241;212;90m▀\x1b[49m   \x1b[38;2;235;235;98;49m▄\x1b[38;2;243;235;63;49m▄\x1b[38;2;251;238;25;48;2;237;228;73m▄\x1b[38;2;253;236;20;48;2;247;234;52m▄\x1b[38;2;254;230;22;48;2;252;238;23m▄\x1b[38;2;252;206;26;48;2;253;233;21m▄\x1b[38;2;253;198;28;48;2;252;217;25m▄\x1b[38;2;252;201;36;48;2;252;196;26m▄\x1b[38;2;240;205;70;48;2;252;199;28m▄\x1b[49;38;2;250;202;38m▀\x1b[49;38;2;241;213;88m▀\x1b[49m         \x1b[m
+\x1b[49;38;2;207;207;191m▀\x1b[49m    \x1b[38;2;236;232;82;49m▄\x1b[38;2;248;239;48;49m▄\x1b[49m     \x1b[49;38;2;244;231;69m▀\x1b[49;38;2;249;233;29m▀\x1b[38;2;244;228;69;48;2;248;234;23m▄\x1b[38;2;249;233;28;48;2;247;231;21m▄\x1b[38;2;247;232;25;48;2;247;230;20m▄\x1b[38;2;248;231;23;48;2;248;231;19m▄\x1b[38;2;249;232;23;48;2;247;233;20m▄\x1b[38;2;249;233;24;48;2;246;237;59m▄\x1b[38;2;248;237;29;48;2;242;242;77m▄\x1b[38;2;244;240;76;49m▄\x1b[49m      \x1b[38;2;241;234;99;49m▄\x1b[38;2;250;238;41;49m▄\x1b[38;2;253;237;26;48;2;242;232;79m▄\x1b[38;2;253;236;25;48;2;252;240;27m▄\x1b[38;2;254;233;24;48;2;254;236;20m▄\x1b[38;2;251;210;29;48;2;253;235;21m▄\x1b[38;2;251;197;28;48;2;253;225;23m▄\x1b[38;2;246;202;53;48;2;254;200;27m▄\x1b[49;38;2;253;199;32m▀\x1b[49;38;2;245;207;64m▀\x1b[49m             \x1b[m
+\x1b[49m    \x1b[49;38;2;231;219;97m▀\x1b[49;38;2;243;229;58m▀\x1b[49m         \x1b[49;38;2;237;237;91m▀\x1b[49;38;2;246;231;56m▀\x1b[38;2;246;238;68;48;2;246;233;22m▄\x1b[38;2;245;230;48;48;2;246;233;21m▄\x1b[38;2;247;235;23;48;2;247;232;19m▄\x1b[38;2;246;233;21;48;2;247;232;18m▄\x1b[38;2;247;232;20;48;2;248;232;18m▄\x1b[38;2;247;231;19;48;2;246;234;29m▄\x1b[38;2;247;232;20;48;2;240;230;80m▄\x1b[38;2;246;233;34;49m▄\x1b[38;2;245;231;52;49m▄\x1b[38;2;250;233;23;48;2;225;225;105m▄\x1b[38;2;252;233;19;48;2;248;234;46m▄\x1b[38;2;253;233;20;48;2;253;235;21m▄\x1b[38;2;254;232;21;48;2;253;234;20m▄\x1b[38;2;252;217;24;48;2;254;234;20m▄\x1b[38;2;253;202;35;48;2;254;230;23m▄\x1b[38;2;246;211;84;48;2;253;201;28m▄\x1b[49;38;2;250;203;46m▀\x1b[49;38;2;247;206;82m▀\x1b[49m                \x1b[m
+\x1b[49m                   \x1b[49;38;2;247;226;63m▀\x1b[49;38;2;247;232;36m▀\x1b[38;2;245;229;57;48;2;246;232;22m▄\x1b[38;2;247;230;31;48;2;248;232;21m▄\x1b[38;2;247;232;21;48;2;247;231;19m▄\x1b[38;2;247;233;19;48;2;246;231;18m▄\x1b[38;2;247;232;17;48;2;246;231;17m▄\x1b[38;2;251;232;19;48;2;249;232;17m▄\x1b[38;2;253;221;24;48;2;252;232;20m▄\x1b[38;2;249;207;48;48;2;253;229;22m▄\x1b[38;2;248;209;72;48;2;253;207;28m▄\x1b[49;38;2;245;202;59m▀\x1b[49;38;2;237;200;109m▀\x1b[49m                   \x1b[m
+\x1b[49m                      \x1b[49;38;2;242;230;89m▀\x1b[49;38;2;247;232;50m▀\x1b[38;2;244;227;72;48;2;249;233;28m▄\x1b[38;2;244;218;55;48;2;252;231;23m▄\x1b[49;38;2;250;215;37m▀\x1b[49;38;2;244;206;65m▀\x1b[49m                       \x1b[m
+`;
+&nbsp;
+/**
+ * Get the intro banner with ASCII art
+ */
+export function getIntroBanner(version: string): string {
+  const versionLine = `v${version}`;
+  const totalWidth = 38; // Total width inside the box
+  const padding = " ".repeat(totalWidth - 3 - versionLine.length); // 3 is for leading spaces "   "
+&nbsp;
+  return `
+  ${colors.magentaBright("╭──────────────────────────────────────╮")}
+  ${colors.magentaBright("│")}                                      ${colors.magentaBright("│")}
+  ${colors.magentaBright("│")}   🧙 ${colors.bold(colors.yellowBright("WARLOCK.JS"))}                      ${colors.magentaBright("│")}
+  ${colors.magentaBright("│")}   ${colors.cyan("The Magical Node.js Framework")}      ${colors.magentaBright("│")}
+  ${colors.magentaBright("│")}                                      ${colors.magentaBright("│")}
+  ${colors.magentaBright("│")}   ${colors.green(versionLine)}${padding}${colors.magentaBright("│")}
+  ${colors.magentaBright("│")}                                      ${colors.magentaBright("│")}
+  ${colors.magentaBright("╰──────────────────────────────────────╯")}
+`;
+}
+&nbsp;
+/**
+ * Display the intro banner
+ */
+export function showIntroBanner(version: string): void {
+  console.log(warlockLogoAnsi);
+  console.log(warlockTextAnsi);
+  console.log(getIntroBanner(version));
+}
+&nbsp;
+/**
+ * Get the success screen with project summary
+ */
+export function getSuccessScreen(options: {
+  projectName: string;
+  database: string;
+  features: string[];
+  packageManager: string;
+}): string {
+  const { projectName, database, features, packageManager } = options;
+&nbsp;
+  // Format features text
+  let featuresText = features.join(", ");
+  if (features.length === 0) {
+    featuresText = "none";
+  }
+&nbsp;
+  // Calculate dynamic width
+  const baseLabelLength = 10; // "Project: ".length
+  const padding = 6; // 3 spaces left, 3 spaces right padding for text inside box
+&nbsp;
+  const projectLineLen = projectName.length + baseLabelLength;
+  const dbLineLen = database.length + baseLabelLength;
+  const featuresLineLen = featuresText.length + baseLabelLength;
+&nbsp;
+  // Find the longest line to determine box width
+  // Ensure minimum width of 50 for aesthetics
+  const maxContentLength = Math.max(
+    projectLineLen,
+    dbLineLen,
+    featuresLineLen,
+    40,
+  );
+  const boxWidth = maxContentLength + padding + 2; // +2 for borders │
+&nbsp;
+  // Helper to generate borders
+  const createBorder = (start: string, end: string) =&gt;
+    colors.magentaBright(start + "─".repeat(boxWidth - 2) + end);
+&nbsp;
+  // Helper to pad content lines
+  const padLine = (label: string, value: string, isFeature = false) =&gt; {
+    const valueColor = (text: string) =&gt; {
+      if (isFeature &amp;&amp; text === "none") return colors.dim(text);
+      return colors.white(text);
+    };
+&nbsp;
+    const labelPart = colors.dim(label.padEnd(10)); // "Project:  "
+    const valuePart = valueColor(value);
+&nbsp;
+    // Calculate visible length for padding
+    const contentVisibleLength = 3 + 10 + value.length;
+    const remaining = boxWidth - 2 - contentVisibleLength; // -2 for borders
+&nbsp;
+    return (
+      colors.magentaBright("│") +
+      "   " +
+      labelPart +
+      valuePart +
+      " ".repeat(remaining) +
+      colors.magentaBright("│")
+    );
+  };
+&nbsp;
+  const emptyLine =
+    colors.magentaBright("│") +
+    " ".repeat(boxWidth - 2) +
+    colors.magentaBright("│");
+&nbsp;
+  const headerText = "🎉 YOUR PROJECT IS READY! 🎉";
+  const headerPadding = Math.floor((boxWidth - 2 - headerText.length) / 2);
+  const headerLine =
+    colors.magentaBright("│") +
+    " ".repeat(headerPadding) +
+    colors.bold(colors.green(headerText)) +
+    " ".repeat(boxWidth - 2 - headerPadding - headerText.length) +
+    colors.magentaBright("│");
+&nbsp;
+  const devCommand =
+    packageManager === "npm" ? "npm run dev" : `${packageManager} dev`;
+&nbsp;
+  return `
+  ${createBorder("╭", "╮")}
+  ${emptyLine}
+  ${headerLine}
+  ${emptyLine}
+  ${padLine("Project:", projectName)}
+  ${padLine("Database:", database)}
+  ${padLine("Features:", featuresText, true)}
+  ${emptyLine}
+  ${createBorder("╰", "╯")}
+&nbsp;
+  ${colors.bold(colors.cyan("🚀 Next steps:"))}
+&nbsp;
+     ${colors.cyan("cd")} ${projectName}
+     ${colors.cyan(devCommand)}
+&nbsp;
+  ${colors.dim("💡 Pro tip: Install the")} ${colors.yellow("Generator Z")} ${colors.dim("extension in VSCode")}
+     ${colors.dim("for helpful code snippets and productivity boosters!")}
+&nbsp;
+  ${colors.dim("📚 Docs:")} ${colors.cyan("https://warlock.js.org")}
+  ${colors.dim("⭐ Star us:")} ${colors.cyan("https://github.com/warlockjs/framework")}
+`;
+}
+&nbsp;
+/**
+ * Display the success screen
+ */
+export function showSuccessScreen(options: {
+  projectName: string;
+  database: string;
+  features: string[];
+  packageManager: string;
+}): void {
+  console.log(getSuccessScreen(options));
+}
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-06-01T23:44:36.581Z
+            </div>
+        <script src="../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
+    </body>
+</html>
+    

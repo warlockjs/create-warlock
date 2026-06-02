@@ -19,7 +19,5 @@ export class Post extends Model<PostSchema> {
 
   public static schema = postSchema;
 
-  public static relations = {};
-
   public static resource = PostResource;
 }

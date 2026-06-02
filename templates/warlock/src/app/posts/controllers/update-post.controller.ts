@@ -1,10 +1,9 @@
-import { type RequestHandler } from "@warlock.js/core";
+import { type GuardedRequestHandler } from "app/auth/requests/guarded.request";
 import { Post } from "../models/post/post.model";
-import { type UpdatePostRequest } from "../requests/update-post.request";
-import { updatePostSchema } from "../validation/update-post.schema";
+import { type UpdatePostSchema, updatePostSchema } from "../schema/update-post.schema";
 
-export const updatePostController: RequestHandler = async (
-  request: UpdatePostRequest,
+export const updatePostController: GuardedRequestHandler<UpdatePostSchema> = async (
+  request,
   response,
 ) => {
   const post = await Post.find(request.int("id"));

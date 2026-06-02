@@ -1,4 +1,4 @@
-import { fileExistsAsync } from "@mongez/fs";
+import { fileExistsAsync } from "@warlock.js/fs";
 import { CACHE_FOR } from "@warlock.js/cache";
 import { Image, type RequestHandler, storage, v } from "@warlock.js/core";
 

@@ -1,8 +1,8 @@
-import { type RequestHandler } from "@warlock.js/core";
+import { type GuardedRequestHandler } from "app/auth/requests/guarded.request";
 import { User } from "../models/user";
-import { createUserSchema } from "../validation/create-user.schema";
+import { type CreateUserSchema, createUserSchema } from "../schema/create-user.schema";
 
-export const createNewUserController: RequestHandler = async (
+export const createNewUserController: GuardedRequestHandler<CreateUserSchema> = async (
   request,
   response,
 ) => {
@@ -16,7 +16,7 @@ export const createNewUserController: RequestHandler = async (
     imageMetadata: await file.metadata(),
   });
 
-  return response.success({
+  return response.successCreate({
     message: "File uploaded successfully",
     user,
   });

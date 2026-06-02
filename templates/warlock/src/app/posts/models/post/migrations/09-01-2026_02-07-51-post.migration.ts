@@ -1,36 +1,23 @@
-import { Migration } from "@warlock.js/cascade";
+import {
+  bool,
+  integer,
+  json,
+  Migration,
+  string,
+  text,
+  timestamp,
+} from "@warlock.js/cascade";
 import { Post } from "../post.model";
 
-export default class PostsMigration extends Migration.for(Post) {
-  public up() {
-    // Create table
-    this.createTableIfNotExists();
-
-    // Primary key
-    this.id();
-
-    // Post fields
-    this.string("title", 255);
-    this.text("description");
-    this.string("slug", 255).unique();
-    this.string("image", 500).nullable();
-
-    // Status
-    this.boolean("isActive").default(true);
-
-    this.int("authorId").notNullable();
-
-    // Embedded user references (JSONB for PostgreSQL)
-    this.json("createdBy").nullable();
-    this.json("updatedBy").nullable();
-    this.json("deletedBy").nullable();
-
-    // Timestamps
-    this.timestamps();
-    this.timestamp("deletedAt").nullable();
-  }
-
-  public down() {
-    this.dropTableIfExists();
-  }
-}
+export default Migration.create(Post, {
+  title: string(255),
+  description: text(),
+  slug: string(255).unique(),
+  image: string(500).nullable(),
+  isActive: bool(),
+  authorId: integer().notNullable(),
+  createdBy: json().nullable(),
+  updatedBy: json().nullable(),
+  deletedBy: json().nullable(),
+  deletedAt: timestamp().nullable(),
+});

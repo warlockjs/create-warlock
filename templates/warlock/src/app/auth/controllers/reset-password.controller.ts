@@ -1,14 +1,13 @@
-import { t, type Response } from "@warlock.js/core";
-import { type ResetPasswordRequest } from "../requests/reset-password.request";
-import { resetPasswordSchema } from "../schema/reset-password.schema";
+import { t, type Request, type RequestHandler } from "@warlock.js/core";
+import { type ResetPasswordSchema, resetPasswordSchema } from "../schema/reset-password.schema";
 import { resetPasswordService } from "../services/reset-password.service";
 
 /**
  * Reset password controller
  */
-export const resetPasswordController = async (
-  request: ResetPasswordRequest,
-  response: Response,
+export const resetPasswordController: RequestHandler<Request<ResetPasswordSchema>> = async (
+  request,
+  response,
 ) => {
   await resetPasswordService(request.validated());
 
