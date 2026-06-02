@@ -1,4 +1,4 @@
-import { v, type Infer } from "@warlock.js/core";
+import { v, type Infer } from "@warlock.js/seal";
 
 export const resetPasswordSchema = v.object({
   email: v.string().email().required(),

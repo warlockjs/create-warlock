@@ -1,6 +1,7 @@
 import { fileExistsAsync } from "@warlock.js/fs";
 import { CACHE_FOR } from "@warlock.js/cache";
-import { Image, type RequestHandler, storage, v } from "@warlock.js/core";
+import { Image, type RequestHandler, storage } from "@warlock.js/core";
+import { v } from "@warlock.js/seal";
 
 export const fetchUploadedFileController: RequestHandler = async (
   request,
