@@ -6,7 +6,13 @@ export const updatePostController: GuardedRequestHandler<UpdatePostSchema> = asy
   request,
   response,
 ) => {
-  const post = await Post.find(request.int("id"));
+  const id = request.int("id");
+
+  if (!id) {
+    return response.notFound();
+  }
+
+  const post = await Post.find(id);
 
   if (!post) {
     return response.notFound();

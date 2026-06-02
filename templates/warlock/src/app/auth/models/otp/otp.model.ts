@@ -34,7 +34,7 @@ export class OTP extends Model<OTPSchema> {
    */
   public get isValid(): boolean {
     if (this.get("usedAt")) return false;
-    if (this.get("attempts") >= this.get("maxAttempts")) return false;
+    if ((this.get("attempts") ?? 0) >= (this.get("maxAttempts") ?? 0)) return false;
     if (new Date() > new Date(this.get("expiresAt"))) return false;
     return true;
   }
@@ -50,7 +50,7 @@ export class OTP extends Model<OTPSchema> {
    * Check if max attempts exceeded
    */
   public get isMaxAttemptsExceeded(): boolean {
-    return this.get("attempts") >= this.get("maxAttempts");
+    return (this.get("attempts") ?? 0) >= (this.get("maxAttempts") ?? 0);
   }
 
   /**
@@ -64,6 +64,6 @@ export class OTP extends Model<OTPSchema> {
    * Increment failed attempt
    */
   public async incrementAttempt(): Promise<this> {
-    return this.set("attempts", this.get("attempts") + 1).save();
+    return this.set("attempts", (this.get("attempts") ?? 0) + 1).save();
   }
 }

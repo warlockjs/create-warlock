@@ -1,8 +1,17 @@
-import type { Duration } from "@warlock.js/auth";
 import { ForbiddenError, t } from "@warlock.js/core";
 import { OTP } from "../models/otp";
 import { AuthErrorCode } from "../utils/auth-error-code";
 import type { OTPChannel, OTPType } from "../utils/types";
+
+/** Human-friendly duration parts, summed to milliseconds by `parseDurationToMs`. */
+type Duration = {
+  milliseconds?: number;
+  seconds?: number;
+  minutes?: number;
+  hours?: number;
+  days?: number;
+  weeks?: number;
+};
 
 // Default OTP expiration
 const DEFAULT_OTP_EXPIRATION: Duration = { minutes: 15 };
