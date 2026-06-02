@@ -16,14 +16,14 @@ import { Template, template } from "./paths";
 export async function initializeGitRepository(appPath: string) {
   // initialize git repository
   await executeCommand(`git`, ["init"], appPath);
-  // switching to `main` branch
+  // switching to`main`branch
   await executeCommand(`git`, ["checkout", "-b", "main"], appPath);
 
   // add files
   await executeCommand(`git`, ["add", "."], appPath);
 
   // commit files
-  await executeCommand(`git`, ["commit", "-m", "Initial commit âš¡ï¸"], appPath);
+  await executeCommand(`git`, ["commit", "-m", "Initial commit"], appPath);
 
   return true;
 }
@@ -80,7 +80,7 @@ export async function copyTemplateFiles(
 
 export async function allDone(appName: string) {
   outro(
-    "ðŸŒŸ Awesome! Your project is ready to rock! " +
+    "Awesome! Your project is ready to rock! " +
       "Run the following command to start development:",
   );
 
@@ -89,8 +89,8 @@ export async function allDone(appName: string) {
   console.log();
 
   console.log(
-    `ðŸ’¡ Pro tip: Install the ${colors.yellow(
+    `Pro tip: Install the ${colors.yellow(
       "Generator Z",
-    )} extension in VSCode for helpful code snippets and productivity boosters! ðŸš€`,
+    )} extension in VSCode for helpful code snippets and productivity boosters!`,
   );
 }

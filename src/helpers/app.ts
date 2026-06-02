@@ -13,7 +13,7 @@ import { AppOptions, Application } from "../commands/create-new-app/types";
 import { getDatabaseDriver } from "../features/database-drivers";
 import { executeCommand, runCommand } from "./exec";
 import { getPackageManager } from "./package-manager";
-import { Template, template } from "./paths";
+import { packageRoot, Template, template } from "./paths";
 
 export class App {
   /**
@@ -71,10 +71,30 @@ export class App {
   }
 
   public updatePackageJson() {
-    this.package
+    const pkg = this.package
       .replace("name", this.name.replaceAll("/", "-"))
-      .replaceAll("yarn", getPackageManager())
-      .save();
+      .replaceAll("yarn", getPackageManager());
+
+    // Pin every @warlock.js/* dependency to THIS create-warlock release version
+    // so a scaffolded project always matches the framework version it was created
+    // with. create-warlock and the framework ship in lockstep, so the scaffolder's
+    // own version is the single source of truth (the template's hardcoded versions
+    // are irrelevant — they get overwritten here).
+    const warlockVersion: string = getJsonFile(packageRoot("package.json")).version;
+    const content: any = pkg.content;
+
+    for (const field of ["dependencies", "devDependencies"] as const) {
+      const deps = content[field] as Record<string, string> | undefined;
+      if (!deps) continue;
+
+      for (const dependency of Object.keys(deps)) {
+        if (dependency.startsWith("@warlock.js/")) {
+          deps[dependency] = warlockVersion;
+        }
+      }
+    }
+
+    pkg.save();
 
     return this;
   }
