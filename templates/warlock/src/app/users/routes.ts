@@ -4,8 +4,5 @@ import { createNewUserController } from "./controllers/create-new-user.controlle
 import { listUsersController } from "./controllers/list-users.controller";
 
 guarded(() => {
-  router
-    .route("/users")
-    .list(listUsersController)
-    .post(createNewUserController);
+  router.route("/users").list(listUsersController).post(createNewUserController);
 });

@@ -1,11 +1,4 @@
-import {
-  bool,
-  integer,
-  json,
-  Migration,
-  string,
-  timestamp,
-} from "@warlock.js/cascade";
+import { bool, integer, json, Migration, string, timestamp } from "@warlock.js/cascade";
 import { OTP } from "../otp.model";
 
 export default Migration.create(

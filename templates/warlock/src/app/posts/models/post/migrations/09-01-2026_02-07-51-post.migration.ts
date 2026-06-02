@@ -1,12 +1,4 @@
-import {
-  bool,
-  integer,
-  json,
-  Migration,
-  string,
-  text,
-  timestamp,
-} from "@warlock.js/cascade";
+import { bool, integer, json, Migration, string, text, timestamp } from "@warlock.js/cascade";
 import { Post } from "../post.model";
 
 export default Migration.create(Post, {

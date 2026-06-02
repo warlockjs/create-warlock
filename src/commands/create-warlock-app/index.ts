@@ -20,7 +20,8 @@ export async function createWarlockApp(application: App) {
     .use("warlock")
     .updatePackageJson()
     .updateDotEnv()
-    .configureDatabaseEnv(databaseDriver);
+    .configureDatabaseEnv(databaseDriver)
+    .configureHomePage(features.includes("react"));
 
   templateSpinner.stop(spinnerMessages.templateCopied);
 

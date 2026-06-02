@@ -8,6 +8,7 @@ import {
   putJsonFile,
   renameFile,
 } from "@warlock.js/fs";
+import { unlinkSync } from "node:fs";
 import path from "path";
 import { AppOptions, Application } from "../commands/create-new-app/types";
 import { getDatabaseDriver } from "../features/database-drivers";
@@ -124,6 +125,34 @@ export class App {
     }
 
     putFile(this.path + "/.env", envContent);
+
+    return this;
+  }
+
+  /**
+   * Pick the home page implementation based on whether React was selected.
+   *
+   * The template ships BOTH a plain JSON controller (`home-page.controller.ts`)
+   * and a React-rendered page (`home-page.controller.tsx` + `HomePageComponent.tsx`).
+   * Exactly one survives the scaffold: React projects keep the `.tsx` page (its
+   * `react`/`react-dom` deps come from the `react` feature), every other project
+   * keeps the dependency-free JSON controller — so a fresh project never imports
+   * `react` unless it asked for it.
+   */
+  public configureHomePage(useReact: boolean) {
+    const controllers = this.path + "/src/app/shared/controllers";
+    const components = this.path + "/src/app/shared/components";
+
+    const remove = (file: string) => {
+      if (fileExists(file)) unlinkSync(file);
+    };
+
+    if (useReact) {
+      remove(controllers + "/home-page.controller.ts");
+    } else {
+      remove(controllers + "/home-page.controller.tsx");
+      remove(components + "/HomePageComponent.tsx");
+    }
 
     return this;
   }

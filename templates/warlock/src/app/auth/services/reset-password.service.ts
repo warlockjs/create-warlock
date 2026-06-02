@@ -13,9 +13,7 @@ type ResetPasswordOptions = {
 /**
  * Reset user password using OTP verification
  */
-export async function resetPasswordService(
-  options: ResetPasswordOptions,
-): Promise<User> {
+export async function resetPasswordService(options: ResetPasswordOptions): Promise<User> {
   const { email, code, newPassword } = options;
 
   // Verify OTP

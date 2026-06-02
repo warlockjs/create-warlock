@@ -20,8 +20,7 @@ const globalPrefix = () => {
     return cachePrefix;
   }
 
-  const domain =
-    request.originDomain || request.header("domain") || request.input("domain");
+  const domain = request.originDomain || request.header("domain") || request.input("domain");
 
   if (!domain) return cachePrefix;
 

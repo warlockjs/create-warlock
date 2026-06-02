@@ -1,8 +1,4 @@
-import {
-  type Request,
-  type RequestHandler,
-  type Response,
-} from "@warlock.js/core";
+import { type Request, type RequestHandler, type Response } from "@warlock.js/core";
 import { v } from "@warlock.js/seal";
 import { refreshTokensService } from "../services/auth.service";
 

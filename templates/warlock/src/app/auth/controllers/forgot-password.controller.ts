@@ -1,9 +1,4 @@
-import {
-  t,
-  type Request,
-  type RequestHandler,
-  type Response,
-} from "@warlock.js/core";
+import { t, type Request, type RequestHandler, type Response } from "@warlock.js/core";
 import { v } from "@warlock.js/seal";
 import { forgotPasswordService } from "../services/forgot-password.service";
 

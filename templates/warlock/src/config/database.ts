@@ -5,10 +5,7 @@ import type {
 } from "@warlock.js/cascade";
 import { env } from "@warlock.js/core";
 
-const databaseConfigurations: ConnectionOptions<
-  MongoDriverOptions,
-  MongoClientOptions
-> = {
+const databaseConfigurations: ConnectionOptions<MongoDriverOptions, MongoClientOptions> = {
   driver: env("DB_DRIVER", "mongodb"),
   name: "default",
   database: env("DB_NAME"),

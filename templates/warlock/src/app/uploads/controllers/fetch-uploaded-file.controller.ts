@@ -1,12 +1,9 @@
-import { fileExistsAsync } from "@warlock.js/fs";
 import { CACHE_FOR } from "@warlock.js/cache";
 import { Image, type RequestHandler, storage } from "@warlock.js/core";
+import { fileExistsAsync } from "@warlock.js/fs";
 import { v } from "@warlock.js/seal";
 
-export const fetchUploadedFileController: RequestHandler = async (
-  request,
-  response,
-) => {
+export const fetchUploadedFileController: RequestHandler = async (request, response) => {
   const absolutePath = storage.root(request.input("*"));
 
   const { w: width, h: height } = request.validated();

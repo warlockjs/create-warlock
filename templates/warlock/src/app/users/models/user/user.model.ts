@@ -9,11 +9,7 @@ export const userSchema = globalColumnsSchema.extend({
   name: v.string().required(),
   email: v.email().requiredIfEmpty("id"),
   image: v.string(),
-  password: v
-    .string()
-    .min(6)
-    .requiredIfEmpty("id")
-    .addTransformer(useHashedPassword()),
+  password: v.string().min(6).requiredIfEmpty("id").addTransformer(useHashedPassword()),
 });
 
 export type UserSchema = Infer<typeof userSchema>;
@@ -49,15 +45,15 @@ export class User extends Auth<UserSchema> {
 
   static {
     // Local scopes
-    this.addScope("active", query => {
+    this.addScope("active", (query) => {
       query.where("isActive", true);
     });
 
-    this.addScope("admins", query => {
+    this.addScope("admins", (query) => {
       query.where("role", "admin");
     });
 
-    this.addScope("verified", query => {
+    this.addScope("verified", (query) => {
       query.where("emailVerified", true);
     });
 
