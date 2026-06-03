@@ -108,19 +108,9 @@ export const features: FeatureOption[] = [
     group: "Realtime",
   },
 
-  // API Docs
-  {
-    key: "swagger",
-    label: "Swagger",
-    hint: "OpenAPI documentation for your routes",
-    group: "API Docs",
-  },
-  {
-    key: "postman",
-    label: "Postman",
-    hint: "Generate a Postman collection for your API",
-    group: "API Docs",
-  },
+  // API Docs (swagger / postman / openapi) — not shipped yet; they will arrive
+  // together in the unified @warlock.js/api-docs package. Re-add the selection
+  // once that package exists. (Removed so the wizard can't offer unbuilt features.)
 
   // Tooling
   {

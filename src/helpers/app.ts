@@ -101,15 +101,31 @@ export class App {
   }
 
   /**
-   * Wire DB_DRIVER and DB_PORT into .env.
+   * Configure the chosen database driver: wire `DB_DRIVER` / `DB_PORT` into
+   * `.env`, AND pin the driver's npm package (`mongodb` / `pg`) into the
+   * project's `package.json` dependencies.
    *
-   * The driver's npm package is installed via `warlock add` (single source for
-   * versions), so this only touches environment configuration — not deps.
+   * The dependency is written HERE — before the base `yarn install` — so the
+   * driver is pulled deterministically by the very first install. We do NOT
+   * rely on the post-copy `warlock add <driver> --no-install` + separate
+   * batched install, which can be skipped or fail and leave the driver
+   * missing (the "mongodb package is not installed" runtime error).
    */
   public configureDatabaseEnv(driverValue: string) {
     const driver = getDatabaseDriver(driverValue);
 
     if (!driver) return this;
+
+    // Pin the driver package into dependencies (idempotent — never downgrade).
+    const packageJsonPath = path.resolve(this.path, "package.json");
+    const packageJson = getJsonFile(packageJsonPath) as {
+      dependencies?: Record<string, string>;
+    };
+    packageJson.dependencies = packageJson.dependencies ?? {};
+    if (!packageJson.dependencies[driver.package]) {
+      packageJson.dependencies[driver.package] = driver.packageVersion;
+      putJsonFile(packageJsonPath, packageJson);
+    }
 
     let envContent = getFile(this.path + "/.env") as string;
 
