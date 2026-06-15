@@ -14,6 +14,7 @@
  */
 
 export type FeatureGroup =
+  | "Auth & Access"
   | "Rendering & Mail"
   | "Media"
   | "Storage & Cache"
@@ -37,6 +38,14 @@ export type FeatureOption = {
  * NOT here — they have dedicated prompts.
  */
 export const features: FeatureOption[] = [
+  // Auth & Access
+  {
+    key: "access",
+    label: "Access (authorization)",
+    hint: "RBAC permission checks, ABAC policies, and roles — pairs with auth",
+    group: "Auth & Access",
+  },
+
   // Rendering & Mail
   {
     key: "react",
@@ -97,6 +106,12 @@ export const features: FeatureOption[] = [
     key: "herald",
     label: "Herald (RabbitMQ)",
     hint: "Message broker for event-driven architecture",
+    group: "Jobs & Messaging",
+  },
+  {
+    key: "notifications",
+    label: "Notifications",
+    hint: "Multi-channel notifications — mail + in-app database, preferences, idempotency",
     group: "Jobs & Messaging",
   },
 
