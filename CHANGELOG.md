@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## 4.2.7
+
+### Fixed
+
+- The published package now ships its `templates/` folder, so scaffolding a new project works from the installed package — it was missing from the build, which made the wizard fail with "Something went wrong" at the template-copy step. The rest of the family is re-published at 4.2.7 to keep the lockstep version line; no other functional changes.
+
 ## 4.2.6
 
 ### Fixed
