@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## 4.2.10
+
+### Changed
+
+- The project template now pins the latest `@mongez/*` versions — `@mongez/reinforcements@^3.2.0` and `@mongez/agent-kit@^1.2.0` — so freshly scaffolded apps start on current dependencies. (`@warlock.js/*` versions in the template are still rewritten to the scaffolder's own version at install time.)
+
 ## 4.2.7
 
 ### Fixed
