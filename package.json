@@ -1,6 +1,6 @@
 {
   "name": "create-warlock",
-  "version": "4.2.10",
+  "version": "4.2.11",
   "description": "Project scaffolder for the Warlock.js framework — interactive wizard and non-interactive CLI for creating new apps.",
   "main": "./esm/index.js",
   "license": "MIT",
@@ -25,7 +25,7 @@
     "@clack/prompts": "^0.7.0",
     "@mongez/copper": "^2.1.2",
     "@warlock.js/fs": "*",
-    "@mongez/reinforcements": "^3.2.0",
+    "@mongez/reinforcements": "^3.3.0",
     "cross-spawn": "^7.0.3",
     "rimraf": "^6.0.1",
     "which-pm-runs": "^1.1.0"

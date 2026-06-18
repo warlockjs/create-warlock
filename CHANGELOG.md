@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## 4.2.11
+
+### Changed
+
+- Bumped `@mongez/reinforcements` to 3.3.0 (package dependency + project template)
+
 ## 4.2.10
 
 ### Changed

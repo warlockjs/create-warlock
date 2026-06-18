@@ -32,7 +32,7 @@
     "lf": "find . -type d ( -name 'node_modules' -o -name '.git' ) -prune -o -type f -exec dos2unix {} ;"
   },
   "dependencies": {
-    "@mongez/reinforcements": "^3.2.0",
+    "@mongez/reinforcements": "^3.3.0",
     "@mongez/localization": "^3.4.6",
     "@mongez/supportive-is": "^2.1.3",
     "@warlock.js/auth": "4.0.119",
