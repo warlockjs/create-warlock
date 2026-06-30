@@ -372,7 +372,7 @@ describe("createNonInteractive (--yes)", () => {
       name: "flagged-app",
       db: "postgres",
       features: ["test", "herald"],
-      ai: ["openai", "anthropic"],
+      ai: ["ai-openai", "ai-anthropic"],
       pm: "pnpm",
       git: true,
       jwt: true,
@@ -386,7 +386,7 @@ describe("createNonInteractive (--yes)", () => {
     expect(app.options.databaseDriver).toBe("postgres");
     expect(app.options.databasePort).toBe(5432);
     expect(app.options.features).toEqual(["test", "herald"]);
-    expect(app.options.aiProviders).toEqual(["openai", "anthropic"]);
+    expect(app.options.aiProviders).toEqual(["ai-openai", "ai-anthropic"]);
     expect(app.options.useGit).toBe(true);
     expect(app.options.useJWT).toBe(true);
     expect(setPackageManager).toHaveBeenCalledWith("pnpm");
@@ -454,12 +454,21 @@ describe("createNonInteractive (--yes)", () => {
     expect(createWarlockApp).not.toHaveBeenCalled();
   });
 
-  it("accepts the full known feature + provider set without complaint", async () => {
+  it("accepts the full known feature + provider + package set without complaint", async () => {
     await createNewApp({
       yes: true,
       name: "app",
-      features: ["react", "test", "redis", "swagger"],
-      ai: ["openai", "google", "anthropic", "bedrock", "ollama"],
+      features: ["react", "test", "redis"],
+      ai: [
+        "ai-openai",
+        "ai-google",
+        "ai-anthropic",
+        "ai-bedrock",
+        "ai-ollama",
+        "ai-tools",
+        "ai-panoptic",
+        "ai-workspace",
+      ],
     });
 
     expect(cancel).not.toHaveBeenCalled();

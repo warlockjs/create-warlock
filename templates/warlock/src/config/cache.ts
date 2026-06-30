@@ -30,7 +30,7 @@ const globalPrefix = () => {
 };
 
 const cacheConfigurations: CacheConfigurations<"database"> = {
-  default: "memoryExtended",
+  default: "redis",
   drivers: {
     file: FileCacheDriver,
     memory: MemoryCacheDriver,

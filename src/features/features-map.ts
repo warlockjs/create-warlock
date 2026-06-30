@@ -34,8 +34,8 @@ export type FeatureOption = {
 
 /**
  * Optional features offered in the general multiselect step. The database
- * driver (its own select) and AI providers (their own step) are intentionally
- * NOT here — they have dedicated prompts.
+ * driver (its own select) and AI providers + capability packages (their own
+ * step) are intentionally NOT here — they have dedicated prompts.
  */
 export const features: FeatureOption[] = [
   // Auth & Access
@@ -137,7 +137,7 @@ export const features: FeatureOption[] = [
 ];
 
 export type AiProviderOption = {
-  /** Must match a provider key in core's `add` feature map. */
+  /** Must match a provider/package key in core's `add` feature map. */
   key: string;
   label: string;
   hint: string;
@@ -147,13 +147,40 @@ export type AiProviderOption = {
  * AI providers offered in the dedicated AI step. Selecting any of these pulls
  * the core `@warlock.js/ai` package automatically via the provider's `requires`
  * in core's feature map — the scaffolder never lists `ai` as a standalone pick.
+ *
+ * Keys are `ai-`prefixed to mirror core's renamed provider feature keys
+ * (`ai-openai` → `@warlock.js/ai-openai`, etc.).
  */
 export const aiProviders: AiProviderOption[] = [
-  { key: "openai", label: "OpenAI", hint: "GPT models via the OpenAI API" },
-  { key: "google", label: "Google (Gemini)", hint: "Gemini models via Google AI" },
-  { key: "anthropic", label: "Anthropic (Claude)", hint: "Claude models via the Anthropic API" },
-  { key: "bedrock", label: "AWS Bedrock", hint: "Foundation models via Amazon Bedrock" },
-  { key: "ollama", label: "Ollama", hint: "Local models via Ollama" },
+  { key: "ai-openai", label: "OpenAI", hint: "GPT models via the OpenAI API" },
+  { key: "ai-google", label: "Google (Gemini)", hint: "Gemini models via Google AI" },
+  { key: "ai-anthropic", label: "Anthropic (Claude)", hint: "Claude models via the Anthropic API" },
+  { key: "ai-bedrock", label: "AWS Bedrock", hint: "Foundation models via Amazon Bedrock" },
+  { key: "ai-ollama", label: "Ollama", hint: "Local models via Ollama" },
+];
+
+/**
+ * AI capability packages offered alongside the providers in the dedicated AI
+ * step. These are the satellite packages that sit on top of the core
+ * `@warlock.js/ai` toolkit (each pulls the core `ai` package via its `requires`
+ * in core's feature map, same as the providers).
+ */
+export const aiPackages: AiProviderOption[] = [
+  {
+    key: "ai-tools",
+    label: "AI Tools",
+    hint: "Ready-made agent tools (web search, fetch, HTTP, calculator, date-time) + MCP client/server",
+  },
+  {
+    key: "ai-panoptic",
+    label: "AI Observability (Panoptic)",
+    hint: "Tracing + exporters + a zero-setup local dashboard",
+  },
+  {
+    key: "ai-workspace",
+    label: "AI Workspace",
+    hint: "Policy-jailed filesystem + shell for coding agents",
+  },
 ];
 
 /**
@@ -187,9 +214,26 @@ export function getAiProviderOptions() {
 }
 
 /**
- * Every selectable key the scaffolder knows about (features + AI providers).
- * Used to validate `--features` / `--ai` flags in non-interactive mode.
+ * AI capability package options for the dedicated AI multiselect step. Offered
+ * together with the providers (see `getAiProviderOptions`).
+ */
+export function getAiPackageOptions() {
+  return aiPackages.map(pkg => ({
+    value: pkg.key,
+    label: pkg.label,
+    hint: pkg.hint,
+  }));
+}
+
+/**
+ * Every selectable key the scaffolder knows about (features + AI providers +
+ * AI capability packages). Used to validate `--features` / `--ai` flags in
+ * non-interactive mode.
  */
 export function getAllFeatureKeys(): string[] {
-  return [...features.map(feature => feature.key), ...aiProviders.map(provider => provider.key)];
+  return [
+    ...features.map(feature => feature.key),
+    ...aiProviders.map(provider => provider.key),
+    ...aiPackages.map(pkg => pkg.key),
+  ];
 }

@@ -76,6 +76,9 @@ function makeFakeApp(
     configureDatabaseEnv: vi.fn(function (this: unknown) {
       return this;
     }),
+    configureHomePage: vi.fn(function (this: unknown) {
+      return this;
+    }),
     install: vi.fn(() => ({
       abort: vi.fn(),
       install: Promise.resolve(true),

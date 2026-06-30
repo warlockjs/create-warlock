@@ -13,6 +13,7 @@ import {
   getDatabaseDriverOptions,
 } from "../../features/database-drivers";
 import {
+  getAiPackageOptions,
   getAiProviderOptions,
   getAllFeatureKeys,
   getDefaultFeatureKeys,
@@ -117,10 +118,14 @@ export default async function createNewApp(cli: CliFlags = {}) {
     process.exit(0);
   }
 
-  // Step 4b: AI providers  selecting any pulls @warlock.js/ai automatically
+  // Step 4b: AI providers + capability packages — selecting any pulls
+  // @warlock.js/ai automatically. The result still flows through the
+  // `selectedAiProviders` → `aiProviders` pipeline, which now also carries the
+  // capability packages (ai-tools / ai-panoptic / ai-workspace).
   const selectedAiProviders = await multiselect({
-    message: "Add AI providers? The core AI package is included automatically",
-    options: getAiProviderOptions(),
+    message:
+      "Add AI packages? Providers + capabilities — the core AI package is included automatically",
+    options: [...getAiProviderOptions(), ...getAiPackageOptions()],
     required: false,
   });
 
@@ -197,7 +202,7 @@ async function createNonInteractive(cli: CliFlags) {
   const driver = getDatabaseDriver(databaseDriver);
 
   if (!driver) {
-    cancel(`Unknown database driver"${databaseDriver}"`);
+    cancel(`Unknown database driver "${databaseDriver}"`);
     process.exit(1);
   }
 

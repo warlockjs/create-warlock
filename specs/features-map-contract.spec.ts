@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  aiPackages,
   aiProviders,
   features,
   getAllFeatureKeys,
@@ -21,6 +22,7 @@ import { databaseDrivers } from "../src/features/database-drivers";
  */
 
 const ALLOWED_GROUPS = new Set([
+  "Auth & Access",
   "Rendering & Mail",
   "Media",
   "Storage & Cache",
@@ -55,27 +57,50 @@ describe("features array shape", () => {
   });
 });
 
-describe("aiProviders array shape", () => {
-  it("gives every provider a non-empty key, label and hint", () => {
-    for (const provider of aiProviders) {
-      expect(provider.key).toBeTruthy();
-      expect(provider.label).toBeTruthy();
-      expect(provider.hint).toBeTruthy();
+describe("aiProviders + aiPackages array shape", () => {
+  const aiOptions = [...aiProviders, ...aiPackages];
+
+  it("gives every provider/package a non-empty key, label and hint", () => {
+    for (const option of aiOptions) {
+      expect(option.key).toBeTruthy();
+      expect(option.label).toBeTruthy();
+      expect(option.hint).toBeTruthy();
     }
   });
 
-  it("has no duplicate provider keys", () => {
-    const keys = aiProviders.map((provider) => provider.key);
+  it("has no duplicate keys across providers and packages", () => {
+    const keys = aiOptions.map((option) => option.key);
 
     expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  it("ai-prefixes every provider and package key", () => {
+    for (const option of aiOptions) {
+      expect(option.key.startsWith("ai-")).toBe(true);
+    }
+  });
+
+  it("no longer exposes the old bare provider keys", () => {
+    const allKeys = new Set(getAllFeatureKeys());
+    const retired = ["openai", "google", "anthropic", "bedrock", "ollama"];
+
+    for (const key of retired) {
+      expect(allKeys.has(key)).toBe(false);
+    }
+  });
+
+  it("offers the three AI capability satellite packages", () => {
+    const packageKeys = aiPackages.map((pkg) => pkg.key);
+
+    expect(packageKeys).toEqual(["ai-tools", "ai-panoptic", "ai-workspace"]);
   });
 });
 
 describe("cross-list contract invariants (scaffolder side)", () => {
-  it("never lets a feature key collide with an AI provider key", () => {
+  it("never lets a feature key collide with an AI provider/package key", () => {
     const featureKeys = new Set(features.map((feature) => feature.key));
-    const collisions = aiProviders
-      .map((provider) => provider.key)
+    const collisions = [...aiProviders, ...aiPackages]
+      .map((option) => option.key)
       .filter((key) => featureKeys.has(key));
 
     expect(collisions).toEqual([]);
@@ -101,11 +126,12 @@ describe("cross-list contract invariants (scaffolder side)", () => {
     }
   });
 
-  it("exposes the union of feature + provider keys with no duplicates", () => {
+  it("exposes the union of feature + provider + package keys with no duplicates", () => {
     const all = getAllFeatureKeys();
     const expected = [
       ...features.map((feature) => feature.key),
       ...aiProviders.map((provider) => provider.key),
+      ...aiPackages.map((pkg) => pkg.key),
     ];
 
     expect(all).toEqual(expected);

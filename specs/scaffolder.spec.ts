@@ -11,6 +11,7 @@ import {
   getDatabaseDriverOptions,
 } from "../src/features/database-drivers";
 import {
+  getAiPackageOptions,
   getAiProviderOptions,
   getAllFeatureKeys,
   getDefaultFeatureKeys,
@@ -211,20 +212,22 @@ describe("features map", () => {
     expect(options).not.toContain("postgres");
   });
 
-  it("includes every feature and ai provider key in the allow-list used to validate flags", () => {
+  it("includes every feature and ai provider/package key in the allow-list used to validate flags", () => {
     const keys = getAllFeatureKeys();
 
     expect(keys).toContain("test");
-    expect(keys).toContain("openai");
-    expect(keys).toContain("anthropic");
+    expect(keys).toContain("ai-openai");
+    expect(keys).toContain("ai-anthropic");
+    expect(keys).toContain("ai-tools");
   });
 
-  it("merges feature keys and ai provider keys with no duplicates", () => {
+  it("merges feature keys and ai provider/package keys with no duplicates", () => {
     const featureValues = getFeatureOptions().map((option) => option.value);
     const aiValues = getAiProviderOptions().map((option) => option.value);
+    const aiPackageValues = getAiPackageOptions().map((option) => option.value);
     const allKeys = getAllFeatureKeys();
 
-    expect(allKeys).toEqual([...featureValues, ...aiValues]);
+    expect(allKeys).toEqual([...featureValues, ...aiValues, ...aiPackageValues]);
     expect(new Set(allKeys).size).toBe(allKeys.length);
   });
 
@@ -241,12 +244,24 @@ describe("features map", () => {
     const values = options.map((option) => option.value);
 
     expect(values).toEqual([
-      "openai",
-      "google",
-      "anthropic",
-      "bedrock",
-      "ollama",
+      "ai-openai",
+      "ai-google",
+      "ai-anthropic",
+      "ai-bedrock",
+      "ai-ollama",
     ]);
+
+    for (const option of options) {
+      expect(option.label).toBeTruthy();
+      expect(option.hint).toBeTruthy();
+    }
+  });
+
+  it("lists the ai capability packages with a label and hint", () => {
+    const options = getAiPackageOptions();
+    const values = options.map((option) => option.value);
+
+    expect(values).toEqual(["ai-tools", "ai-panoptic", "ai-workspace"]);
 
     for (const option of options) {
       expect(option.label).toBeTruthy();

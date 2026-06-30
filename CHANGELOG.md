@@ -14,19 +14,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
-- The project template now pins the latest `@mongez/*` versions — `@mongez/reinforcements@^3.2.0` and `@mongez/agent-kit@^1.2.0` — so freshly scaffolded apps start on current dependencies. (`@warlock.js/*` versions in the template are still rewritten to the scaffolder's own version at install time.)
+- The project template now pins the latest `@mongez/*` versions (`@mongez/reinforcements@^3.2.0`, `@mongez/agent-kit@^1.2.0`) so freshly scaffolded apps start on current dependencies. (`@warlock.js/*` versions are still rewritten to the scaffolder's own version at install time.)
 
 ## 4.2.7
 
 ### Fixed
 
-- The published package now ships its `templates/` folder, so scaffolding a new project works from the installed package — it was missing from the build, which made the wizard fail with "Something went wrong" at the template-copy step. The rest of the family is re-published at 4.2.7 to keep the lockstep version line; no other functional changes.
+- The published package now ships its `templates/` folder, so scaffolding a new project works from the installed package — it was missing from the build, which failed the wizard with "Something went wrong" at the template-copy step.
 
 ## 4.2.6
 
 ### Fixed
 
-- The published package now ships its `bin` folder again, so the `create-warlock` CLI works from the installed package — it was omitted from the 4.2.5 build. The rest of the family is re-published at 4.2.6 to keep the lockstep version line; no other functional changes.
+- The published package now ships its `bin` folder again, so the `create-warlock` CLI works from the installed package — it was omitted from the 4.2.5 build.
 
 ## 4.2.5
 
