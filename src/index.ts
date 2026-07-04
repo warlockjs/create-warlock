@@ -1,5 +1,6 @@
 import createNewApp from "./commands/create-new-app";
 import { CliFlags } from "./commands/create-new-app/types";
+import { NO_DATABASE } from "./features/database-drivers";
 
 const valueFlags = ["name", "db", "pm", "features", "ai"];
 
@@ -57,6 +58,10 @@ export function parseFlags(argv: string[]): CliFlags {
         break;
       case "db":
         flags.db = value;
+        break;
+      case "no-db":
+        // Opt out of a database entirely — equivalent to `--db=none`.
+        flags.db = NO_DATABASE;
         break;
       case "pm":
         flags.pm = value;

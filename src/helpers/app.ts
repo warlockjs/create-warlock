@@ -81,7 +81,9 @@ export class App {
     // with. create-warlock and the framework ship in lockstep, so the scaffolder's
     // own version is the single source of truth (the template's hardcoded versions
     // are irrelevant — they get overwritten here).
-    const warlockVersion: string = getJsonFile(packageRoot("package.json")).version;
+    const warlockVersion: string = (
+      getJsonFile(packageRoot("package.json")) as { version: string }
+    ).version;
     const content: any = pkg.content;
 
     for (const field of ["dependencies", "devDependencies"] as const) {
@@ -141,6 +143,30 @@ export class App {
     }
 
     putFile(this.path + "/.env", envContent);
+
+    return this;
+  }
+
+  /**
+   * Remove the database layer for a "no database" scaffold.
+   *
+   * Deletes `src/config/database.ts` (and a `.tsx` variant if present) from the
+   * freshly-copied template. The framework's database connector is config-gated
+   * on that file — with it gone, `config.get("database")` is undefined and the
+   * connector no-ops, so the app boots with no database wired and no driver
+   * package pulled. The `DB_*` lines in `.env` are left in place (harmless: no
+   * config reads them) as a ready template for adding a database back later.
+   */
+  public removeDatabaseConfig() {
+    const configDir = path.resolve(this.path, "src/config");
+
+    for (const fileName of ["database.ts", "database.tsx"]) {
+      const filePath = path.resolve(configDir, fileName);
+
+      if (fileExists(filePath)) {
+        unlinkSync(filePath);
+      }
+    }
 
     return this;
   }

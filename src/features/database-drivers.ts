@@ -11,6 +11,15 @@ export type DatabaseDriver = {
   hint?: string;
 };
 
+/**
+ * Sentinel `--db` value / select option that means "no database at all".
+ *
+ * Picking it wires no driver, pulls no driver package, and deletes the
+ * template's `src/config/database.ts` — the framework's database connector is
+ * config-gated on that file, so with it gone the app boots with no database.
+ */
+export const NO_DATABASE = "none";
+
 export const databaseDrivers: DatabaseDriver[] = [
   {
     value: "mongodb",
@@ -38,15 +47,26 @@ export const databaseDrivers: DatabaseDriver[] = [
 ];
 
 /**
- * Get database driver options for the select prompt
+ * Get database driver options for the select prompt.
+ *
+ * The real drivers come first, followed by a "None" opt-out so the user can
+ * scaffold an app with no database.
  */
 export function getDatabaseDriverOptions() {
-  return databaseDrivers.map(driver => ({
-    value: driver.value,
-    label: driver.label,
-    hint: driver.hint,
-    disabled: driver.disabled,
-  }));
+  return [
+    ...databaseDrivers.map(driver => ({
+      value: driver.value,
+      label: driver.label,
+      hint: driver.hint,
+      disabled: driver.disabled,
+    })),
+    {
+      value: NO_DATABASE,
+      label: "None",
+      hint: "No database — skips the driver and removes src/config/database.ts",
+      disabled: undefined,
+    },
+  ];
 }
 
 /**
@@ -54,6 +74,24 @@ export function getDatabaseDriverOptions() {
  */
 export function getDatabaseDriver(value: string): DatabaseDriver | undefined {
   return databaseDrivers.find(driver => driver.value === value);
+}
+
+/**
+ * Whether a `--db` value / selection means "no database".
+ */
+export function isNoDatabase(value: string | undefined): boolean {
+  return value === NO_DATABASE;
+}
+
+/**
+ * Human-readable database label for the success screen: `"None"` when no
+ * database was chosen, otherwise the driver's own label (falling back to the
+ * raw value for an unrecognized driver).
+ */
+export function getDatabaseLabel(value: string): string {
+  if (isNoDatabase(value)) return "None";
+
+  return getDatabaseDriver(value)?.label ?? value;
 }
 
 /**

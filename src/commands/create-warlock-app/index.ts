@@ -1,4 +1,8 @@
 import { spinner } from "@clack/prompts";
+import {
+  getDatabaseLabel,
+  isNoDatabase,
+} from "../../features/database-drivers";
 import { App } from "../../helpers/app";
 import {
   getPackageManager,
@@ -10,6 +14,7 @@ import { spinnerMessages } from "../../ui/spinners";
 export async function createWarlockApp(application: App) {
   const options = application.options;
   const { useGit, useJWT, features, aiProviders, databaseDriver } = options;
+  const noDatabase = isNoDatabase(databaseDriver);
 
   // Step 1: Initialize and copy template
   const templateSpinner = spinner();
@@ -19,9 +24,17 @@ export async function createWarlockApp(application: App) {
     .init()
     .use("warlock")
     .updatePackageJson()
-    .updateDotEnv()
-    .configureDatabaseEnv(databaseDriver)
-    .configureHomePage(features.includes("react"));
+    .updateDotEnv();
+
+  // Wire the chosen database driver into .env — or, when the user opted out,
+  // strip the database config entirely so the app boots with no database.
+  if (noDatabase) {
+    application.removeDatabaseConfig();
+  } else {
+    application.configureDatabaseEnv(databaseDriver);
+  }
+
+  application.configureHomePage(features.includes("react"));
 
   templateSpinner.stop(spinnerMessages.templateCopied);
 
@@ -35,8 +48,13 @@ export async function createWarlockApp(application: App) {
 
   // Step 3: Add features via `warlock add --no-install`, then one batched install.
   // The DB driver, optional features, and AI providers all go through the single
-  // source of truth (core's feature map) so versions never drift.
-  const selectedFeatures = [databaseDriver, ...features, ...aiProviders];
+  // source of truth (core's feature map) so versions never drift. When no
+  // database was chosen, the driver is omitted (there is no `none` feature).
+  const selectedFeatures = [
+    ...(noDatabase ? [] : [databaseDriver]),
+    ...features,
+    ...aiProviders,
+  ];
 
   if (selectedFeatures.length > 0) {
     const featuresSpinner = spinner();
@@ -82,7 +100,7 @@ export async function createWarlockApp(application: App) {
   // Step 6: Show success screen
   showSuccessScreen({
     projectName: application.name,
-    database: databaseDriver === "mongodb" ? "MongoDB" : "PostgreSQL",
+    database: getDatabaseLabel(databaseDriver),
     features: [...features, ...aiProviders],
     packageManager: getPackageManager(),
   });

@@ -4,11 +4,15 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { parseFlags } from "../src/index";
+import { resolveNonInteractiveOptions } from "../src/commands/create-new-app";
 import {
   databaseDrivers,
   getDatabaseDependency,
   getDatabaseDriver,
   getDatabaseDriverOptions,
+  getDatabaseLabel,
+  isNoDatabase,
+  NO_DATABASE,
 } from "../src/features/database-drivers";
 import {
   getAiPackageOptions,
@@ -67,6 +71,15 @@ describe("parseFlags", () => {
 
     expect(equals.db).toBe("postgres");
     expect(spaced.db).toBe("postgres");
+  });
+
+  it("maps --no-db to the 'none' database sentinel", () => {
+    expect(parseFlags(["app", "--no-db"]).db).toBe("none");
+  });
+
+  it("accepts --db=none (and --db none) to opt out of a database", () => {
+    expect(parseFlags(["app", "--db=none"]).db).toBe("none");
+    expect(parseFlags(["app", "--db", "none"]).db).toBe("none");
   });
 
   it("splits comma lists for --features and --ai, trimming blanks", () => {
@@ -174,8 +187,33 @@ describe("database drivers", () => {
     expect(postgres?.disabled).toBeUndefined();
   });
 
-  it("returns one option per registered driver", () => {
-    expect(getDatabaseDriverOptions()).toHaveLength(databaseDrivers.length);
+  it("returns one option per registered driver plus a None opt-out", () => {
+    expect(getDatabaseDriverOptions()).toHaveLength(databaseDrivers.length + 1);
+  });
+
+  it("appends a None opt-out as the last option, enabled and hinted", () => {
+    const options = getDatabaseDriverOptions();
+    const last = options[options.length - 1];
+
+    expect(last.value).toBe(NO_DATABASE);
+    expect(last.label).toBe("None");
+    expect(last.disabled).toBeUndefined();
+    expect(last.hint).toBeTruthy();
+  });
+
+  it("recognises the no-database sentinel", () => {
+    expect(isNoDatabase(NO_DATABASE)).toBe(true);
+    expect(isNoDatabase("none")).toBe(true);
+    expect(isNoDatabase("mongodb")).toBe(false);
+    expect(isNoDatabase(undefined)).toBe(false);
+  });
+
+  it("labels the database for the success screen", () => {
+    expect(getDatabaseLabel("mongodb")).toBe("MongoDB");
+    expect(getDatabaseLabel("postgres")).toBe("PostgreSQL");
+    expect(getDatabaseLabel(NO_DATABASE)).toBe("None");
+    // Unknown driver falls back to the raw value rather than throwing.
+    expect(getDatabaseLabel("oracle")).toBe("oracle");
   });
 
   it("maps a known driver to its single package -> version dependency", () => {
@@ -193,6 +231,64 @@ describe("database drivers", () => {
         [driver.package]: driver.packageVersion,
       });
     }
+  });
+});
+
+describe("resolveNonInteractiveOptions", () => {
+  it("defaults to mongodb on port 27017 with no features when given empty flags", () => {
+    const options = resolveNonInteractiveOptions({});
+
+    expect(options.databaseDriver).toBe("mongodb");
+    expect(options.databasePort).toBe(27017);
+    expect(options.features).toEqual([]);
+    expect(options.aiProviders).toEqual([]);
+    expect(options.useGit).toBe(false);
+    expect(options.useJWT).toBe(false);
+  });
+
+  it("resolves an explicit driver to its default port", () => {
+    const options = resolveNonInteractiveOptions({ db: "postgres" });
+
+    expect(options.databaseDriver).toBe("postgres");
+    expect(options.databasePort).toBe(5432);
+  });
+
+  it("accepts the 'none' database with a harmless fallback port", () => {
+    const options = resolveNonInteractiveOptions({ db: NO_DATABASE });
+
+    expect(options.databaseDriver).toBe(NO_DATABASE);
+    expect(options.databasePort).toBe(27017);
+  });
+
+  it("throws on an unknown database driver so the run fails fast", () => {
+    expect(() => resolveNonInteractiveOptions({ db: "oracle" })).toThrow(
+      /Unknown database driver "oracle"/,
+    );
+  });
+
+  it("throws on an unknown feature or ai key", () => {
+    expect(() =>
+      resolveNonInteractiveOptions({ features: ["test", "bogus"] }),
+    ).toThrow(/Unknown feature\(s\): bogus/);
+
+    expect(() => resolveNonInteractiveOptions({ ai: ["ai-openai", "nope"] })).toThrow(
+      /nope/,
+    );
+  });
+
+  it("passes through valid features, ai providers, and the git/jwt toggles", () => {
+    const options = resolveNonInteractiveOptions({
+      db: "postgres",
+      features: ["test", "redis"],
+      ai: ["ai-openai"],
+      git: true,
+      jwt: true,
+    });
+
+    expect(options.features).toEqual(["test", "redis"]);
+    expect(options.aiProviders).toEqual(["ai-openai"]);
+    expect(options.useGit).toBe(true);
+    expect(options.useJWT).toBe(true);
   });
 });
 
@@ -393,6 +489,33 @@ describe("App template emission", () => {
     for (const file of expectedFiles) {
       expect(existsSync(path.join(appPath, file))).toBe(true);
     }
+  });
+
+  it("removeDatabaseConfig deletes src/config/database.ts but keeps its siblings", () => {
+    const app = new App(makeApplication(appPath, { databaseDriver: NO_DATABASE }));
+
+    app.use("warlock");
+
+    // The template always ships the DB config; removal is a scaffold-time step.
+    expect(existsSync(path.join(appPath, "src/config/database.ts"))).toBe(true);
+
+    app.removeDatabaseConfig();
+
+    expect(existsSync(path.join(appPath, "src/config/database.ts"))).toBe(false);
+    // Sibling config files are untouched.
+    expect(existsSync(path.join(appPath, "src/config/app.ts"))).toBe(true);
+    expect(existsSync(path.join(appPath, "src/config/cache.ts"))).toBe(true);
+  });
+
+  it("removeDatabaseConfig is chainable and a no-op when the file is already gone", () => {
+    const app = new App(makeApplication(appPath, { databaseDriver: NO_DATABASE }));
+
+    app.use("warlock");
+
+    expect(app.removeDatabaseConfig()).toBe(app);
+    // Second call: the file is already gone — it must not throw.
+    expect(() => app.removeDatabaseConfig()).not.toThrow();
+    expect(existsSync(path.join(appPath, "src/config/database.ts"))).toBe(false);
   });
 
   it("preserves dotfiles and nested hidden directories from the template", () => {
