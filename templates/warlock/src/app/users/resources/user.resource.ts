@@ -8,7 +8,6 @@ export const UserResource = defineResource({
     image: "storageUrl",
     createdAt: "date",
     updatedAt: "date",
-    isActive: "boolean",
     type: () => "user",
   },
 });

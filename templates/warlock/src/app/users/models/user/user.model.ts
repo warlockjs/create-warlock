@@ -2,10 +2,9 @@ import { Auth } from "@warlock.js/auth";
 import { RegisterModel } from "@warlock.js/cascade";
 import { useHashedPassword } from "@warlock.js/core";
 import { type Infer, v } from "@warlock.js/seal";
-import { globalColumnsSchema } from "app/shared/utils/global-columns-schema";
 import { UserResource } from "app/users/resources/user.resource";
 
-export const userSchema = globalColumnsSchema.extend({
+export const userSchema = v.object({
   name: v.string().required(),
   email: v.email().requiredIfEmpty("id"),
   image: v.string(),
@@ -45,10 +44,6 @@ export class User extends Auth<UserSchema> {
 
   static {
     // Local scopes
-    this.addScope("active", (query) => {
-      query.where("isActive", true);
-    });
-
     this.addScope("admins", (query) => {
       query.where("role", "admin");
     });
@@ -56,9 +51,5 @@ export class User extends Auth<UserSchema> {
     this.addScope("verified", (query) => {
       query.where("emailVerified", true);
     });
-
-    // this.addGlobalScope("active", (query) => {
-    //   query.where("isActive", true);
-    // });
   }
 }

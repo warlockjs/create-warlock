@@ -7,8 +7,5 @@ export const PostResource = defineResource({
     title: "string",
     description: "string",
     image: "storageUrl",
-    createdBy: "object",
-    updatedBy: "object",
-    isActive: "boolean",
   },
 });

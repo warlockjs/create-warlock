@@ -183,7 +183,6 @@ describe("migration templates use only current cascade column helpers", () => {
     expect(source).toMatch(/name:\s*string\(\d+\)/);
     expect(source).toMatch(/email:\s*string\(\d+\)\.unique\(\)/);
     expect(source).toMatch(/password:\s*string\(\d+\)/);
-    expect(source).toMatch(/isActive:\s*bool\(\)/);
   });
 
   it("post migration keeps description as unbounded text() with no length", () => {

@@ -1,4 +1,4 @@
-import { bool, integer, json, Migration, string, timestamp } from "@warlock.js/cascade";
+import { integer, json, Migration, string, timestamp } from "@warlock.js/cascade";
 import { OTP } from "../otp.model";
 
 export default Migration.create(
@@ -15,10 +15,6 @@ export default Migration.create(
     attempts: integer(),
     maxAttempts: integer(),
     metadata: json().nullable(),
-    isActive: bool(),
-    createdBy: json().nullable(),
-    updatedBy: json().nullable(),
-    deletedBy: json().nullable(),
   },
   {
     index: [

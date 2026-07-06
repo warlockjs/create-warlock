@@ -87,7 +87,7 @@ my-app/
       ├─ users/                 # model, migration, resource, repository, create + list controllers, schema, events, seeds, commands
       ├─ posts/                 # sample module — model, migration, resource, schema, create + update controllers
       ├─ uploads/               # file-serving controller (fetch-uploaded-file)
-      └─ shared/                # router/locale utils, home page, scheduler, global columns schema
+      └─ shared/                # router/locale utils, home page, scheduler
 ```
 
 The template ships a working auth module (login / logout / logout-all / refresh / me / forgot + reset password via OTP), a `users` module, and a sample `posts` module — all using the current framework surface: schemas via `v` from `@warlock.js/seal`, controllers typed with `GuardedRequestHandler` carrying a `.validation = { schema }`, models on `@warlock.js/cascade`, and declarative migrations via `Migration.create`.

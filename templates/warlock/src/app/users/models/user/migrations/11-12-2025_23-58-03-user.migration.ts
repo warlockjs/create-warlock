@@ -1,4 +1,4 @@
-import { bool, json, Migration, string, timestamp } from "@warlock.js/cascade";
+import { json, Migration, string, timestamp } from "@warlock.js/cascade";
 import { User } from "../user.model";
 
 export default Migration.create(User, {
@@ -7,9 +7,5 @@ export default Migration.create(User, {
   password: string(255),
   image: string(500).nullable(),
   imageMetadata: json().nullable(),
-  isActive: bool(),
-  createdBy: json().nullable(),
-  updatedBy: json().nullable(),
-  deletedBy: json().nullable(),
   deletedAt: timestamp().nullable(),
 });

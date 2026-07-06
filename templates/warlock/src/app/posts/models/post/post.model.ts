@@ -2,9 +2,8 @@ import { Model, RegisterModel } from "@warlock.js/cascade";
 import { useComputedSlug } from "@warlock.js/core";
 import { type Infer, v } from "@warlock.js/seal";
 import { PostResource } from "app/posts/resources/post.resource";
-import { globalColumnsSchema } from "app/shared/utils/global-columns-schema";
 
-export const postSchema = globalColumnsSchema.extend({
+export const postSchema = v.object({
   title: v.string().required(),
   description: v.string().required(),
   slug: v.computed(useComputedSlug()),

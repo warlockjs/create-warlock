@@ -481,7 +481,7 @@ describe("App template emission", () => {
       "src/app/auth/models/otp/otp.model.ts",
       "src/app/auth/routes.ts",
       "src/app/uploads/routes.ts",
-      "src/app/shared/utils/global-columns-schema.ts",
+      "src/app/shared/utils/router.ts",
       "src/config/database.ts",
       "src/config/app.ts",
     ];

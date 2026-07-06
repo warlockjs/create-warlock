@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Non-interactive scaffolding — `create-warlock <name> --yes` (with `--db`, `--pm`, `--features`, `--ai`, `--git`, `--jwt`) scaffolds the entire app in a single command, no prompts
 - `--db=none` / `--no-db` and a **None** option in the database prompt — scaffold with no database: the driver, its package, and `src/config/database.ts` are all skipped
 
+### Changed
+
+- Starter models drop the baked-in `globalColumnsSchema` audit columns (`createdBy` / `updatedBy` / `deletedBy` / `isActive`) — global columns are left to the developer
+
 ## 4.2.11
 
 ### Changed
