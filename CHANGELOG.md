@@ -4,6 +4,14 @@ All notable changes to `create-warlock` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@warlock.js/*` packages are released in lockstep — every package shares the same version number, so a version below may list only the changes that affected this package.
 
+## 4.15.0
+
+### Dependencies
+
+- Bumped `@mongez/reinforcements` to `^4.0.1` (package dependency + project template). This is a **major** bump: `Random.string/nanoid/id/token/uuid` are now CSPRNG-backed (WebCrypto) and no longer honor `Random.seed()`, and throw without WebCrypto available. Audited `create-warlock`'s own source and the `templates/warlock` scaffold for `Random.seed`/`Random.*` usage — none found, no code changes required.
+- Project template (`templates/warlock/package.json`) `@mongez/*` deps bumped: `@mongez/localization` to `^3.4.7`, `@mongez/supportive-is` to `^2.1.4`, `@mongez/agent-kit` to `^1.2.1`.
+- Project template `@warlock.js/*` deps were pinned at the stale `4.0.119` — rewritten to the current lockstep version `4.15.0` to match the published `@warlock.js/*` packages.
+
 ## 4.12.0
 
 ### Changed
