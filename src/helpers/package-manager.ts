@@ -8,6 +8,24 @@ let detectedPackageManager: string | undefined;
 let cachedSystemManagers: string[] | undefined;
 let cachedPreferredManager: string | undefined;
 
+/**
+ * The only package managers `--pm` may select. This value reaches `spawn()`
+ * as the executable to run and is spliced into the generated
+ * `package.json`'s scripts — an allow-list here is a hard security
+ * boundary, not just input hygiene, so it stays a fixed literal list
+ * rather than anything derived from user input or the running environment.
+ */
+export const ALLOWED_PACKAGE_MANAGERS = ["npm", "yarn", "pnpm", "bun"] as const;
+
+export type AllowedPackageManager = (typeof ALLOWED_PACKAGE_MANAGERS)[number];
+
+/** Whether `value` is one of the allow-listed package managers. */
+export function isValidPackageManager(
+  value: string,
+): value is AllowedPackageManager {
+  return (ALLOWED_PACKAGE_MANAGERS as readonly string[]).includes(value);
+}
+
 export function getPackageManager() {
   if (detectedPackageManager) {
     return detectedPackageManager;

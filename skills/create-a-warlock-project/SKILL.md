@@ -44,7 +44,7 @@ Pass `--yes` (or `-y`) to skip every prompt and build from flags with defaults.
 | `<positional>` / `--name`| yes         | — (required)   | Project name + target directory.                                    |
 | `--db`                   | yes         | `mongodb`      | Database driver key (`mongodb`, `postgres`, or `none`).             |
 | `--no-db`                | no          | —              | Opt out of a database — shorthand for `--db=none`.                  |
-| `--pm`                   | yes         | auto-detected  | Package manager (`npm` / `yarn` / `pnpm`).                           |
+| `--pm`                   | yes         | auto-detected  | Package manager — must be one of `npm` / `yarn` / `pnpm` / `bun`; anything else is rejected before scaffolding starts. |
 | `--features`             | yes (CSV)   | none           | Comma-separated optional feature keys.                              |
 | `--ai`                   | yes (CSV)   | none           | Comma-separated AI provider keys (auto-pulls `@warlock.js/ai`).     |
 | `--git` / `--no-git`     | no          | off            | Initialize a Git repo (`git init` + `main` branch + initial commit).|

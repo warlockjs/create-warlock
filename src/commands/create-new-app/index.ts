@@ -22,10 +22,12 @@ import {
 } from "../../features/features-map";
 import { App } from "../../helpers/app";
 import {
+  ALLOWED_PACKAGE_MANAGERS,
   detectPackageManagers,
   getPackageManager,
   getPreferredPackageManager,
   getSystemPackageManagers,
+  isValidPackageManager,
   setPackageManager,
 } from "../../helpers/package-manager";
 import { packageRoot } from "../../helpers/paths";
@@ -238,6 +240,14 @@ async function createNonInteractive(cli: CliFlags) {
   await detectPackageManagers();
 
   const packageManager = cli.pm ?? getPreferredPackageManager();
+
+  if (!isValidPackageManager(packageManager)) {
+    cancel(
+      `Unknown package manager "${packageManager}" — expected one of: ${ALLOWED_PACKAGE_MANAGERS.join(", ")}`,
+    );
+    process.exit(1);
+  }
+
   setPackageManager(packageManager);
 
   let options: AppOptions;

