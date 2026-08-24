@@ -48,6 +48,12 @@ export const features: FeatureOption[] = [
 
   // Rendering & Mail
   {
+    key: "web",
+    label: "Web (SSR React pages)",
+    hint: "Server-rendered React pages on the same server as your API — scaffolds src/web and registers the connector",
+    group: "Rendering & Mail",
+  },
+  {
     key: "react",
     label: "React (rendering & mails)",
     hint: "React + ReactDOM for non-interactive rendering and HTML/email generation",
