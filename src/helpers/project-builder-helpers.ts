@@ -13,17 +13,31 @@ import { executeCommand } from "./exec";
 import { startCommand } from "./package-manager";
 import { Template, template } from "./paths";
 
+/**
+ * Bootstrap the project's git repository.
+ *
+ * Returns `false` as soon as a step fails, and leaves that step's captured
+ * output where the caller can claim it with `takeLastCommandOutput()`. It used
+ * to `return true` unconditionally, which meant a machine without git printed
+ * "Grimoire initialized!" over a directory that was not a repository.
+ */
 export async function initializeGitRepository(appPath: string) {
-  // initialize git repository
-  await executeCommand(`git`, ["init"], appPath);
-  // switching to`main`branch
-  await executeCommand(`git`, ["checkout", "-b", "main"], appPath);
+  const steps: string[][] = [
+    // initialize git repository
+    ["init"],
+    // switching to `main` branch
+    ["checkout", "-b", "main"],
+    // add files
+    ["add", "."],
+    // commit files
+    ["commit", "-m", "Initial commit"],
+  ];
 
-  // add files
-  await executeCommand(`git`, ["add", "."], appPath);
+  for (const args of steps) {
+    const succeeded = await executeCommand(`git`, args, appPath);
 
-  // commit files
-  await executeCommand(`git`, ["commit", "-m", "Initial commit"], appPath);
+    if (!succeeded) return false;
+  }
 
   return true;
 }

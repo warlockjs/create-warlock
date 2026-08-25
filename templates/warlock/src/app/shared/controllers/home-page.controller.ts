@@ -7,7 +7,7 @@ import { Application, type RequestHandler } from "@warlock.js/core";
  * page (`home-page.controller.tsx` + `HomePageComponent.tsx`) instead; this
  * plain controller is removed at scaffold time when React is selected.
  */
-export const homePageController: RequestHandler = async (_request, response) => {
+export const homePageController: RequestHandler = async ({ response }) => {
   return response.success({
     message: "Welcome to Warlock 🧙 — your app is up and running!",
     version: Application.version,

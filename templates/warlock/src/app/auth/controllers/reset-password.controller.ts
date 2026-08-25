@@ -5,10 +5,10 @@ import { resetPasswordService } from "../services/reset-password.service";
 /**
  * Reset password controller
  */
-export const resetPasswordController: RequestHandler<Request<ResetPasswordSchema>> = async (
+export const resetPasswordController: RequestHandler<Request<ResetPasswordSchema>> = async ({
   request,
   response,
-) => {
+}) => {
   await resetPasswordService(request.validated());
 
   return response.success({

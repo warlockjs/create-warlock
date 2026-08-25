@@ -176,7 +176,21 @@ export default async function createNewApp(cli: CliFlags = {}) {
   };
 
   // Create the app
-  await createWarlockApp(new App(appDetails));
+  await scaffold(appDetails);
+}
+
+/**
+ * Run the scaffold and make the process's exit code tell the truth: anything
+ * the user asked for that did not happen leaves the shell with a non-zero
+ * status, so scripts and CI cannot mistake a half-built project for a finished
+ * one. The problems themselves are printed by the scaffolder.
+ */
+async function scaffold(appDetails: Required<AppType>) {
+  const outcome = await createWarlockApp(new App(appDetails));
+
+  if (outcome && !outcome.ok) {
+    process.exitCode = 1;
+  }
 }
 
 /**
@@ -267,5 +281,5 @@ async function createNonInteractive(cli: CliFlags) {
     options,
   };
 
-  await createWarlockApp(new App(appDetails));
+  await scaffold(appDetails);
 }

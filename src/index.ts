@@ -94,5 +94,16 @@ function splitList(value: string | undefined): string[] {
 export default function createApp() {
   const flags = parseFlags(process.argv.slice(2));
 
-  createNewApp(flags);
+  // An unexpected throw must surface as a readable error AND a non-zero exit
+  // code — never as a stack trace the user scrolls past on the way to a green
+  // banner (there is no banner after this point).
+  Promise.resolve(createNewApp(flags)).catch((error: unknown) => {
+    console.error();
+    console.error(
+      `  create-warlock failed: ${(error as Error)?.message ?? String(error)}`,
+    );
+    console.error();
+
+    process.exit(1);
+  });
 }

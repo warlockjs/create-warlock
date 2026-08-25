@@ -1,7 +1,7 @@
-import { type Request, type RequestHandler, type Response } from "@warlock.js/core";
+import { type RequestHandler } from "@warlock.js/core";
 import { HomePageComponent } from "../components/HomePageComponent";
 
-export const homePageController: RequestHandler = async (_request: Request, response: Response) => {
+export const homePageController: RequestHandler = async ({ response }) => {
   return response.render(<HomePageComponent />);
 };
 

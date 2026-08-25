@@ -4,6 +4,17 @@ All notable changes to `create-warlock` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@warlock.js/*` packages are released in lockstep — every package shares the same version number, so a version below may list only the changes that affected this package.
 
+## 5.0.0 - 2026-08-25
+
+### Added
+
+- The project creator now offers the `web` feature for Warlock SSR pages.
+
+### Changed
+
+- Scaffold command failures are captured and reported instead of allowing later success output to hide a failed dependency install, Git initialization, feature addition, or cache warm-up.
+- Generated route handlers use the new request-context argument shape, and generated cache configuration honors `CACHE_DRIVER`.
+
 ## 4.16.0 - 2026-08-18
 
 ### Security

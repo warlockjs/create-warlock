@@ -15,6 +15,21 @@ import { getDatabaseDriver } from "../features/database-drivers";
 import { executeCommand, runCommand } from "./exec";
 import { getPackageManager } from "./package-manager";
 import { packageRoot, Template, template } from "./paths";
+import { fallbackRange } from "./warlock-versions";
+
+/**
+ * Environment for every install the scaffolder spawns.
+ *
+ * A shell that exports `NODE_ENV=production` makes the package managers skip
+ * every devDependency — and still exit 0. The scaffolded project needs its dev
+ * toolchain (typescript, vitest, eslint) to be usable at all, so the install
+ * child is pinned to `development` regardless of the ambient environment. A
+ * silently incomplete install that reports success is the exact failure mode
+ * this file exists to prevent.
+ */
+export function installEnvironment(): NodeJS.ProcessEnv {
+  return { NODE_ENV: "development" };
+}
 
 export class App {
   /**
@@ -56,7 +71,9 @@ export class App {
   }
 
   public install() {
-    return runCommand(getPackageManager(), ["install"], this.path);
+    return runCommand(getPackageManager(), ["install"], this.path, {
+      env: installEnvironment(),
+    });
   }
 
   public async exec(command: string) {
@@ -71,19 +88,28 @@ export class App {
     return await initializeGitRepository(this.path);
   }
 
-  public updatePackageJson() {
+  /**
+   * Write the project's `package.json`: the project name, the chosen package
+   * manager, and the version of every `@warlock.js/*` dependency.
+   *
+   * `versions` comes from {@link resolveWarlockVersions} — versions the
+   * registry has confirmed exist. It is optional because the fluent chain is
+   * synchronous; without it every sibling gets the caret range floored to the
+   * scaffolder's major, which is always satisfiable by a published release.
+   *
+   * What it must NEVER do again is stamp the scaffolder's own version blind:
+   * the release tooling bumps that version on every build, published or not,
+   * so an unverified pin resolves to nothing and the install dies with ETARGET.
+   */
+  public updatePackageJson(versions: Record<string, string> = {}) {
     const pkg = this.package
       .replace("name", this.name.replaceAll("/", "-"))
       .replaceAll("yarn", getPackageManager());
 
-    // Pin every @warlock.js/* dependency to THIS create-warlock release version
-    // so a scaffolded project always matches the framework version it was created
-    // with. create-warlock and the framework ship in lockstep, so the scaffolder's
-    // own version is the single source of truth (the template's hardcoded versions
-    // are irrelevant — they get overwritten here).
     const warlockVersion: string = (
       getJsonFile(packageRoot("package.json")) as { version: string }
     ).version;
+    const defaultRange = fallbackRange(warlockVersion);
     const content: any = pkg.content;
 
     for (const field of ["dependencies", "devDependencies"] as const) {
@@ -92,7 +118,7 @@ export class App {
 
       for (const dependency of Object.keys(deps)) {
         if (dependency.startsWith("@warlock.js/")) {
-          deps[dependency] = warlockVersion;
+          deps[dependency] = versions[dependency] ?? defaultRange;
         }
       }
     }

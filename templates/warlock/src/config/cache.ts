@@ -30,7 +30,10 @@ const globalPrefix = () => {
 };
 
 const cacheConfigurations: CacheConfigurations<"database"> = {
-  default: "redis",
+  // Driven by CACHE_DRIVER so the shipped .env (`memory`) actually wins.
+  // Hardcoding "redis" made a `--no-db` scaffold hang forever retrying a
+  // Redis connection that was never going to exist.
+  default: env("CACHE_DRIVER") || "redis",
   drivers: {
     file: FileCacheDriver,
     memory: MemoryCacheDriver,

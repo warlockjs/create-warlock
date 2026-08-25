@@ -1,4 +1,4 @@
-import { type Request, type RequestHandler, type Response } from "@warlock.js/core";
+import { type RequestHandler } from "@warlock.js/core";
 import { v } from "@warlock.js/seal";
 import { refreshTokensService } from "../services/auth.service";
 
@@ -6,10 +6,7 @@ import { refreshTokensService } from "../services/auth.service";
  * Refresh token controller
  * POST /auth/refresh-token
  */
-export const refreshTokenController: RequestHandler = async (
-  request: Request,
-  response: Response,
-) => {
+export const refreshTokenController: RequestHandler = async ({ request, response }) => {
   const token = request.input("refreshToken");
 
   const result = await refreshTokensService(token, {
