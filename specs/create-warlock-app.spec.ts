@@ -84,6 +84,7 @@ function makeFakeApp(
       install: Promise.resolve(true),
     })),
     installFeatures: vi.fn(async () => hooks.installFeaturesResult ?? true),
+    pinViteResolution: vi.fn(() => true),
     git: vi.fn(async () => true),
     exec: vi.fn(async () => true),
   };
@@ -141,6 +142,36 @@ describe("createWarlockApp — feature batch", () => {
       "test",
       "redis",
       "openai",
+    ]);
+  });
+
+  it("pins vite AFTER the features are recorded and BEFORE the batched install", async () => {
+    const order: string[] = [];
+    const fake = makeFakeApp({ features: ["web"] });
+
+    fake.installFeatures.mockImplementation(async () => {
+      order.push("installFeatures");
+      return true;
+    });
+    fake.pinViteResolution.mockImplementation(() => {
+      order.push("pinViteResolution");
+      return true;
+    });
+    fake.install.mockImplementation(() => {
+      order.push("install");
+      return { abort: vi.fn(), install: Promise.resolve(true) };
+    });
+
+    await run(fake);
+
+    // The pin must land between the two: `warlock add --no-install` is what
+    // writes vite into package.json, and yarn reads `resolutions` when the
+    // batched install starts. Either side of that window and it is a no-op.
+    expect(order).toEqual([
+      "install", // base install (step 2)
+      "installFeatures",
+      "pinViteResolution",
+      "install", // batched feature install
     ]);
   });
 

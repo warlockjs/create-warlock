@@ -243,6 +243,62 @@ export class App {
   }
 
   /**
+   * Force a single copy of `vite` when the project ends up with BOTH `vite`
+   * (written by the `web` feature) and `vitest` (always in the template).
+   *
+   * `vitest` depends on vite through a wide range of its own
+   * (`^6 || ^7 || ^8`), which resolves to a DIFFERENT major than the range the
+   * feature map pins. Yarn 1 then has to nest the second copy under
+   * `vitest/node_modules` and dies on its own linker invariant:
+   *
+   *     error Invariant Violation: could not find a copy of vite to link in
+   *       <project>/node_modules/vitest/node_modules
+   *
+   * It aborts BEFORE `node_modules/.bin` is written, so `warlock` is never
+   * linked and the very first `yarn dev` fails with "'warlock' is not
+   * recognized". npm and pnpm nest happily and never hit this — for them the
+   * `overrides` twin below is one copy instead of two, not a crash fix.
+   *
+   * The pin is READ BACK from whatever range the project's own package.json
+   * declares, never re-stated as a literal here: the feature map in
+   * `@warlock.js/core` owns the version, and a second copy of it would drift
+   * the moment that one moves.
+   *
+   * Returns whether a pin was written, so the caller (and its spec) can assert
+   * it instead of assuming it.
+   */
+  public pinViteResolution() {
+    const packageJsonPath = path.resolve(this.path, "package.json");
+
+    if (!fileExists(packageJsonPath)) return false;
+
+    const packageJson = getJsonFile(packageJsonPath) as {
+      dependencies?: Record<string, string>;
+      devDependencies?: Record<string, string>;
+      resolutions?: Record<string, string>;
+      overrides?: Record<string, string>;
+    };
+
+    const declaredRange = (name: string) =>
+      packageJson.dependencies?.[name] ?? packageJson.devDependencies?.[name];
+
+    const viteRange = declaredRange("vite");
+
+    // No vite, or no vitest to conflict with it — nothing to pin. Writing a
+    // resolution for a package the project does not depend on would only
+    // freeze a transitive tree nobody asked us to freeze.
+    if (!viteRange || !declaredRange("vitest")) return false;
+
+    // yarn 1 / yarn berry read `resolutions`; npm 8+ and pnpm read `overrides`.
+    packageJson.resolutions = { ...packageJson.resolutions, vite: viteRange };
+    packageJson.overrides = { ...packageJson.overrides, vite: viteRange };
+
+    putJsonFile(packageJsonPath, packageJson);
+
+    return true;
+  }
+
+  /**
    * Get package json file
    */
   public get package() {

@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -84,12 +84,22 @@ afterEach(() => {
 });
 
 describe("App.install", () => {
+  // Every install is pinned to NODE_ENV=development — a shell exporting
+  // `production` makes the package managers skip devDependencies and still
+  // exit 0 (see `installEnvironment` in helpers/app.ts).
+  const installEnv = { env: { NODE_ENV: "development" } };
+
   it("delegates to runCommand with `<pm> install` in the app directory", () => {
     const instance = makeApp(workdir);
 
     instance.install();
 
-    expect(runCommand).toHaveBeenCalledWith("yarn", ["install"], workdir);
+    expect(runCommand).toHaveBeenCalledWith(
+      "yarn",
+      ["install"],
+      workdir,
+      installEnv,
+    );
   });
 
   it("follows the active package manager", () => {
@@ -98,7 +108,12 @@ describe("App.install", () => {
 
     instance.install();
 
-    expect(runCommand).toHaveBeenCalledWith("pnpm", ["install"], workdir);
+    expect(runCommand).toHaveBeenCalledWith(
+      "pnpm",
+      ["install"],
+      workdir,
+      installEnv,
+    );
   });
 });
 
@@ -164,6 +179,111 @@ describe("App.installFeatures", () => {
     // --no-install MUST be the final token (the CLI parser would otherwise
     // swallow the first feature as the flag's value).
     expect(args[args.length - 1]).toBe("--no-install");
+  });
+});
+
+describe("App.pinViteResolution", () => {
+  /**
+   * Write the package.json a scaffold is left holding AFTER
+   * `warlock add <features> --no-install` has recorded the feature deps, but
+   * BEFORE the batched install runs. The `web` feature contributes `vite` to
+   * devDependencies; `vitest` is already there from the template.
+   */
+  function writeScaffoldPackageJson(
+    devDependencies: Record<string, string>,
+    rest: Record<string, unknown> = {},
+  ) {
+    writeFileSync(
+      path.join(workdir, "package.json"),
+      JSON.stringify({ name: "my-warlock-app", devDependencies, ...rest }),
+    );
+  }
+
+  function readScaffoldPackageJson() {
+    return JSON.parse(
+      readFileSync(path.join(workdir, "package.json"), "utf-8"),
+    );
+  }
+
+  it("pins vite for yarn AND npm/pnpm when a web-feature scaffold has both vite and vitest", () => {
+    writeScaffoldPackageJson({
+      "@vitejs/plugin-react": "^5.2.0",
+      vite: "^7.3.5",
+      vitest: "^4.0.6",
+    });
+
+    const pinned = makeApp(workdir).pinViteResolution();
+
+    expect(pinned).toBe(true);
+
+    const packageJson = readScaffoldPackageJson();
+
+    // yarn 1 dies in the link phase without this; npm/pnpm merely nest.
+    expect(packageJson.resolutions).toEqual({ vite: "^7.3.5" });
+    expect(packageJson.overrides).toEqual({ vite: "^7.3.5" });
+  });
+
+  it("mirrors whatever range the project declares rather than a literal of its own", () => {
+    writeScaffoldPackageJson({ vite: "^9.1.2", vitest: "^4.0.6" });
+
+    makeApp(workdir).pinViteResolution();
+
+    const packageJson = readScaffoldPackageJson();
+
+    expect(packageJson.resolutions.vite).toBe("^9.1.2");
+    expect(packageJson.overrides.vite).toBe("^9.1.2");
+  });
+
+  it("reads vite out of dependencies too, not only devDependencies", () => {
+    writeScaffoldPackageJson(
+      { vitest: "^4.0.6" },
+      { dependencies: { vite: "^7.3.5" } },
+    );
+
+    expect(makeApp(workdir).pinViteResolution()).toBe(true);
+    expect(readScaffoldPackageJson().resolutions.vite).toBe("^7.3.5");
+  });
+
+  it("does nothing when the scaffold has vitest but no vite (no web feature)", () => {
+    writeScaffoldPackageJson({ vitest: "^4.0.6" });
+
+    expect(makeApp(workdir).pinViteResolution()).toBe(false);
+    expect(readScaffoldPackageJson().resolutions).toBeUndefined();
+    expect(readScaffoldPackageJson().overrides).toBeUndefined();
+  });
+
+  it("does nothing when the scaffold has vite but no vitest to conflict with it", () => {
+    writeScaffoldPackageJson({ vite: "^7.3.5" });
+
+    expect(makeApp(workdir).pinViteResolution()).toBe(false);
+    expect(readScaffoldPackageJson().resolutions).toBeUndefined();
+  });
+
+  it("keeps unrelated resolutions/overrides the project already declares", () => {
+    writeScaffoldPackageJson(
+      { vite: "^7.3.5", vitest: "^4.0.6" },
+      {
+        resolutions: { "some-pkg": "1.0.0" },
+        overrides: { "some-pkg": "1.0.0" },
+      },
+    );
+
+    makeApp(workdir).pinViteResolution();
+
+    const packageJson = readScaffoldPackageJson();
+
+    expect(packageJson.resolutions).toEqual({
+      "some-pkg": "1.0.0",
+      vite: "^7.3.5",
+    });
+    expect(packageJson.overrides).toEqual({
+      "some-pkg": "1.0.0",
+      vite: "^7.3.5",
+    });
+  });
+
+  it("reports false instead of throwing when there is no package.json", () => {
+    expect(makeApp(workdir).pinViteResolution()).toBe(false);
   });
 });
 

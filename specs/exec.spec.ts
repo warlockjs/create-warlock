@@ -115,9 +115,12 @@ describe("executeCommand (async, resolves boolean)", () => {
     child.emit("close", 0);
 
     await expect(promise).resolves.toBe(true);
+    // Output is piped and captured (not discarded) so a failure can be
+    // explained; with no `options.env` the child inherits the ambient env.
     expect(spawnFn).toHaveBeenCalledWith("git", ["init"], {
       cwd: "/repo",
-      stdio: "ignore",
+      stdio: ["ignore", "pipe", "pipe"],
+      env: process.env,
     });
   });
 

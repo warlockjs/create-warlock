@@ -167,6 +167,13 @@ export async function createWarlockApp(
     let featureInstall: CommandResult | undefined;
 
     if (addedFeatures.length > 0) {
+      // `warlock add` records the feature dependencies but does not reconcile
+      // them with each other. The `web` feature brings `vite` while the
+      // template always brings `vitest`, whose own vite range resolves to a
+      // different major — two copies, and yarn 1 aborts the whole link phase
+      // on them. Pin one copy BEFORE the batched install, not after.
+      application.pinViteResolution();
+
       const install = application.install();
       const installed = await install.install;
 
