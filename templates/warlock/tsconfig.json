@@ -10,18 +10,27 @@
     "downlevelIteration": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "typeRoots": ["./src/typings.d.ts"],
     "noFallthroughCasesInSwitch": true,
     "module": "ESNext",
     "jsx": "react-jsx",
     "isolatedModules": true,
-    "moduleResolution": "node",
+    // "bundler", not "node". The framework builds this project with esbuild, and
+    // every `@warlock.js/*` package ships an `exports` map with subpath entries
+    // (e.g. `@warlock.js/core/tests`). Classic "node" resolution ignores
+    // `exports` entirely, so those subpaths resolved to nothing and any import
+    // of one failed to typecheck even though it ran fine at runtime.
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "paths": {
       "app/*": ["./src/app/*"]
     },
     "noEmit": true
   },
-  "include": ["src", "warlock.config.ts", ".warlock/typings/*.d.ts"],
+  // `src/typings.d.ts` is listed explicitly even though "src" already covers it:
+  // it is the project's module-augmentation file, and a dangling reference to it
+  // here is exactly the bug this replaced (it used to sit under `typeRoots`,
+  // which takes DIRECTORIES of @types packages, not files — so the entry pointed
+  // at a path that did not exist and did nothing).
+  "include": ["src", "src/typings.d.ts", "warlock.config.ts", ".warlock/typings/*.d.ts"],
   "exclude": ["node_modules"]
 }

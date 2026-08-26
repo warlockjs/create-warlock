@@ -9,8 +9,23 @@
  * selections here and delegates the actual install to `warlock add`, so the
  * two never drift on versions again.
  *
- * Every `key` below MUST exist in core's `allowedFeatures`; a CI guard should
- * assert that subset relationship so a typo fails the build instead of shipping.
+ * Every `key` below MUST exist in core's `allowedFeatures`. A CI guard should
+ * assert that, but a subset assertion ALONE is not enough and has already let a
+ * bug ship: `--features=web,tailwind` was rejected with "Unknown feature(s):
+ * tailwind" because `tailwind` and `shadcn` existed in core and were missing
+ * from THIS file — a direction a scaffolder ⊆ core check cannot see. The guard
+ * has to run both ways:
+ *
+ *   1. scaffolder ⊆ core — catches a typo or a key core renamed.
+ *   2. core ⊆ scaffolder + an explicit omission list — catches a feature core
+ *      gained that never became scaffoldable.
+ *
+ * The two lists are not equal and should not be forced to be. As of this
+ * writing core holds 28 keys and this file offers 24; the other four are
+ * deliberate and are the entire allow-list direction (2) needs:
+ * `mongodb`, `postgres`, `mysql` (the database driver has its own select) and
+ * `ai` (pulled automatically by every `ai-*` key's `requires`). Anything beyond
+ * those four is a gap, not a decision, and should fail the build.
  */
 
 export type FeatureGroup =
@@ -51,6 +66,18 @@ export const features: FeatureOption[] = [
     key: "web",
     label: "Web (SSR React pages)",
     hint: "Server-rendered React pages on the same server as your API — scaffolds src/web and registers the connector",
+    group: "Rendering & Mail",
+  },
+  {
+    key: "tailwind",
+    label: "Tailwind CSS",
+    hint: "Tailwind v4 for the SSR page layer — creates src/web/app.css (the CSS-first config) and wires it through Vite (pulls web)",
+    group: "Rendering & Mail",
+  },
+  {
+    key: "shadcn",
+    label: "shadcn/ui prerequisites",
+    hint: "components.json, cn(), design tokens, and the web/* tsconfig path so `npx shadcn add <component>` works first time (pulls tailwind)",
     group: "Rendering & Mail",
   },
   {

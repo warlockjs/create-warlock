@@ -1,7 +1,7 @@
 /**
  * Sample test to verify test infrastructure
  */
-import { testGet } from "@warlock.js/core";
+import { testGet } from "@warlock.js/core/tests";
 import { describe, expect, it } from "vitest";
 
 describe("Test Infrastructure", () => {

@@ -18,6 +18,7 @@
     "fix": "npx eslint --fix -c ./.eslintrc.json ./src --max-warnings=0",
     "format": "npx prettier --write ./src/**/*.{js,jsx,ts,tsx,css,md,json} --config ./.prettierrc.json",
     "test": "npx vitest run",
+    "typecheck:scaffold": "node scripts/typecheck-scaffold.mjs",
     "llms": "node scripts/generate-llms.mjs",
     "update": "npx tsx version-checker.ts"
   },

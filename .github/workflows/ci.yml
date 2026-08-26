@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  # The scaffold job installs the framework from the registry, so it can go red
+  # without anyone touching this repo — a framework release is enough. The
+  # nightly run is what turns that from "the next contributor discovers it" into
+  # "we find out the day it happens".
+  schedule:
+    - cron: "0 4 * * *"
+  workflow_dispatch:
+
+jobs:
+  specs:
+    name: Specs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm install
+
+      - name: Vitest
+        run: npm test
+
+  scaffold-typecheck:
+    name: Fresh scaffold typechecks
+    runs-on: ubuntu-latest
+    # Scaffolding runs a full dependency install of the generated project on top
+    # of this repo's own install.
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm install
+
+      # Scaffolds a real project into a temp dir, installs it, and runs THAT
+      # project's `tsc --noEmit`. Typechecking `templates/warlock/` in place
+      # would prove nothing: it has no node_modules, so every framework type
+      # would resolve to `any`. See the header of the script.
+      - name: Typecheck a freshly scaffolded project
+        run: npm run typecheck:scaffold

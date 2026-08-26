@@ -4,6 +4,44 @@ All notable changes to `create-warlock` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@warlock.js/*` packages are released in lockstep — every package shares the same version number, so a version below may list only the changes that affected this package.
 
+## 5.1.0
+
+> **If your scaffold includes the `web` feature, upgrade.** React did not execute at all
+> in published installs of `@warlock.js/web` 5.0.0 through 5.0.2 — see that package's
+> changelog for the defect and its fix.
+
+### Added
+
+- **The scaffold typechecks from a fresh install, and a CI gate keeps it that way.** A
+  newly created project previously could fail `tsc` on its own generated source.
+- **A real home page**, replacing the placeholder — it includes a counter whose working
+  state is proof that hydration actually ran in the browser.
+
+### Changed
+
+- **`src/typings.d.ts` is now the sanctioned home for `RequestLocals` / `RequestUser`
+  module augmentation.** The file is generated with both augmentation blocks stubbed and
+  commented, so there is one obvious place to declare per-request typed data.
+- Replaced stale scaffold values that had been carried forward: the `wow2` project name
+  and the `4.15.0` dependency version no longer appear in generated projects.
+
+## 5.0.2 - 2026-08-25
+
+No changes to `create-warlock`. Released in lockstep with the `@warlock.js/web` SSR fix
+(`ssr.noExternal`) — see that package's changelog.
+
+## 5.0.1 - 2026-08-25
+
+### Fixed
+
+- **The `warlock` binary was never linked in a yarn-1 scaffold.** Installing the batched
+  features under yarn 1 hit an *Invariant Violation* in yarn's linker, which aborted the
+  install before `node_modules/.bin` was written — leaving a scaffolded project whose
+  own `warlock` command did not exist. `App.pinViteResolution()` now writes matching
+  `resolutions` and `overrides` entries for vite into the generated `package.json`
+  *before* the batched feature install runs, so a single vite version is resolved and
+  the linker completes.
+
 ## 5.0.0 - 2026-08-25
 
 ### Added

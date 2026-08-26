@@ -7,5 +7,6 @@ export default Migration.create(User, {
   password: string(255),
   image: string(500).nullable(),
   imageMetadata: json().nullable(),
+  lastLogin: timestamp().nullable(),
   deletedAt: timestamp().nullable(),
 });

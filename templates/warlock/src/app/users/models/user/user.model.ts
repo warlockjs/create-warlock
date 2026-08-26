@@ -9,6 +9,11 @@ export const userSchema = v.object({
   email: v.email().requiredIfEmpty("id"),
   image: v.string(),
   password: v.string().min(6).requiredIfEmpty("id").addTransformer(useHashedPassword()),
+  // Written by the social-login handler (`app/users/services/login-social.ts`).
+  // A field only reachable through `save({ merge })` still has to be declared
+  // here — `merge` is typed against this schema, so an undeclared key is a
+  // compile error, not a silent write.
+  lastLogin: v.date(),
 });
 
 export type UserSchema = Infer<typeof userSchema>;

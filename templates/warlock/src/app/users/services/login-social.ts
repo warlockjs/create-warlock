@@ -13,8 +13,14 @@ const loginSocial: GuardedRequestHandler = async ({ request, response }) => {
 
   const auth = await user.generateAccessToken();
 
-  user.save({
-    lastLogin: new Date(),
+  // `save()` takes WriterOptions — the fields to write go under `merge`, typed
+  // against `userSchema`. Passing `{ lastLogin }` at the top level was not a
+  // write at all: it was an unknown option, and the value went nowhere.
+  // Awaited, so the write is not a floating promise racing the response.
+  await user.save({
+    merge: {
+      lastLogin: new Date(),
+    },
   });
 
   return response.success({
