@@ -69,6 +69,36 @@ dependency versions. That remains unresolved from this package's fence and
 should be verified against a real published (or `--install-links`) install,
 not from source.
 
+## CI
+
+`.github/workflows/ci.yml` runs two jobs:
+
+- **`specs`** — on pushes to `main`/`master` and on pull requests: `node scripts/check-resolver-boundaries.mjs`
+  (below), a smoke test that the built CLI's `--version` output matches `package.json`, then
+  `vitest`.
+- **`scaffold-typecheck`** — scaffolds a real project with the current scaffolder, installs
+  it, and runs that project's own `tsc --noEmit` (`npm run typecheck:scaffold`; see the
+  header of `scripts/typecheck-scaffold.mjs` for why this can't be done by typechecking
+  `templates/warlock/` in place).
+
+Both jobs also run nightly (`cron "0 4 * * *"`) and on `workflow_dispatch`, in addition to
+push/PR — `scaffold-typecheck` installs the framework from the registry, so a framework
+release alone can turn it red without anyone touching this repo, and the nightly run is what
+surfaces that the same day rather than when the next contributor happens to run it.
+
+### Resolver-boundary check
+
+`scripts/check-resolver-boundaries.mjs` treats every `package.json` in the checkout as an
+independent publish boundary. It walks each package's `tsconfig.json` `compilerOptions.paths`
+and any `vite.config.*` / `vitest.config.*` alias, and fails (exit 1, one line per violation)
+if a target resolves outside that package's own directory. An alias inside the package (e.g.
+pointing `app/*` at its own `src/*`) is fine; one that reaches into a sibling checkout is not
+— it resolves in this monorepo today and breaks the moment the package is installed on its
+own, which nothing else here catches before publish. Run it directly with
+`node scripts/check-resolver-boundaries.mjs [root]` (defaults to this package's root); its
+pure logic is exported as `findResolverBoundaryViolations` and covered by
+`specs/resolver-boundaries.spec.ts`.
+
 ## License
 
 This project is licensed under the MIT License.

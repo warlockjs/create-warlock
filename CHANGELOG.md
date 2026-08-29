@@ -4,6 +4,31 @@ All notable changes to `create-warlock` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@warlock.js/*` packages are released in lockstep — every package shares the same version number, so a version below may list only the changes that affected this package.
 
+## Unreleased
+
+### Added
+
+- **A resolver-boundary check (`scripts/check-resolver-boundaries.mjs`), run in CI.** Every
+  `package.json` in the checkout is treated as a publish boundary; the script walks each
+  package's `tsconfig.json` `paths` and any `vite.config.*` / `vitest.config.*` alias and
+  fails if one resolves outside its own package. A test/build-only alias that reaches into a
+  sibling checkout (e.g. `../core/src`) proves nothing about the published package — it
+  resolves locally today and 404s the moment the package is installed on its own. Covered by
+  `specs/resolver-boundaries.spec.ts`.
+- **`--help`/`--version` are now exercised end to end** (`specs/cli-entry.spec.ts`): both exit
+  0 before `createNewApp` runs — no prompt, filesystem write, or network call — and `--help`
+  wins even over a positional project name and other flags. `--version` prints this package's
+  own `package.json` version, pinned loosely (a bare semver-ish string) since the exact value
+  drifts every release.
+- **A CI workflow (`.github/workflows/ci.yml`)**, with two jobs: `specs` (resolver-boundary
+  check, a `--version` smoke test asserting the built CLI's reported version matches
+  `package.json`, then `vitest`) and `scaffold-typecheck` (the existing
+  `typecheck:scaffold` gate, scaffolding a real project and installing it). `specs` runs on
+  pushes to `main`/`master` and every pull request; both jobs also run nightly
+  (`schedule: cron "0 4 * * *"`) plus
+  `workflow_dispatch`, since the scaffold-typecheck gate installs the framework from the
+  registry and can go red from a framework release alone, without anyone touching this repo.
+
 ## 5.1.0
 
 > **If your scaffold includes the `web` feature, upgrade.** React did not execute at all

@@ -53,6 +53,8 @@ Pass `--yes` (or `-y`) to skip every prompt and build from flags with defaults.
 
 Value flags accept either `--db=postgres` or `--db postgres`. Unknown `--features` / `--ai` keys fail fast before any install.
 
+`--help`/`-h` and `--version`/`-v` short-circuit before anything else — no prompt, filesystem write, or network call, and `--help` wins even over a positional project name. `--version` prints the installed `create-warlock` version.
+
 ## Valid keys
 
 **Database drivers** (`--db`):
@@ -64,7 +66,7 @@ Value flags accept either `--db=postgres` or `--db postgres`. Unknown `--feature
 | `mysql`    | 3306         | coming soon (disabled in the wizard) |
 | `none`     | —            | opt out — no driver, no driver package, `src/config/database.ts` removed |
 
-**Features** (`--features`): `react`, `react-email`, `mail`, `ses`, `image`, `s3`, `redis`, `scheduler`, `herald`, `socket`, `swagger`, `postman`, `test`.
+**Features** (`--features`): `react`, `react-email`, `mail`, `ses`, `image`, `s3`, `redis`, `scheduler`, `herald`, `socket`, `test`, `access`, `web`, `tailwind`, `shadcn`, `notifications`.
 
 **AI providers / packages** (`--ai`): `ai-openai`, `ai-google`, `ai-anthropic`, `ai-bedrock`, `ai-ollama`, plus the capability packages `ai-tools`, `ai-panoptic`, `ai-workspace`. Any pick auto-pulls the core `@warlock.js/ai` package.
 
