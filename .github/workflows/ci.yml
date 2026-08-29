@@ -23,7 +23,19 @@ jobs:
         with:
           node-version: 20
 
+      - name: Pin Yarn
+        run: corepack enable && corepack prepare yarn@1.22.22 --activate
+
       - run: yarn install --frozen-lockfile
+
+      - name: Check resolver boundaries
+        run: node scripts/check-resolver-boundaries.mjs
+
+      - name: Smoke CLI version
+        run: |
+          actual="$(./node_modules/.bin/tsx src/index.ts --version)"
+          expected="$(node -p "require('./package.json').version")"
+          test "$actual" = "$expected"
 
       - name: Vitest
         run: npm test
@@ -40,6 +52,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      - name: Pin Yarn
+        run: corepack enable && corepack prepare yarn@1.22.22 --activate
 
       - run: yarn install --frozen-lockfile
 

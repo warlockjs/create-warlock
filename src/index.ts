@@ -1,8 +1,33 @@
+import { getJsonFile } from "@warlock.js/fs";
 import createNewApp from "./commands/create-new-app";
 import { CliFlags } from "./commands/create-new-app/types";
 import { NO_DATABASE } from "./features/database-drivers";
+import { packageRoot } from "./helpers/paths";
 
 const valueFlags = ["name", "db", "pm", "features", "ai"];
+
+const HELP_TEXT = `
+  create-warlock — scaffold a new Warlock.js project
+
+  Usage
+    $ create-warlock [project-name] [options]
+
+  Options
+    --name              Project name (or pass it as the first positional arg)
+    --db=<driver>        Database driver (e.g. postgres, mongodb)
+    --no-db               Skip database selection entirely
+    --features=<list>    Comma-separated feature keys (e.g. test,herald)
+    --ai=<list>           Comma-separated AI provider keys (e.g. openai,anthropic)
+    --pm=<manager>        Package manager to use (npm, yarn, pnpm)
+    --git / --no-git      Force-enable or force-disable git initialization
+    --jwt / --no-jwt      Force-enable or force-disable JWT secret generation
+    -y, --yes             Skip prompts and accept defaults for anything unset
+    -h, --help            Show this help message and exit
+    -v, --version         Show the installed create-warlock version and exit
+
+  Example
+    $ create-warlock my-app --db=postgres --features=test,herald --yes
+`;
 
 /**
  * Parse the scaffolder's own CLI flags for non-interactive mode.
@@ -37,6 +62,14 @@ export function parseFlags(argv: string[]): CliFlags {
     }
 
     switch (key) {
+      case "help":
+      case "h":
+        flags.help = true;
+        break;
+      case "version":
+      case "v":
+        flags.version = true;
+        break;
       case "yes":
       case "y":
         flags.yes = true;
@@ -91,8 +124,33 @@ function splitList(value: string | undefined): string[] {
     .filter(Boolean);
 }
 
+/**
+ * Read this package's own `version` field. A plain JSON read — no network
+ * call, no write, nothing else touched — so `--version` stays a pure,
+ * side-effect-free exit.
+ */
+export function packageVersion(): string {
+  return (getJsonFile(packageRoot("package.json")) as { version: string })
+    .version;
+}
+
 export default function createApp() {
   const flags = parseFlags(process.argv.slice(2));
+
+  // `--help` and `--version` must exit before anything that touches the
+  // filesystem, the network, or a prompt — they win over every other flag,
+  // including a positional project name.
+  if (flags.help) {
+    console.log(HELP_TEXT);
+    process.exit(0);
+    return;
+  }
+
+  if (flags.version) {
+    console.log(packageVersion());
+    process.exit(0);
+    return;
+  }
 
   // An unexpected throw must surface as a readable error AND a non-zero exit
   // code — never as a stack trace the user scrolls past on the way to a green

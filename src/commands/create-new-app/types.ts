@@ -30,4 +30,8 @@ export type CliFlags = {
   pm?: string;
   git?: boolean;
   jwt?: boolean;
+  /** `-h` / `--help` — print usage and exit before any scaffolding runs. */
+  help?: boolean;
+  /** `-v` / `--version` — print the installed version and exit. */
+  version?: boolean;
 };

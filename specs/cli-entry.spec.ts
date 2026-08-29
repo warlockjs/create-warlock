@@ -115,4 +115,88 @@ describe("parseFlags — additional edge cases", () => {
 
     expect(flags.ai).toEqual([]);
   });
+
+  it("recognizes --help and its -h shorthand", () => {
+    expect(parseFlags(["--help"]).help).toBe(true);
+    expect(parseFlags(["-h"]).help).toBe(true);
+  });
+
+  it("recognizes --version and its -v shorthand", () => {
+    expect(parseFlags(["--version"]).version).toBe(true);
+    expect(parseFlags(["-v"]).version).toBe(true);
+  });
+});
+
+describe("createApp — --help / --version early exit", () => {
+  /**
+   * Both flags must short-circuit BEFORE `createNewApp` runs: no prompts, no
+   * filesystem writes, no network calls. We assert that by spying on
+   * `process.exit` (so the exit doesn't kill the test worker) and asserting
+   * `createNewApp` was never reached — the only filesystem read left is
+   * `packageVersion()`'s own `package.json` lookup, which is not a side
+   * effect (nothing is written, nothing is scaffolded).
+   */
+  let exitSpy: ReturnType<typeof vi.spyOn>;
+  let logSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    exitSpy = vi.spyOn(process, "exit").mockImplementation((() => undefined) as never);
+    logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    exitSpy.mockRestore();
+    logSpy.mockRestore();
+  });
+
+  it("--help prints usage, exits 0, and never reaches createNewApp", () => {
+    process.argv = ["node", "create-app.js", "--help"];
+
+    createApp();
+
+    expect(createNewApp).not.toHaveBeenCalled();
+    expect(exitSpy).toHaveBeenCalledWith(0);
+    expect(logSpy).toHaveBeenCalledTimes(1);
+    expect(logSpy.mock.calls[0][0]).toContain("Usage");
+  });
+
+  it("-h behaves identically to --help", () => {
+    process.argv = ["node", "create-app.js", "-h"];
+
+    createApp();
+
+    expect(createNewApp).not.toHaveBeenCalled();
+    expect(exitSpy).toHaveBeenCalledWith(0);
+  });
+
+  it("--version prints the package version, exits 0, and never reaches createNewApp", () => {
+    process.argv = ["node", "create-app.js", "--version"];
+
+    createApp();
+
+    expect(createNewApp).not.toHaveBeenCalled();
+    expect(exitSpy).toHaveBeenCalledWith(0);
+    expect(logSpy).toHaveBeenCalledTimes(1);
+    // Pinned loosely — the exact version drifts with every release, but it
+    // must be a bare semver-ish string, not an object or an error.
+    expect(logSpy.mock.calls[0][0]).toMatch(/^\d+\.\d+\.\d+/);
+  });
+
+  it("-v behaves identically to --version", () => {
+    process.argv = ["node", "create-app.js", "-v"];
+
+    createApp();
+
+    expect(createNewApp).not.toHaveBeenCalled();
+    expect(exitSpy).toHaveBeenCalledWith(0);
+  });
+
+  it("--help wins over a positional project name and other flags", () => {
+    process.argv = ["node", "create-app.js", "my-app", "--db=postgres", "--help"];
+
+    createApp();
+
+    expect(createNewApp).not.toHaveBeenCalled();
+    expect(exitSpy).toHaveBeenCalledWith(0);
+  });
 });
