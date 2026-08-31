@@ -25,7 +25,7 @@
   "dependencies": {
     "@clack/prompts": "^0.7.0",
     "@mongez/copper": "^2.1.2",
-    "@warlock.js/fs": "*",
+    "@warlock.js/fs": "workspace:^",
     "@mongez/reinforcements": "^4.0.1",
     "cross-spawn": "^7.0.3",
     "rimraf": "^6.0.1",
@@ -46,5 +46,6 @@
     "vitest": "4.1.10"
   },
   "module": "./src/index.ts",
-  "typings": "./src/index.ts"
+  "typings": "./src/index.ts",
+  "packageManager": "pnpm@11.24.0"
 }
