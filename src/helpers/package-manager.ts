@@ -114,11 +114,12 @@ export function getPreferredPackageManager(): string {
   const runningPm = detectPackageManager()?.name;
   if (runningPm && runningPm !== "npm") return runningPm;
 
-  // Priority 2: Yarn (if installed)
-  if (isInstalled("yarn")) return "yarn";
-
-  // Priority 3: pnpm (if installed)
+  // Priority 2: pnpm (if installed) — the framework's own package manager, so a
+  // scaffolded app defaults to the same tooling Warlock itself is developed with.
   if (isInstalled("pnpm")) return "pnpm";
+
+  // Priority 3: Yarn (if installed)
+  if (isInstalled("yarn")) return "yarn";
 
   // Priority 4: npm (default)
   return "npm";
