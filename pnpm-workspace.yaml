@@ -1,0 +1,7 @@
+# This repo is BOTH a member of the Warlock monorepo and an independently
+# CI'd repository. CI checks it out alone, so it needs its own pnpm config:
+# the root's allowBuilds does not travel with a standalone checkout.
+#
+# esbuild is a native binary and does not function without its install script.
+allowBuilds:
+  esbuild: true
