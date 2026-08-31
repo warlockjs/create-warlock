@@ -9,8 +9,15 @@
  * selections here and delegates the actual install to `warlock add`, so the
  * two never drift on versions again.
  *
- * Every `key` below MUST exist in core's `allowedFeatures`. A CI guard should
- * assert that, but a subset assertion ALONE is not enough and has already let a
+ * Every `key` below MUST exist in core’s `allowedFeatures`. That guard now
+ * EXISTS: `builder/scripts/check-feature-parity.ts`, run by every publishing
+ * script in `builder/package.json`, so a release aborts before `pkgist` starts.
+ * It could not live in this repo: this package deliberately does not depend on
+ * `@warlock.js/core`, and our own CI checks out only this repo, so core’s keys
+ * are not present here to compare against. `builder` sits above both and
+ * imports each by relative path, adding no dependency edge in either direction.
+ *
+ * A subset assertion ALONE is not enough and has already let a
  * bug ship: `--features=web,tailwind` was rejected with "Unknown feature(s):
  * tailwind" because `tailwind` and `shadcn` existed in core and were missing
  * from THIS file — a direction a scaffolder ⊆ core check cannot see. The guard
