@@ -11,7 +11,7 @@ description: 'Scaffold a brand-new Warlock.js project with `create-warlock` — 
 
 ```bash
 # Interactive wizard (recommended for humans)
-yarn create warlock
+pnpm create warlock
 # or: npm create warlock@latest / pnpm create warlock / npx create-warlock
 
 # Non-interactive (CI, agents, reproducible setups) — one command scaffolds the whole app
