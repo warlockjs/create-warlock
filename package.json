@@ -1,6 +1,6 @@
 {
   "name": "create-warlock",
-  "version": "5.2.2",
+  "version": "5.2.3",
   "description": "Project scaffolder for the Warlock.js framework — interactive wizard and non-interactive CLI for creating new apps.",
   "main": "./src/index.ts",
   "license": "MIT",
