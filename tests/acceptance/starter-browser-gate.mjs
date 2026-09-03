@@ -83,44 +83,6 @@ const report = {
   failures: [],
 };
 
-let passed = false;
-try {
-  Object.assign(report, await runGate(candidate));
-  passed = Object.values(report.checks).every(Boolean);
-} catch (error) {
-  report.failures.push(formatError(error));
-} finally {
-  for (const key of ["chrome", "server"]) {
-    try {
-      await stopOwned(key);
-    } catch (error) {
-      report.failures.push(`${key} cleanup: ${formatError(error)}`);
-    }
-  }
-  passed = passed && report.failures.length === 0;
-}
-
-console.log(`EVIDENCE ${JSON.stringify(report, null, 2)}`);
-if (!passed && output.server.length) printTail("SERVER", output.server);
-if (!passed && output.chrome.length) printTail("CHROME", output.chrome);
-
-if (options.keepTemp && state.tempRoot) {
-  console.log(`TEMP kept=${state.tempRoot}`);
-} else if (state.tempRoot) {
-  try {
-    await rm(state.tempRoot, { recursive: true, force: true });
-    console.log(`TEMP removed=${state.tempRoot}`);
-  } catch (error) {
-    passed = false;
-    console.log(
-      `TEMP cleanup-failed=${state.tempRoot} error=${formatError(error)}`,
-    );
-  }
-}
-
-console.log(`EXIT ${passed ? "PASS" : "FAIL"} code=${passed ? 0 : 1}`);
-process.exitCode = passed ? 0 : 1;
-
 async function runGate({ registry, version, port, chrome }) {
   await assertPortFree(port, "starter");
   if (typeof globalThis.WebSocket !== "function") {
@@ -145,6 +107,10 @@ async function runGate({ registry, version, port, chrome }) {
     "utf8",
   );
   const env = isolatedEnv(registry, npmrc, npmCache);
+  report.checks.developmentInstallEnvironment = env.NODE_ENV === "development";
+  if (!report.checks.developmentInstallEnvironment) {
+    throw new Error(`INVALID_INSTALL_ENVIRONMENT: NODE_ENV=${env.NODE_ENV}`);
+  }
 
   console.log(`CANDIDATE registry=${registry} version=${version} port=${port}`);
   console.log(
@@ -170,7 +136,7 @@ async function runGate({ registry, version, port, chrome }) {
     {
       cwd: state.tempRoot,
       env,
-      timeoutMs: 10 * 60_000,
+      timeoutMs: 20 * 60_000,
       label: "checkout scaffolder",
     },
   );
@@ -430,6 +396,13 @@ async function driveChrome({ chrome, baseUrl, profile }) {
       `document.readyState === "complete" && document.querySelector("#contact-demo")`,
       30_000,
     );
+    await waitForExpression(
+      cdp,
+      sessionId,
+      `Object.keys(document.querySelector("#root") ?? {}).some(key => key.startsWith("__reactContainer$"))`,
+      30_000,
+    );
+    report.checks.reactRootAttached = true;
     const payload = await evaluate(
       cdp,
       sessionId,
@@ -482,6 +455,10 @@ async function driveChrome({ chrome, baseUrl, profile }) {
       consoleErrors,
       exceptions,
     };
+  } catch (error) {
+    throw new Error(
+      `${formatError(error)}; consoleErrors=${JSON.stringify(consoleErrors)}; exceptions=${JSON.stringify(exceptions)}; documentRequests=${JSON.stringify(documentRequests)}; contactStatus=${contactStatus}`,
+    );
   } finally {
     cdp.close();
   }
@@ -666,6 +643,7 @@ function isolatedEnv(registry, npmrc, cache) {
   );
   return {
     ...env,
+    NODE_ENV: "development",
     npm_config_registry: registry,
     NPM_CONFIG_REGISTRY: registry,
     npm_config_userconfig: npmrc,
@@ -895,3 +873,41 @@ function formatError(error) {
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+let passed = false;
+try {
+  Object.assign(report, await runGate(candidate));
+  passed = Object.values(report.checks).every(Boolean);
+} catch (error) {
+  report.failures.push(formatError(error));
+} finally {
+  for (const key of ["chrome", "server"]) {
+    try {
+      await stopOwned(key);
+    } catch (error) {
+      report.failures.push(`${key} cleanup: ${formatError(error)}`);
+    }
+  }
+  passed = passed && report.failures.length === 0;
+}
+
+console.log(`EVIDENCE ${JSON.stringify(report, null, 2)}`);
+if (!passed && output.server.length) printTail("SERVER", output.server);
+if (!passed && output.chrome.length) printTail("CHROME", output.chrome);
+
+if (options.keepTemp && state.tempRoot) {
+  console.log(`TEMP kept=${state.tempRoot}`);
+} else if (state.tempRoot) {
+  try {
+    await rm(state.tempRoot, { recursive: true, force: true });
+    console.log(`TEMP removed=${state.tempRoot}`);
+  } catch (error) {
+    passed = false;
+    console.log(
+      `TEMP cleanup-failed=${state.tempRoot} error=${formatError(error)}`,
+    );
+  }
+}
+
+console.log(`EXIT ${passed ? "PASS" : "FAIL"} code=${passed ? 0 : 1}`);
+process.exitCode = passed ? 0 : 1;
