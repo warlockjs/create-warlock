@@ -8,9 +8,9 @@ import {
   putJsonFile,
   renameFile,
 } from "@warlock.js/fs";
-import { unlinkSync } from "node:fs";
+import { existsSync, rmSync, unlinkSync } from "node:fs";
 import path from "path";
-import { AppOptions, Application } from "../commands/create-new-app/types";
+import { Application, AppOptions } from "../commands/create-new-app/types";
 import { getDatabaseDriver } from "../features/database-drivers";
 import { executeCommand, runCommand } from "./exec";
 import { getPackageManager } from "./package-manager";
@@ -82,9 +82,8 @@ export class App {
   }
 
   public async git() {
-    const { initializeGitRepository } = await import(
-      "./project-builder-helpers"
-    );
+    const { initializeGitRepository } =
+      await import("./project-builder-helpers");
     return await initializeGitRepository(this.path);
   }
 
@@ -125,9 +124,7 @@ export class App {
       );
     }
 
-    const hooks = content.huskier?.hooks as
-      | Record<string, unknown>
-      | undefined;
+    const hooks = content.huskier?.hooks as Record<string, unknown> | undefined;
 
     if (hooks) {
       for (const hook of Object.keys(hooks)) {
@@ -193,10 +190,16 @@ export class App {
 
     let envContent = getFile(this.path + "/.env") as string;
 
-    envContent = envContent.replace(/DB_PORT=\d+/, `DB_PORT=${driver.defaultPort}`);
+    envContent = envContent.replace(
+      /DB_PORT=\d+/,
+      `DB_PORT=${driver.defaultPort}`,
+    );
 
     if (envContent.includes("DB_DRIVER=")) {
-      envContent = envContent.replace(/DB_DRIVER=\w*/, `DB_DRIVER=${driver.value}`);
+      envContent = envContent.replace(
+        /DB_DRIVER=\w*/,
+        `DB_DRIVER=${driver.value}`,
+      );
     } else {
       envContent = envContent.replace(
         /DB_PORT=\d+/,
@@ -234,28 +237,75 @@ export class App {
   }
 
   /**
-   * Pick the home page implementation based on whether React was selected.
+   * Configure the web starter only when the web feature owns `/`.
    *
-   * The template ships BOTH a plain JSON controller (`home-page.controller.ts`)
-   * and a React-rendered page (`home-page.controller.tsx` + `HomePageComponent.tsx`).
-   * Exactly one survives the scaffold: React projects keep the `.tsx` page (its
-   * `react`/`react-dom` deps come from the `react` feature), every other project
-   * keeps the dependency-free JSON controller — so a fresh project never imports
-   * `react` unless it asked for it.
+   * A dependency-free HTTP response is retained without web; otherwise the
+   * SSR page loader owns the route.
+   * Exactly one survives the scaffold: web projects keep the SSR page and API
+   * example; every other project keeps the dependency-free JSON controller.
    */
-  public configureHomePage(useReact: boolean) {
-    const controllers = this.path + "/src/app/shared/controllers";
-    const components = this.path + "/src/app/shared/components";
-
-    const remove = (file: string) => {
-      if (fileExists(file)) unlinkSync(file);
+  public configureWebStarter(useWeb: boolean) {
+    const remove = (relativePath: string) => {
+      const target = path.resolve(this.path, relativePath);
+      if (existsSync(target)) rmSync(target, { recursive: true, force: true });
     };
 
-    if (useReact) {
-      remove(controllers + "/home-page.controller.ts");
-    } else {
-      remove(controllers + "/home-page.controller.tsx");
-      remove(components + "/HomePageComponent.tsx");
+    if (!useWeb) {
+      for (const entry of [
+        "src/web",
+        "src/app/contact",
+        "src/app/locale",
+        "src/shared/contact.schema.ts",
+        "src/shared/locale.schema.ts",
+        "src/shared/locales.ts",
+        "postcss.config.mjs",
+      ]) {
+        remove(entry);
+      }
+
+      const tsconfigPath = path.resolve(this.path, "tsconfig.json");
+      const tsconfig = getFile(tsconfigPath) as string;
+      putFile(
+        tsconfigPath,
+        tsconfig
+          .replace('      "web/*": ["./src/web/*"],\n', "")
+          .replace('      "@shared/*": ["./src/shared/*"]\n', ""),
+      );
+
+      return this;
+    }
+
+    // The SSR page owns `/`; its loader still uses src/app/home/services.
+    remove("src/app/home/controllers/home-page.controller.ts");
+    remove("src/app/home/routes.ts");
+
+    const packageJsonPath = path.resolve(this.path, "package.json");
+    const packageJson = getJsonFile(packageJsonPath) as {
+      dependencies?: Record<string, string>;
+      devDependencies?: Record<string, string>;
+    };
+    packageJson.dependencies = {
+      ...packageJson.dependencies,
+      "@mongez/http": "^3.5.0",
+      "@mongez/react-form": "^4.0.0",
+    };
+    packageJson.devDependencies = {
+      ...packageJson.devDependencies,
+      "@tailwindcss/postcss": "^4.1.16",
+      tailwindcss: "^4.1.16",
+    };
+    putJsonFile(packageJsonPath, packageJson);
+
+    const configPath = path.resolve(this.path, "warlock.config.ts");
+    const config = getFile(configPath) as string;
+    if (!config.includes('"@warlock.js/web/connector"')) {
+      putFile(
+        configPath,
+        `import { webConnector } from "@warlock.js/web/connector";\n${config}`.replace(
+          "export default defineConfig({",
+          "export default defineConfig({\n  connectors: [webConnector()],",
+        ),
+      );
     }
 
     return this;

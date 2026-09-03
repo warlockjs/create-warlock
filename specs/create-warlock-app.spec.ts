@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { App } from "../src/helpers/app";
 import type { AppOptions } from "../src/commands/create-new-app/types";
+import type { App } from "../src/helpers/app";
 
 /**
  * `createWarlockApp` is the orchestration that walks a freshly-built `App`
@@ -76,7 +76,7 @@ function makeFakeApp(
     configureDatabaseEnv: vi.fn(function (this: unknown) {
       return this;
     }),
-    configureHomePage: vi.fn(function (this: unknown) {
+    configureWebStarter: vi.fn(function (this: unknown) {
       return this;
     }),
     install: vi.fn(() => ({
@@ -115,6 +115,15 @@ describe("createWarlockApp — template + base install", () => {
     expect(fake.updatePackageJson).toHaveBeenCalledTimes(1);
     expect(fake.updateDotEnv).toHaveBeenCalledTimes(1);
     expect(fake.configureDatabaseEnv).toHaveBeenCalledWith("mongodb");
+    expect(fake.configureWebStarter).toHaveBeenCalledWith(false);
+  });
+
+  it("uses web ownership only when the web feature was selected", async () => {
+    const fake = makeFakeApp({ features: ["web"] });
+
+    await run(fake);
+
+    expect(fake.configureWebStarter).toHaveBeenCalledWith(true);
   });
 
   it("invokes the base install at least once (so the warlock binary exists)", async () => {

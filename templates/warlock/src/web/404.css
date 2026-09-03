@@ -1,0 +1,113 @@
+.not-found,
+.not-found *,
+.not-found *::before,
+.not-found *::after {
+  box-sizing: border-box;
+}
+
+.not-found {
+  display: grid;
+  min-block-size: 100vh;
+  min-block-size: 100dvb;
+  align-items: center;
+  padding-block: clamp(2rem, 8vh, 6rem);
+  padding-inline: clamp(1.5rem, 7vw, 8rem);
+  background: #fafafa;
+  color: #18181b;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+.not-found__content {
+  inline-size: min(100%, 62rem);
+  margin-inline-start: clamp(0rem, 7vw, 8rem);
+}
+
+.not-found__title,
+.not-found__description {
+  margin: 0;
+}
+
+.not-found h1 {
+  margin: 0;
+  color: #facc15;
+  font-size: clamp(8rem, 25vw, 22rem);
+  font-weight: 800;
+  letter-spacing: -0.09em;
+  line-height: 0.72;
+}
+
+.not-found__title {
+  margin-block-start: clamp(2rem, 6vw, 5rem);
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: 680;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.not-found__description {
+  max-inline-size: 30rem;
+  margin-block-start: 0.75rem;
+  color: #52525b;
+  font-size: clamp(1rem, 1.4vw, 1.125rem);
+  line-height: 1.55;
+}
+
+.not-found__action {
+  display: inline-block;
+  margin-block-start: clamp(1.5rem, 3vw, 2.5rem);
+  padding-block: 0.65rem;
+  padding-inline: 1rem;
+  background: #facc15;
+  color: #18181b;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.not-found__action:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.not-found__action:focus-visible {
+  outline: 3px solid #18181b;
+  outline-offset: 4px;
+}
+
+:dir(rtl) .not-found__content {
+  margin-inline-start: 0;
+  margin-inline-end: clamp(0rem, 7vw, 8rem);
+}
+
+@media (max-width: 40rem) {
+  .not-found__content {
+    margin-inline-start: 0;
+  }
+
+  :dir(rtl) .not-found__content {
+    margin-inline-end: 0;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .not-found {
+    background: #18181b;
+    color: #fafafa;
+  }
+
+  .not-found__description {
+    color: #d4d4d8;
+  }
+
+  .not-found__action {
+    color: #18181b;
+  }
+
+  .not-found__action:focus-visible {
+    outline-color: #fafafa;
+  }
+}

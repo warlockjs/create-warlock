@@ -85,7 +85,7 @@ export async function createWarlockApp(
       application.configureDatabaseEnv(databaseDriver);
     }
 
-    application.configureHomePage(features.includes("react"));
+    application.configureWebStarter(features.includes("web"));
   } catch (error) {
     templateSpinner.stop(spinnerMessages.templateFailed);
 

@@ -22,7 +22,9 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "paths": {
-      "app/*": ["./src/app/*"]
+      "web/*": ["./src/web/*"],
+      "app/*": ["./src/app/*"],
+      "@shared/*": ["./src/shared/*"]
     },
     "noEmit": true
   },

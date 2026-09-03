@@ -48,7 +48,7 @@ function generateApp(): string {
     },
   };
 
-  new App(application).use("warlock");
+  new App(application).use("warlock").configureWebStarter(false);
   generatedRoots.push(root);
 
   return appPath;
@@ -68,7 +68,7 @@ afterEach(() => {
   }
 });
 
-describe("the ESLint config emitted by a real App.use() scaffold", () => {
+describe("the ESLint config emitted by a real no-web scaffold", () => {
   it("keeps the innocent no-CSS scaffold linting exactly as before", () => {
     const appPath = generateApp();
     const sourceFiles = readdirSync(path.join(appPath, "src"), {
