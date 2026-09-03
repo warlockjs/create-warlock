@@ -39,7 +39,7 @@ export default [
 
   // TypeScript files configuration
   {
-    files: ["**/*.ts", "**/*.tsx", "**/*.css"],
+    files: ["**/*.ts", "**/*.tsx"],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
