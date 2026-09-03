@@ -10,7 +10,7 @@ import "./styles/home.css";
 
 export { register } from "./register";
 
-export const route = "/";
+export const route = { path: "/", name: "home" };
 export const metadata = {
   title: "Warlock.js — Build with uncommon power",
   description:
