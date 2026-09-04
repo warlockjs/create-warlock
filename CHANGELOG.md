@@ -4,6 +4,26 @@ All notable changes to `create-warlock` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@warlock.js/*` packages are released in lockstep — every package shares the same version number, so a version below may list only the changes that affected this package.
 
+## 5.3.1 - 2026-09-04
+
+### Fixed
+
+- `npm create warlock@5.3.1` resolves and runs. The 5.3.0 scaffolder could not install, because the family's reciprocal exact peer requirements were unsatisfiable from a fresh registry install.
+
+## 5.3.0 - 2026-09-03
+
+### Added
+
+- A browser gate for the freshly scaffolded starter, so the generated project is exercised in a real browser rather than assumed to work.
+
+### Changed
+
+- The web starter template migrated to the current page contract, with a pinned home route identity so SSR and hydration agree on one route name.
+
+### Fixed
+
+- The scaffolder no longer parses CSS as TypeScript.
+
 ## 5.2.3 - 2026-09-02
 
 ### Fixed
