@@ -899,7 +899,13 @@ if (options.keepTemp && state.tempRoot) {
   console.log(`TEMP kept=${state.tempRoot}`);
 } else if (state.tempRoot) {
   try {
-    await rm(state.tempRoot, { recursive: true, force: true });
+    await rm(state.tempRoot, {
+      recursive: true,
+      force: true,
+      // Chrome can retain journal handles briefly after taskkill on Windows.
+      maxRetries: 5,
+      retryDelay: 200,
+    });
     console.log(`TEMP removed=${state.tempRoot}`);
   } catch (error) {
     passed = false;
