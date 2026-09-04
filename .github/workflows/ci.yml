@@ -33,6 +33,13 @@ jobs:
       - name: Check resolver boundaries
         run: node scripts/check-resolver-boundaries.mjs
 
+      # The template's own formatting, checked with the template's own config —
+      # the same config the scaffolded project receives. Without this, an
+      # unformatted template file reaches the user and their first `warlock dev`
+      # reports it as an error.
+      - name: Check template formatting
+        run: node scripts/format-check-template.mjs
+
       - name: Smoke CLI version
         run: |
           actual="$(./node_modules/.bin/tsx src/index.ts --version)"
