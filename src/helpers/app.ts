@@ -13,6 +13,7 @@ import path from "path";
 import { Application, AppOptions } from "../commands/create-new-app/types";
 import { getDatabaseDriver } from "../features/database-drivers";
 import { executeCommand, runCommand } from "./exec";
+import { insertImportInSortedPosition } from "./insert-import";
 import { getPackageManager } from "./package-manager";
 import { packageRoot, Template, template } from "./paths";
 import { fallbackRange } from "./warlock-versions";
@@ -283,9 +284,21 @@ export class App {
     const configPath = path.resolve(this.path, "warlock.config.ts");
     const config = getFile(configPath) as string;
     if (!config.includes('"@warlock.js/web/connector"')) {
+      // Inserted in sorted position, not prepended. The generated app formats
+      // with `prettier-plugin-organize-imports`, so an import pushed to the top
+      // of a file that already imports `@warlock.js/auth` and `@warlock.js/core`
+      // is out of order the moment it is written — and the developer meets it as
+      // a `prettier/prettier` error on their first `warlock dev`, in a file they
+      // did not write.
+      const withConnector = insertImportInSortedPosition(
+        config,
+        'import { webConnector } from "@warlock.js/web/connector";',
+        "@warlock.js/web/connector",
+      );
+
       putFile(
         configPath,
-        `import { webConnector } from "@warlock.js/web/connector";\n${config}`.replace(
+        withConnector.replace(
           "export default defineConfig({",
           "export default defineConfig({\n  connectors: [webConnector()],",
         ),
