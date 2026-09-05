@@ -631,7 +631,8 @@ describe("App template emission", () => {
     expect(existsSync(path.join(appPath, ".prettierrc.json"))).toBe(true);
     expect(existsSync(path.join(appPath, ".gitattributes"))).toBe(true);
     expect(existsSync(path.join(appPath, ".vscode/settings.json"))).toBe(true);
-    expect(existsSync(path.join(appPath, ".husky/pre-commit"))).toBe(true);
+    // husky was removed entirely (card b683be27) — the template no longer
+    // ships a .husky directory, so there is nothing to assert here.
     // .env.example is the source for .env and is left in place after copying.
     expect(existsSync(path.join(appPath, ".env.example"))).toBe(true);
   });

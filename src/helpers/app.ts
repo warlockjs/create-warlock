@@ -108,36 +108,20 @@ export class App {
     const content: any = pkg.content;
 
     // Substitute the chosen package manager ONLY into the fields the template
-    // writes it into literally — the `serve` script and the huskier hooks — by
-    // path, never with a blanket substring replace over the serialized JSON. A
-    // raw `replaceAll("yarn", pm)` rewrites every occurrence of the substring
+    // writes it into literally — the `serve` script — by path, never with a
+    // blanket substring replace over the serialized JSON. A raw
+    // `replaceAll("yarn", pm)` rewrites every occurrence of the substring
     // "yarn" anywhere in the document, so a project named `my-yarn-app`, or any
     // dependency/path containing "yarn", is silently corrupted (`--pm=npm`
     // turned `my-yarn-app` into `my-npm-app`). Field-scoped rewriting is also
-    // order-independent: the name lives in `content.name` and these tokens live
-    // in `scripts.serve` / `huskier.hooks`, disjoint fields that cannot collide
-    // with the name substitution above regardless of which runs first.
+    // order-independent: the name lives in `content.name` and this token lives
+    // in `scripts.serve`, a disjoint field that cannot collide with the name
+    // substitution above regardless of which runs first.
     if (typeof content.scripts?.serve === "string") {
       content.scripts.serve = content.scripts.serve.replaceAll(
         "yarn",
         packageManager,
       );
-    }
-
-    const hooks = content.huskier?.hooks as Record<string, unknown> | undefined;
-
-    if (hooks) {
-      for (const hook of Object.keys(hooks)) {
-        const commands = hooks[hook];
-
-        if (!Array.isArray(commands)) continue;
-
-        hooks[hook] = commands.map(command =>
-          typeof command === "string"
-            ? command.replaceAll("yarn", packageManager)
-            : command,
-        );
-      }
     }
 
     const warlockVersion: string = (

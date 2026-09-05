@@ -25,7 +25,6 @@
     "lint": "npx eslint --fix ./src --max-warnings=0",
     "format": "npx prettier --write ./src/**/*.{js,jsx,ts,tsx,css,md,json} --config ./.prettierrc.json",
     "tsc": "npx tsc --noEmit",
-    "prepare": "huskier-init && husky install",
     "postinstall": "agent-kit init && agent-kit sync || echo skills-sync-skipped",
     "skills:sync": "agent-kit sync",
     "skills:watch": "agent-kit watch",
@@ -47,7 +46,6 @@
   },
   "devDependencies": {
     "@mongez/agent-kit": "^1.2.1",
-    "@mongez/huskier": "^3.0.0",
     "@types/node": "^25.0.3",
     "@types/prettier": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^8.50.0",
@@ -59,16 +57,6 @@
     "prettier": "^3.7.4",
     "prettier-plugin-organize-imports": "^4.3.0",
     "typescript": "^5.9.3",
-    "husky": "^8.0.0",
     "vitest": "^4.0.6"
-  },
-  "huskier": {
-    "hooks": {
-      "pre-commit": [
-        "yarn format",
-        "yarn lint",
-        "yarn tsc"
-      ]
-    }
   }
 }
