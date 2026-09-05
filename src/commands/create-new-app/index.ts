@@ -31,6 +31,7 @@ import {
   setPackageManager,
 } from "../../helpers/package-manager";
 import { packageRoot } from "../../helpers/paths";
+import { hasInteractiveStdin } from "../../helpers/tty";
 import { showIntroBanner } from "../../ui/banner";
 import { createWarlockApp } from "../create-warlock-app";
 import getAppPath from "./get-app-path";
@@ -57,7 +58,22 @@ export default async function createNewApp(cli: CliFlags = {}) {
   }
 
   // Non-interactive path: build everything from flags and skip the prompts.
-  if (cli.yes) {
+  //
+  // Triggered by --yes, OR automatically the moment stdin has no TTY — CI, a
+  // script, an agent harness. This check MUST run before the first prompt
+  // call: attempting `text()`/`select()` on a non-TTY stdin does not fail
+  // cleanly, it crashes with a libuv internal ("TTY initialization failed:
+  // uv_tty_init returned EBADF") before any app directory exists, no matter
+  // how the run was invoked.
+  //
+  // Prompting is the fallback, not the precondition: a project name is the
+  // only answer with no sane default, so when a name is already available
+  // (positional arg or --name) the run proceeds exactly as --yes would, TTY
+  // or not. When the name is ALSO missing and there is no TTY to ask for one,
+  // createNonInteractive fails loudly — naming --yes and every non-interactive
+  // flag — instead of ever reaching a prompt. Every other prompt already has a
+  // default; see resolveNonInteractiveOptions below for the full table.
+  if (cli.yes || !hasInteractiveStdin()) {
     await createNonInteractive(cli);
     return;
   }
@@ -243,7 +259,16 @@ async function createNonInteractive(cli: CliFlags) {
   const appName = (cli.name ?? "").trim();
 
   if (!appName) {
-    cancel("--yes requires a project name (first argument or --name=<name>)");
+    // Reached either because --yes was passed with no name, or because stdin
+    // has no TTY to prompt for one — either way, nothing is left to fall back
+    // to. Name --yes AND every non-interactive flag so a CI log is enough to
+    // fix the invocation without hunting for docs.
+    cancel(
+      "A project name is required and no terminal is available to ask for one. " +
+        "Pass it as the first argument or --name=<name>. Non-interactive flags: " +
+        "--yes, --pm=<npm|yarn|pnpm>, --db=<driver>|--no-db, --features=<list>, " +
+        "--ai=<list>, --git|--no-git, --jwt|--no-jwt.",
+    );
     process.exit(1);
   }
 

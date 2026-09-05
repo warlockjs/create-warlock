@@ -76,6 +76,18 @@ vi.mock("../src/commands/create-new-app/get-app-path", () => ({
   default: (...args: unknown[]) => getAppPath(...args),
 }));
 
+// --- TTY detection -------------------------------------------------------
+// Defaults to "interactive" (a real terminal) so every existing prompt-driven
+// test below keeps exercising the prompt flow. Individual tests flip this to
+// simulate the no-TTY case (CI, a script, an agent harness) WITHOUT relying on
+// this test runner's own stdin, which is not a TTY either — the whole point
+// of mocking it.
+const hasInteractiveStdin = vi.fn(() => true);
+
+vi.mock("../src/helpers/tty", () => ({
+  hasInteractiveStdin: (...args: unknown[]) => hasInteractiveStdin(...args),
+}));
+
 // --- the installer we must NEVER actually run -------------------------------
 const createWarlockApp = vi.fn(async () => undefined);
 
@@ -112,6 +124,7 @@ beforeEach(() => {
   getAppPath.mockReturnValue("/tmp/reserved-app");
   detectPackageManagers.mockResolvedValue(undefined);
   createWarlockApp.mockResolvedValue(undefined);
+  hasInteractiveStdin.mockReturnValue(true);
 
   exitSpy = vi.spyOn(process, "exit").mockImplementation((code?: number) => {
     throw new ProcessExit(code);
@@ -421,9 +434,8 @@ describe("createNonInteractive (--yes)", () => {
 
   it("exits 1 when --yes is given without a project name", async () => {
     await expect(createNewApp({ yes: true })).rejects.toThrow(ProcessExit);
-    expect(cancel).toHaveBeenCalledWith(
-      "--yes requires a project name (first argument or --name=<name>)",
-    );
+    expect(cancel).toHaveBeenCalledWith(expect.stringContaining("--yes"));
+    expect(cancel).toHaveBeenCalledWith(expect.stringContaining("--name="));
     expect(exitSpy).toHaveBeenCalledWith(1);
   });
 
@@ -431,9 +443,7 @@ describe("createNonInteractive (--yes)", () => {
     await expect(createNewApp({ yes: true, name: "   " })).rejects.toThrow(
       ProcessExit,
     );
-    expect(cancel).toHaveBeenCalledWith(
-      "--yes requires a project name (first argument or --name=<name>)",
-    );
+    expect(cancel).toHaveBeenCalledWith(expect.stringContaining("--yes"));
   });
 
   it("accepts every allow-listed --pm value", async () => {
@@ -530,5 +540,84 @@ describe("createNonInteractive (--yes)", () => {
     expect(multiselect).not.toHaveBeenCalled();
     expect(confirm).not.toHaveBeenCalled();
     expect(createWarlockApp).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("createNewApp — non-TTY stdin (no keyboard to prompt at)", () => {
+  it("proceeds non-interactively with no --yes, once a name is available, without ever calling a prompt", async () => {
+    hasInteractiveStdin.mockReturnValue(false);
+
+    await createNewApp({ name: "ci-app", features: ["test"] });
+
+    expect(text).not.toHaveBeenCalled();
+    expect(select).not.toHaveBeenCalled();
+    expect(multiselect).not.toHaveBeenCalled();
+    expect(confirm).not.toHaveBeenCalled();
+
+    const app = capturedApp();
+    expect(app.name).toBe("ci-app");
+    expect(app.options.features).toEqual(["test"]);
+    // Same defaults --yes documents: mongodb, no git, no jwt.
+    expect(app.options.databaseDriver).toBe("mongodb");
+    expect(app.options.useGit).toBe(false);
+    expect(app.options.useJWT).toBe(false);
+  });
+
+  it("produces the identical descriptor as the equivalent --yes invocation (one path, not two)", async () => {
+    const flags = {
+      db: "postgres",
+      features: ["test", "herald"],
+      ai: ["ai-openai"],
+      pm: "pnpm",
+      git: true,
+      jwt: true,
+    } as const;
+
+    hasInteractiveStdin.mockReturnValue(true);
+    await createNewApp({ ...flags, yes: true, name: "twin-a" });
+    const viaYes = capturedApp();
+
+    vi.clearAllMocks();
+    getSystemPackageManagers.mockReturnValue(["npm", "yarn", "pnpm"]);
+    getPreferredPackageManager.mockReturnValue("yarn");
+    getPackageManager.mockReturnValue("yarn");
+    getAppPath.mockReturnValue("/tmp/reserved-app");
+    detectPackageManagers.mockResolvedValue(undefined);
+    createWarlockApp.mockResolvedValue(undefined);
+
+    hasInteractiveStdin.mockReturnValue(false);
+    await createNewApp({ ...flags, name: "twin-a" });
+    const viaNoTty = capturedApp();
+
+    expect(viaNoTty.options).toEqual(viaYes.options);
+  });
+
+  it("fails BEFORE any prompt is attempted, naming --yes and --name, when no name is available either — never a libuv crash", async () => {
+    hasInteractiveStdin.mockReturnValue(false);
+
+    await expect(createNewApp({})).rejects.toThrow(ProcessExit);
+
+    expect(text).not.toHaveBeenCalled();
+    expect(select).not.toHaveBeenCalled();
+    expect(multiselect).not.toHaveBeenCalled();
+    expect(confirm).not.toHaveBeenCalled();
+
+    const message = String(cancel.mock.calls[0][0]);
+    expect(message).toContain("--yes");
+    expect(message).toContain("--name=");
+    expect(message).not.toContain("uv_tty_init");
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(createWarlockApp).not.toHaveBeenCalled();
+  });
+
+  it("still prompts normally when a TTY IS present and --yes was not passed, even if flags are given", async () => {
+    hasInteractiveStdin.mockReturnValue(true);
+    primeHappyPath({ name: "interactive-app" });
+
+    await createNewApp({ name: "ignored-by-interactive-path" });
+
+    // The interactive branch never reads cli.name — it always prompts.
+    expect(text).toHaveBeenCalledTimes(1);
+    expect(capturedApp().name).toBe("interactive-app");
   });
 });
