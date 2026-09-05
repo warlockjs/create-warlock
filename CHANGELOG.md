@@ -4,6 +4,18 @@ All notable changes to `create-warlock` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@warlock.js/*` packages are released in lockstep — every package shares the same version number, so a version below may list only the changes that affected this package.
 
+## 5.3.2
+
+### Fixed
+
+- `npm create warlock` could not complete on a clean machine. The starter's `prepare` script ran husky, which needs a git repository, and the scaffolder installs before it runs `git init` — so the install failed and the scaffolder aborted with an empty `node_modules`, with and without `--no-git`.
+- The first `pnpm install` in a fresh project failed with `ERR_PNPM_IGNORED_BUILDS`. pnpm writes `pnpm-workspace.yaml` with a literal `esbuild: set this to true or false` placeholder when it meets an ignored build script non-interactively, and then rejects that value on the next install. The template now ships a decided value, so pnpm never writes the placeholder.
+- Running the scaffolder without a terminal — from CI, a script, or any non-interactive shell — died with `TTY initialization failed: uv_tty_init returned EBADF`, a libuv internal shown to a developer whose only mistake was not being at a keyboard. A missing terminal is no longer an error when the flags already answer every prompt; only a genuinely unanswerable question stops the run, and it names `--yes` and the flags that supply it.
+
+### Removed
+
+- husky and its `prepare` script from the starter. Note what goes with it: the generated project ships no CI, so the format, lint, typecheck and test that ran on commit are gone with nothing yet replacing them. That gap is tracked separately.
+
 ## 5.3.1 - 2026-09-04
 
 ### Fixed

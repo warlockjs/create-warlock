@@ -39,6 +39,20 @@ The wizard asks, in order:
 
 Pass `--yes` (or `-y`) to skip every prompt and build from flags with defaults.
 
+**Without a terminal, `--yes` is not required.** When stdin is not a TTY — CI, a
+script, a container, an agent harness — the scaffolder does not try to prompt.
+If the flags already answer everything it needs, it simply scaffolds. Prompting
+is the fallback, not the precondition.
+
+Only a question that genuinely cannot be answered stops the run, and in practice
+that is just the project name, the one prompt with no default:
+
+```
+A project name is required and no terminal is available to ask for one. Pass it as
+the first argument or --name=<name>. Non-interactive flags: --yes, --pm=<npm|yarn|pnpm>,
+--db=<driver>|--no-db, --features=<list>, --ai=<list>, --git|--no-git, --jwt|--no-jwt.
+```
+
 | Flag                     | Takes value | Default        | Purpose                                                              |
 | ------------------------ | ----------- | -------------- | ------------------------------------------------------------------- |
 | `<positional>` / `--name`| yes         | — (required)   | Project name + target directory.                                    |

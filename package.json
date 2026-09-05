@@ -13,16 +13,17 @@
     "create-warlock": "./bin/create-app.js"
   },
   "scripts": {
-    "start": "npx tsx ./index.dev.ts",
-    "lint": "npx eslint -c ./.eslintrc.json ./src",
-    "fix": "npx eslint --fix -c ./.eslintrc.json ./src --max-warnings=0",
-    "format": "npx prettier --write ./src/**/*.{js,jsx,ts,tsx,css,md,json} --config ./.prettierrc.json",
-    "test": "npx vitest run",
+    "start": "node node_modules/tsx/dist/cli.mjs ./index.dev.ts",
+    "lint": "node node_modules/eslint/bin/eslint.js -c ./.eslintrc.json ./src",
+    "fix": "node node_modules/eslint/bin/eslint.js --fix -c ./.eslintrc.json ./src --max-warnings=0",
+    "format": "node node_modules/prettier/bin/prettier.cjs --write ./src/**/*.{js,jsx,ts,tsx,css,md,json} --config ./.prettierrc.json",
+    "test": "node node_modules/vitest/vitest.mjs run",
     "format:template": "node scripts/format-check-template.mjs",
     "format:template:fix": "node scripts/format-check-template.mjs --write",
     "typecheck:scaffold": "node scripts/typecheck-scaffold.mjs",
     "llms": "node scripts/generate-llms.mjs",
-    "update": "npx tsx version-checker.ts"
+    "update": "node node_modules/tsx/dist/cli.mjs version-checker.ts",
+    "typecheck": "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@clack/prompts": "^0.7.0",
