@@ -19,9 +19,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Node 22, not 20: pnpm 11.24 loads `node:sqlite`, which does not exist
+      # before Node 22.13. On Node 20 it prints its version requirement as a WARN
+      # and then dies on ERR_UNKNOWN_BUILTIN_MODULE, which names neither pnpm nor
+      # the Node version. Move one of these two and you must move the other.
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -58,9 +62,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Node 22, not 20: pnpm 11.24 loads `node:sqlite`, which does not exist
+      # before Node 22.13. On Node 20 it prints its version requirement as a WARN
+      # and then dies on ERR_UNKNOWN_BUILTIN_MODULE, which names neither pnpm nor
+      # the Node version. Move one of these two and you must move the other.
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
