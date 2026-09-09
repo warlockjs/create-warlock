@@ -5,3 +5,5 @@
 # esbuild is a native binary and does not function without its install script.
 allowBuilds:
   esbuild: true
+minimumReleaseAgeExclude:
+  - '@warlock.js/fs@5.6.0'

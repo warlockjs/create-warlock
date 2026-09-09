@@ -18,8 +18,8 @@ importers:
         specifier: ^4.0.1
         version: 4.0.1
       '@warlock.js/fs':
-        specifier: ^5.1.0
-        version: 5.1.0
+        specifier: 5.6.0
+        version: 5.6.0
       cross-spawn:
         specifier: ^7.0.3
         version: 7.0.6
@@ -497,8 +497,8 @@ packages:
   '@vitest/utils@4.1.10':
     resolution: {integrity: sha512-fy9am/HWxbaGt/Sawrp90vt6Y6jQwf1RX77cz3uwoJwJVMli/e1IEwRPnMNJ7vKfPTwo0diXifkpPvwH9v7nGA==}
 
-  '@warlock.js/fs@5.1.0':
-    resolution: {integrity: sha512-QKpf1EnbYPeupOJMLKS+ypTiW//9m87BlwXzq+TeTChV7j5WSZ1BEfI1MofxkLolwi3EcF4kTVB9KPTFHLu6Tw==}
+  '@warlock.js/fs@5.6.0':
+    resolution: {integrity: sha512-NSCbJWoxTfO8TqZLXO0eB/867kyz8H0D6YWwDBVgxO7FaMCpq5NDp4TFTZ3Z3EFbGrpgZchRvQKn8h/3aI72mw==}
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -1626,7 +1626,7 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.1
 
-  '@warlock.js/fs@5.1.0': {}
+  '@warlock.js/fs@5.6.0': {}
 
   acorn-jsx@5.3.2(acorn@8.18.0):
     dependencies:
