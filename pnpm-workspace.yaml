@@ -5,5 +5,13 @@
 # esbuild is a native binary and does not function without its install script.
 allowBuilds:
   esbuild: true
+#
+# The whole @warlock.js scope is excluded from the release-age policy, BY PATTERN.
+# Do not re-pin this to an exact version. The family publishes all 28 packages at
+# once and CI installs them minutes later, so every release trips the age gate; a
+# version-pinned entry would have to be hand-edited on publish day, every time, or
+# CI goes red for a reason no source change explains. That is what happened at 5.6.0.
+# The gate guards against fresh THIRD-PARTY code; these packages are ours, published
+# by our own release, which installs and executes them from the registry origin first.
 minimumReleaseAgeExclude:
-  - '@warlock.js/fs@5.6.0'
+  - '@warlock.js/*'

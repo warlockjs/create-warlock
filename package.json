@@ -50,5 +50,8 @@
   },
   "module": "./src/index.ts",
   "typings": "./src/index.ts",
-  "packageManager": "pnpm@11.24.0"
+  "packageManager": "pnpm@11.24.0",
+  "engines": {
+    "node": ">=22.13"
+  }
 }
