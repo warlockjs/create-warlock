@@ -187,11 +187,31 @@ export function showPartialScreen(options: {
  * path was written for.
  */
 export function installFailureHints(result: CommandResult | undefined) {
-  const hints = [
-    "Nothing was installed. Fix the error above, then run the install again inside the project.",
-  ];
-
   const output = `${result?.stdout ?? ""}${result?.stderr ?? ""}`;
+  const projectDirectory =
+    result?.cwd ?? "the already-created project directory";
+  const command = result?.command ?? "the install command";
+  const npmArboristFailure =
+    command.startsWith("npm ") &&
+    /Cannot read properties of null \(reading 'edgesOut'\)/i.test(output);
+
+  if (npmArboristFailure) {
+    return [
+      "Detected npm 10.9.x: its Arborist peer-dependency resolver has a defect (`edgesOut`); this is not a problem with your project.",
+      `To finish from ${projectDirectory}: run \`cd ${projectDirectory}\`, then \`npm install -g npm@11\` and \`${command}\`.`,
+      `Or, from ${projectDirectory}, install with \`pnpm install\` or \`yarn install\`.`,
+    ];
+  }
+
+  const logPath = output.match(
+    /A complete log of this run can be found in:\s*(\S+)/i,
+  )?.[1];
+  const hints = [
+    `The project remains at ${projectDirectory}; \`${command}\` failed there.`,
+    logPath
+      ? `Review the package manager's log at ${logPath} before retrying.`
+      : "Review the package manager's own log path in the output above before retrying.",
+  ];
 
   if (/ETARGET|No matching version found/i.test(output)) {
     hints.push(
