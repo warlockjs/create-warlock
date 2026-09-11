@@ -44,11 +44,23 @@ jobs:
       - name: Check template formatting
         run: node scripts/format-check-template.mjs
 
+      # Runs `index.dev.ts`, NOT `src/index.ts`. src/index.ts only *exports*
+      # createApp — running it defines a function and calls nothing, so it
+      # printed an empty string and this step compared "" against the version.
+      # The entry that invokes createApp is what a user reaches, and it is the
+      # only thing that can catch "the CLI was never wired to its own main".
+      # specs/cli-entry.spec.ts imports createApp and calls it directly, so it
+      # is structurally blind to this; that is why the step exists at all.
       - name: Smoke CLI version
         run: |
-          actual="$(./node_modules/.bin/tsx src/index.ts --version)"
+          actual="$(./node_modules/.bin/tsx index.dev.ts --version)"
           expected="$(node -p "require('./package.json').version")"
-          test "$actual" = "$expected"
+          # `test` alone fails with exit 1 and no output, which is how this
+          # arrived as a red X naming nothing. A check states what it saw.
+          if [ "$actual" != "$expected" ]; then
+            echo "::error::create-warlock --version printed '$actual', package.json says '$expected'"
+            exit 1
+          fi
 
       - name: Vitest
         run: npm test
