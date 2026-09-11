@@ -4,6 +4,13 @@ All notable changes to `create-warlock` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@warlock.js/*` packages are released in lockstep — every package shares the same version number, so a version below may list only the changes that affected this package.
 
+## 5.7.0
+
+### Fixed
+
+- A freshly scaffolded project could fail `npm install` outright on Node 22, crashing inside npm 10.9.x's Arborist peer resolver with `Cannot read properties of null (reading 'edgesOut')` while resolving the template's vitest dependency. The template now pins vitest to 4.0.5.
+- When the generated project's install failed, the scaffolder told the user to "fix the error above, then run the install again" — advice that could not be followed for an npm-internal crash. It now recognizes the npm 10.9.x Arborist crash and points to concrete next steps (npm 11, pnpm, or yarn) instead.
+
 ## 5.5.0 - 2026-09-07
 
 ### Fixed
