@@ -18,7 +18,7 @@ importers:
         specifier: ^4.0.1
         version: 4.0.1
       '@warlock.js/fs':
-        specifier: 5.6.0
+        specifier: '*'
         version: 5.6.0
       cross-spawn:
         specifier: ^7.0.3
