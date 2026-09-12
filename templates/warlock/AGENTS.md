@@ -99,3 +99,23 @@ suffixes, and JSDoc on the public surface. The bar is senior-level clean code, n
   explicitly asked.
 - When you are unsure how a package or feature works, **stop and read its skill**
   rather than guessing from other files or the web.
+
+## Schema & model conventions (read before writing a model or schema)
+
+Three things that trip everyone up on a fresh app:
+
+- **Seal fields are REQUIRED by default.** `v.string()` is already required —
+  omitting `.required()` does NOT make a field optional. Use `.optional()` to
+  make one optional. `.required()` still exists (it lets you set a custom "this
+  field is required" message), but it is redundant on a plain field, so the
+  generated code and these docs don't use it.
+- **Declare server-set foreign keys on the MODEL schema.** A controller that
+  sets a column the client doesn't send (e.g. `authorId: request.user.id`) must
+  still have that column declared on the model's seal schema
+  (`authorId: v.number()`), or `Model.create()` rejects it as an unknown key.
+  The client-facing request schema and the model schema are separate, so this
+  does not let a client send the FK.
+- **Read model data with `get()` / `toJSON()`, never `model.field`.** A model
+  instance does not expose its columns as direct properties — `post.title` is
+  `undefined` at runtime and a type error. Use `post.get("title")`, or
+  `post.toJSON()` in a page loader (resources are the serialization gate).
