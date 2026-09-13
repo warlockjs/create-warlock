@@ -83,6 +83,7 @@ export async function createWarlockApp(
       application.removeDatabaseConfig();
     } else {
       application.configureDatabaseEnv(databaseDriver);
+      application.configureDatabaseConfig(databaseDriver);
     }
 
     application.configureWebStarter(features.includes("web"));

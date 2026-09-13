@@ -198,19 +198,68 @@ export class App {
   }
 
   /**
+   * Write the correct `src/config/database.ts` for the chosen driver and remove
+   * every per-driver variant so the scaffold ships exactly one config file.
+   *
+   * The template ships a Mongo-shaped `database.ts` (the default) plus a
+   * `database.postgres.ts` variant. Mongo keeps the default in place; Postgres
+   * overwrites `database.ts` with the Postgres-shaped variant (typed
+   * `ConnectionOptions`, `driver: "postgres"`, port 5432, no Mongo-only keys —
+   * no `authSource`, `driverOptions`, `replicaSet`, `randomIncrement` /
+   * `initialId`). Either way the `.postgres` variant file is deleted afterwards
+   * so no leftover config ships in the generated project.
+   *
+   * For Postgres it also corrects the working `.env`: the Mongo template ships
+   * `DB_AUTH=admin`, an `authSource` value Postgres ignores and its config no
+   * longer reads, so the line is dropped to keep `.env` and the config in sync.
+   * The port is rewritten by {@link configureDatabaseEnv} (driver defaultPort),
+   * which runs alongside this in the same branch.
+   */
+  public configureDatabaseConfig(driverValue: string) {
+    const configDir = path.resolve(this.path, "src/config");
+    const databasePath = path.resolve(configDir, "database.ts");
+    const postgresVariantPath = path.resolve(configDir, "database.postgres.ts");
+
+    if (driverValue === "postgres" && fileExists(postgresVariantPath)) {
+      putFile(databasePath, getFile(postgresVariantPath) as string);
+
+      const envPath = this.path + "/.env";
+
+      if (fileExists(envPath)) {
+        const envContent = getFile(envPath) as string;
+        // Drop the Mongo-only DB_AUTH line entirely (its whole line, so no blank
+        // gap is left behind). Postgres has no authSource concept.
+        putFile(envPath, envContent.replace(/^DB_AUTH=.*\r?\n?/m, ""));
+      }
+    }
+
+    // Whatever the driver, no per-driver variant may survive into the scaffold.
+    if (fileExists(postgresVariantPath)) {
+      unlinkSync(postgresVariantPath);
+    }
+
+    return this;
+  }
+
+  /**
    * Remove the database layer for a "no database" scaffold.
    *
-   * Deletes `src/config/database.ts` (and a `.tsx` variant if present) from the
-   * freshly-copied template. The framework's database connector is config-gated
-   * on that file — with it gone, `config.get("database")` is undefined and the
-   * connector no-ops, so the app boots with no database wired and no driver
-   * package pulled. The `DB_*` lines in `.env` are left in place (harmless: no
-   * config reads them) as a ready template for adding a database back later.
+   * Deletes `src/config/database.ts` (and a `.tsx` / per-driver variant if
+   * present) from the freshly-copied template. The framework's database
+   * connector is config-gated on that file — with it gone,
+   * `config.get("database")` is undefined and the connector no-ops, so the app
+   * boots with no database wired and no driver package pulled. The `DB_*` lines
+   * in `.env` are left in place (harmless: no config reads them) as a ready
+   * template for adding a database back later.
    */
   public removeDatabaseConfig() {
     const configDir = path.resolve(this.path, "src/config");
 
-    for (const fileName of ["database.ts", "database.tsx"]) {
+    for (const fileName of [
+      "database.ts",
+      "database.tsx",
+      "database.postgres.ts",
+    ]) {
       const filePath = path.resolve(configDir, fileName);
 
       if (fileExists(filePath)) {

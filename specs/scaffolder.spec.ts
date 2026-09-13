@@ -789,3 +789,107 @@ describe("App template emission", () => {
     expect(env).not.toMatch(/\bappName\b/);
   });
 });
+
+describe("per-driver database config emission", () => {
+  let workdir: string;
+  let appPath: string;
+
+  // Tokens that only ever belong in the MongoDB-shaped config — none of them may
+  // survive into a Postgres scaffold.
+  const mongoOnlyTokens = [
+    "authSource",
+    "counterCollection",
+    "replicaSet",
+    "randomIncrement",
+    "initialId",
+    "autoGenerateId",
+    "MongoDriverOptions",
+    "MongoClientOptions",
+  ];
+
+  const dbConfigPath = () => path.join(appPath, "src/config/database.ts");
+  const readDbConfig = () => readFileSync(dbConfigPath(), "utf8");
+
+  beforeEach(() => {
+    setPackageManager("yarn");
+    workdir = mkdtempSync(path.join(tmpdir(), "create-warlock-"));
+    appPath = path.join(workdir, "generated-app");
+  });
+
+  afterEach(() => {
+    rmSync(workdir, { recursive: true, force: true });
+  });
+
+  it("emits a Postgres-shaped database.ts for --db=postgres", () => {
+    const app = new App(
+      makeApplication(appPath, { databaseDriver: "postgres" }),
+    );
+
+    app
+      .use("warlock")
+      .updateDotEnv()
+      .configureDatabaseEnv("postgres")
+      .configureDatabaseConfig("postgres");
+
+    const dbConfig = readDbConfig();
+
+    // (a) Postgres driver + port.
+    expect(dbConfig).toContain('env("DB_DRIVER", "postgres")');
+    expect(dbConfig).toContain('env("DB_PORT", 5432)');
+
+    // (b) none of the Mongo-only tokens leak through.
+    for (const token of mongoOnlyTokens) {
+      expect(dbConfig).not.toContain(token);
+    }
+  });
+
+  it("keeps the Mongo shape for --db=mongodb", () => {
+    const app = new App(makeApplication(appPath));
+
+    app
+      .use("warlock")
+      .updateDotEnv()
+      .configureDatabaseEnv("mongodb")
+      .configureDatabaseConfig("mongodb");
+
+    const dbConfig = readDbConfig();
+
+    expect(dbConfig).toContain('env("DB_DRIVER", "mongodb")');
+    expect(dbConfig).toContain('env("DB_PORT", 27017)');
+    // The Mongo config is the one that legitimately carries these keys.
+    expect(dbConfig).toContain("authSource");
+    expect(dbConfig).toContain("replicaSet");
+    expect(dbConfig).toContain("MongoDriverOptions");
+  });
+
+  it("leaves exactly one database.ts and no per-driver variant in the scaffold", () => {
+    const postgresApp = new App(
+      makeApplication(appPath, { databaseDriver: "postgres" }),
+    );
+
+    postgresApp.use("warlock").configureDatabaseConfig("postgres");
+
+    expect(existsSync(dbConfigPath())).toBe(true);
+    expect(
+      existsSync(path.join(appPath, "src/config/database.postgres.ts")),
+    ).toBe(false);
+  });
+
+  it("fixes the working .env DB defaults for postgres (no DB_AUTH=admin, DB_PORT=5432)", () => {
+    const app = new App(
+      makeApplication(appPath, { databaseDriver: "postgres" }),
+    );
+
+    app
+      .use("warlock")
+      .updateDotEnv()
+      .configureDatabaseEnv("postgres")
+      .configureDatabaseConfig("postgres");
+
+    const env = readFileSync(path.join(appPath, ".env"), "utf8");
+
+    expect(env).not.toContain("DB_AUTH=admin");
+    expect(env).not.toMatch(/^DB_AUTH=/m);
+    expect(env).toContain("DB_PORT=5432");
+  });
+});

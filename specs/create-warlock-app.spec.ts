@@ -76,6 +76,9 @@ function makeFakeApp(
     configureDatabaseEnv: vi.fn(function (this: unknown) {
       return this;
     }),
+    configureDatabaseConfig: vi.fn(function (this: unknown) {
+      return this;
+    }),
     configureWebStarter: vi.fn(function (this: unknown) {
       return this;
     }),
