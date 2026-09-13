@@ -15,9 +15,14 @@ import type { App } from "../src/helpers/app";
 
 const spinnerStart = vi.fn();
 const spinnerStop = vi.fn();
+const spinnerMessage = vi.fn();
 
-vi.mock("@clack/prompts", () => ({
-  spinner: () => ({ start: spinnerStart, stop: spinnerStop }),
+vi.mock("../src/ui/spinner", () => ({
+  spinner: () => ({
+    start: spinnerStart,
+    stop: spinnerStop,
+    message: spinnerMessage,
+  }),
 }));
 
 const getPackageManager = vi.fn(() => "yarn");

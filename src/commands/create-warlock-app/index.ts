@@ -1,4 +1,3 @@
-import { spinner } from "@clack/prompts";
 import {
   getDatabaseLabel,
   isNoDatabase,
@@ -19,6 +18,7 @@ import {
   showPartialScreen,
   showProblems,
 } from "../../ui/report";
+import { spinner } from "../../ui/spinner";
 import { spinnerMessages } from "../../ui/spinners";
 
 /**
