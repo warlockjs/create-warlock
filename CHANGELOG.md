@@ -4,6 +4,12 @@ All notable changes to `create-warlock` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@warlock.js/*` packages are released in lockstep — every package shares the same version number, so a version below may list only the changes that affected this package.
 
+## 5.10.0
+
+### Fixed
+
+- A postgres scaffold shipped `src/config/database.postgres.ts` unformatted, so a new project's first dev run flagged it. The template is formatted, and the template-format check now runs as part of `create-warlock`'s own test suite.
+
 ## 5.9.0 - 2026-09-13
 
 _Released in lockstep with the `@warlock.js/*` family; no package-specific changes in 5.9.0._
