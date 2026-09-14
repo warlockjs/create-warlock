@@ -1,7 +1,4 @@
-import type {
-  ConnectionOptions,
-  PostgresPoolConfig,
-} from "@warlock.js/cascade";
+import type { ConnectionOptions, PostgresPoolConfig } from "@warlock.js/cascade";
 import { env } from "@warlock.js/core";
 
 const databaseConfigurations: ConnectionOptions<never, PostgresPoolConfig> = {
