@@ -67,7 +67,7 @@ onceConnected(async () => {
 
 ### 2. routes.ts (Auto-imported)
 
-Main routing file that defines all module endpoints. This file is automatically imported by Warlock.js. Use router guards (`guarded`, `guardedAdmin`, `guardedGuest`, etc.) to protect routes.
+Main routing file that defines all module endpoints. This file is automatically imported by Warlock.js. Use router guards (`guarded`, `guardedGuest`, etc.) to protect routes — `guarded` requires an authenticated user; restrict a group to a specific user type (e.g. an admin-only area) by registering that type in `src/config/auth.ts` and passing it to `authMiddleware` directly, e.g. `authMiddleware(["admin"])`.
 
 **Example:**
 
@@ -531,7 +531,7 @@ export function formatUserName(user: User): string {
 
 7. **Routes:**
 
-   - Use appropriate guards (`guarded`, `guardedAdmin`, `guardedGuest`)
+   - Use appropriate guards (`guarded`, `guardedGuest`); restrict a group to a specific user type via `authMiddleware(["<type>"])`
    - Group related routes together
    - Use RESTful resources when appropriate
    - Routes file is auto-imported by Warlock.js

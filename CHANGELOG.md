@@ -4,6 +4,12 @@ All notable changes to `create-warlock` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@warlock.js/*` packages are released in lockstep — every package shares the same version number, so a version below may list only the changes that affected this package.
 
+## 5.11.0
+
+### Removed
+
+- The generated `guardedAdmin()` router helper. It only checked that the user was signed in — any user type — while its name and `/admin` prefix implied an admin-only area. New projects get `guarded()` (any authenticated user) and a documented example for restricting a group to a user type. Existing projects keep their own copy of the file; review it if you used `guardedAdmin`.
+
 ## 5.10.0 - 2026-09-14
 
 ### Fixed

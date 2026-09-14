@@ -301,4 +301,37 @@ describe("template typecheck prerequisites", () => {
     expect(authMain).toMatch(/scheduler\.newJob\(/);
     expect(authMain).toMatch(/scheduler\.start\(\)/);
   });
+
+  it("router utils never export a helper whose name implies an admin boundary it does not enforce", () => {
+    // `guardedAdmin()` used to wrap `authMiddleware([])` — an EMPTY allow-list,
+    // which per authMiddleware's own contract means "any authenticated user,
+    // type not checked" (auth/src/middleware/auth.middleware.ts). Pairing that
+    // with an `/admin` prefix and a name that says "admin" promised a boundary
+    // the code never enforced: the scaffold registers only a `user` type, so
+    // any signed-in user could pass. The helper is removed rather than fixed
+    // in place, so guard against it (or an equivalent) coming back.
+    const source = read("src/app/shared/utils/router.ts");
+
+    expect(source).not.toMatch(/guardedAdmin/);
+
+    // Every `authMiddleware(` call using an EMPTY allow-list must live inside a
+    // helper whose own JSDoc says it allows any authenticated user type — so a
+    // future "admin"-sounding wrapper around an empty list is still caught even
+    // if it avoids the literal name `guardedAdmin`. Comments are kept (not
+    // stripped) here on purpose: the JSDoc itself is what this check reads.
+    const emptyListCalls = [...source.matchAll(/authMiddleware\(\s*\[\s*\]/g)];
+
+    for (const call of emptyListCalls) {
+      const precedingSource = source.slice(0, call.index);
+      const enclosingFunctionStart = precedingSource.lastIndexOf("export function");
+
+      expect(enclosingFunctionStart).toBeGreaterThan(-1);
+
+      const precedingComment = precedingSource.slice(0, enclosingFunctionStart);
+      const lastBlockComment = precedingComment.match(/\/\*\*[\s\S]*?\*\/\s*$/);
+
+      expect(lastBlockComment).not.toBeNull();
+      expect(lastBlockComment![0]).toMatch(/any authenticated user/i);
+    }
+  });
 });
