@@ -15,6 +15,7 @@ vi.mock("../src/commands/create-new-app", () => ({
 }));
 
 import createApp, { parseFlags } from "../src/index";
+import { buildHelpText } from "../src/flags/definitions";
 
 let originalArgv: string[];
 
@@ -124,6 +125,53 @@ describe("parseFlags — additional edge cases", () => {
   it("recognizes --version and its -v shorthand", () => {
     expect(parseFlags(["--version"]).version).toBe(true);
     expect(parseFlags(["-v"]).version).toBe(true);
+  });
+
+  it("recognizes --interactive and its --customize alias", () => {
+    expect(parseFlags(["--interactive"]).interactive).toBe(true);
+    expect(parseFlags(["--customize"]).interactive).toBe(true);
+    expect(parseFlags(["app"]).interactive).toBeUndefined();
+  });
+
+  it("parses --agents as a comma-separated list, in both = and spaced forms", () => {
+    expect(parseFlags(["app", "--agents=claude,cursor"]).agents).toEqual([
+      "claude",
+      "cursor",
+    ]);
+    expect(parseFlags(["app", "--agents", "claude"]).agents).toEqual([
+      "claude",
+    ]);
+  });
+
+  it("parses --stack in both = and spaced forms", () => {
+    expect(parseFlags(["app", "--stack=web"]).stack).toBe("web");
+    expect(parseFlags(["app", "--stack", "api"]).stack).toBe("api");
+  });
+});
+
+describe("--help lists every flag together with its default", () => {
+  it("mentions every documented flag and the word default", () => {
+    const help = buildHelpText();
+
+    for (const flag of [
+      "--name",
+      "--stack",
+      "--db",
+      "--features",
+      "--ai",
+      "--pm",
+      "--agents",
+      "--git",
+      "--jwt",
+      "--yes",
+      "--interactive",
+      "--help",
+      "--version",
+    ]) {
+      expect(help).toContain(flag);
+    }
+
+    expect(help).toContain("default:");
   });
 });
 

@@ -1,33 +1,13 @@
 import { getJsonFile } from "@warlock.js/fs";
 import createNewApp from "./commands/create-new-app";
-import { CliFlags } from "./commands/create-new-app/types";
+import { CliFlags, Stack } from "./commands/create-new-app/types";
 import { NO_DATABASE } from "./features/database-drivers";
+import { buildHelpText } from "./flags/definitions";
 import { packageRoot } from "./helpers/paths";
 
-const valueFlags = ["name", "db", "pm", "features", "ai"];
+const valueFlags = ["name", "db", "pm", "features", "ai", "agents", "stack"];
 
-const HELP_TEXT = `
-  create-warlock — scaffold a new Warlock.js project
-
-  Usage
-    $ create-warlock [project-name] [options]
-
-  Options
-    --name              Project name (or pass it as the first positional arg)
-    --db=<driver>        Database driver (e.g. postgres, mongodb)
-    --no-db               Skip database selection entirely
-    --features=<list>    Comma-separated feature keys (e.g. test,herald)
-    --ai=<list>           Comma-separated AI provider keys (e.g. openai,anthropic)
-    --pm=<manager>        Package manager to use (npm, yarn, pnpm)
-    --git / --no-git      Force-enable or force-disable git initialization
-    --jwt / --no-jwt      Force-enable or force-disable JWT secret generation
-    -y, --yes             Skip prompts and accept defaults for anything unset
-    -h, --help            Show this help message and exit
-    -v, --version         Show the installed create-warlock version and exit
-
-  Example
-    $ create-warlock my-app --db=postgres --features=test,herald --yes
-`;
+const HELP_TEXT = buildHelpText();
 
 /**
  * Parse the scaffolder's own CLI flags for non-interactive mode.
@@ -104,6 +84,16 @@ export function parseFlags(argv: string[]): CliFlags {
         break;
       case "ai":
         flags.ai = splitList(value);
+        break;
+      case "agents":
+        flags.agents = splitList(value);
+        break;
+      case "stack":
+        flags.stack = value as Stack;
+        break;
+      case "interactive":
+      case "customize":
+        flags.interactive = true;
         break;
     }
   }

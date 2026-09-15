@@ -4,6 +4,12 @@ All notable changes to `create-warlock` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@warlock.js/*` packages are released in lockstep — every package shares the same version number, so a version below may list only the changes that affected this package.
 
+## 5.12.0
+
+### Changed
+
+- `create-warlock` asks at most one question (API-only or full-stack web); every other choice is a flag with a default, printed after scaffolding. Fully non-interactive with `--yes`; `--interactive` restores the long form; `--agents` picks agent-kit targets (default `claude`).
+
 ## 5.11.0 - 2026-09-14
 
 ### Removed

@@ -26,13 +26,46 @@ Then follow the instructions, it is easy as that!
 
 ### Flags
 
+`create-warlock` is fully headless: every prompt has a flag that answers it,
+`--yes` takes the default for anything you leave unset, and it works with no
+terminal at all (CI, a script, an agent). With a terminal and neither `--yes`
+nor `--interactive`, it asks **at most one question** — API-only or
+full-stack web, the only choice that changes the generated app's shape.
+Everything else below is a flag with a default; a summary of what was decided
+prints after scaffolding, along with how to change each one.
+
+| Flag | Description | Default |
+| --- | --- | --- |
+| `--name=<name>` | Project name (or the first positional arg) | required — prompted with a TTY, otherwise fails naming this flag |
+| `--stack=<api\|web>` | The one structural question: API-only or full-stack web | `api` |
+| `--db=<driver>` / `--no-db` | Database driver (`postgres`, `mongodb`, …), or skip one entirely | `mongodb` |
+| `--features=<list>` | Comma-separated feature keys (e.g. `test,herald`) | none (or `["web"]` when `--stack=web` and `--features` is not given) |
+| `--ai=<list>` | Comma-separated AI provider keys (e.g. `openai,anthropic`) | none |
+| `--pm=<manager>` | Package manager (`npm`, `yarn`, `pnpm`, `bun`) | inferred from the invoking agent (`npm_config_user_agent`) or the system |
+| `--agents=<list>` | Comma-separated [agent-kit](https://mongez.js.org/agent-kit) targets | `claude` |
+| `--git` / `--no-git` | Force-enable or force-disable git initialization | `false` |
+| `--jwt` / `--no-jwt` | Force-enable or force-disable JWT secret generation | `false` |
+| `-y`, `--yes` | Skip every prompt and take defaults for anything unset | `false` |
+| `--interactive`, `--customize` | Restore the full long-form interactive wizard | `false` |
+| `-h`, `--help` | Print usage (every flag + its default) and exit | — |
+| `-v`, `--version` | Print the installed version and exit | — |
+
 ```bash
-create-warlock --help       # or -h — print usage and exit, no scaffolding runs
-create-warlock --version    # or -v — print the installed version and exit
+create-warlock my-app --db=postgres --features=test,herald --yes
+create-warlock --help       # print every flag with its default, no scaffolding runs
+create-warlock --version    # print the installed version and exit
+create-warlock my-app --interactive   # the full long-form wizard, one prompt at a time
 ```
 
-Both exit before any prompt, filesystem write, or network call — including
-before a positional project name or any other flag is honoured.
+`--help` and `--version` exit before any prompt, filesystem write, or network
+call — including before a positional project name or any other flag is
+honoured.
+
+`--agents` validates against the agent-kit targets published at
+[mongez.js.org/agent-kit/llms.txt](https://mongez.js.org/agent-kit/llms.txt)
+(cached locally after the first successful lookup); `claude`, the default,
+always works offline. An unrecognized target fails the run with the full list
+of valid targets rather than silently falling back.
 
 ## Developing this package locally
 

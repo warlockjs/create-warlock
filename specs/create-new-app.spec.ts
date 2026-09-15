@@ -168,7 +168,7 @@ describe("createNewApp — preamble guards", () => {
   it("shows the intro banner with the version read from package.json", async () => {
     primeHappyPath();
 
-    await createNewApp({});
+    await createNewApp({ interactive: true });
 
     const { showIntroBanner } = await import("../src/ui/banner");
     expect(showIntroBanner).toHaveBeenCalledWith("9.9.9");
@@ -205,7 +205,7 @@ describe("createNewApp — interactive flow", () => {
   it("assembles the full app descriptor from the prompt answers", async () => {
     primeHappyPath();
 
-    await createNewApp({});
+    await createNewApp({ interactive: true });
 
     const app = capturedApp();
     expect(app.name).toBe("my-warlock-app");
@@ -221,7 +221,7 @@ describe("createNewApp — interactive flow", () => {
   it("defaults the database port to 27017 for the mongodb driver", async () => {
     primeHappyPath({ db: "mongodb" });
 
-    await createNewApp({});
+    await createNewApp({ interactive: true });
 
     expect(capturedApp().options.databasePort).toBe(27017);
   });
@@ -229,7 +229,7 @@ describe("createNewApp — interactive flow", () => {
   it("commits the chosen package manager through setPackageManager", async () => {
     primeHappyPath({ pm: "pnpm" });
 
-    await createNewApp({});
+    await createNewApp({ interactive: true });
 
     expect(setPackageManager).toHaveBeenCalledWith("pnpm");
   });
@@ -237,7 +237,7 @@ describe("createNewApp — interactive flow", () => {
   it("awaits package-manager detection before listing options", async () => {
     primeHappyPath();
 
-    await createNewApp({});
+    await createNewApp({ interactive: true });
 
     expect(detectPackageManagers).toHaveBeenCalled();
     expect(getSystemPackageManagers).toHaveBeenCalled();
@@ -246,7 +246,7 @@ describe("createNewApp — interactive flow", () => {
   it("reserves the app path from the typed project name", async () => {
     primeHappyPath({ name: "shop-api" });
 
-    await createNewApp({});
+    await createNewApp({ interactive: true });
 
     expect(getAppPath).toHaveBeenCalledWith("shop-api");
   });
@@ -254,7 +254,7 @@ describe("createNewApp — interactive flow", () => {
   it("treats useGit=false / useJWT=false when the user declines", async () => {
     primeHappyPath({ git: false, jwt: false });
 
-    await createNewApp({});
+    await createNewApp({ interactive: true });
 
     const app = capturedApp();
     expect(app.options.useGit).toBe(false);
@@ -264,7 +264,7 @@ describe("createNewApp — interactive flow", () => {
   it("allows an empty feature and AI selection", async () => {
     primeHappyPath({ features: [], ai: [] });
 
-    await createNewApp({});
+    await createNewApp({ interactive: true });
 
     const app = capturedApp();
     expect(app.options.features).toEqual([]);
@@ -276,7 +276,7 @@ describe("createNewApp — cancellation guards", () => {
   it("aborts when the project name is cancelled", async () => {
     text.mockResolvedValueOnce(CANCEL);
 
-    await expect(createNewApp({})).rejects.toThrow(ProcessExit);
+    await expect(createNewApp({ interactive: true })).rejects.toThrow(ProcessExit);
     expect(cancel).toHaveBeenCalledWith(
       "A project name is required to continue",
     );
@@ -286,7 +286,7 @@ describe("createNewApp — cancellation guards", () => {
   it("aborts when the project name is blank (whitespace only)", async () => {
     text.mockResolvedValueOnce("   ");
 
-    await expect(createNewApp({})).rejects.toThrow(ProcessExit);
+    await expect(createNewApp({ interactive: true })).rejects.toThrow(ProcessExit);
     expect(cancel).toHaveBeenCalledWith(
       "A project name is required to continue",
     );
@@ -297,7 +297,7 @@ describe("createNewApp — cancellation guards", () => {
     text.mockResolvedValueOnce("my-app");
     getAppPath.mockReturnValue(undefined as unknown as string);
 
-    await createNewApp({});
+    await createNewApp({ interactive: true });
 
     // getAppPath owns the exit on collision; createNewApp just returns early.
     expect(createWarlockApp).not.toHaveBeenCalled();
@@ -308,7 +308,7 @@ describe("createNewApp — cancellation guards", () => {
     text.mockResolvedValueOnce("my-app");
     select.mockResolvedValueOnce(CANCEL);
 
-    await expect(createNewApp({})).rejects.toThrow(ProcessExit);
+    await expect(createNewApp({ interactive: true })).rejects.toThrow(ProcessExit);
     expect(cancel).toHaveBeenCalledWith("Package manager selection cancelled");
     expect(setPackageManager).not.toHaveBeenCalled();
   });
@@ -317,7 +317,7 @@ describe("createNewApp — cancellation guards", () => {
     text.mockResolvedValueOnce("my-app");
     select.mockResolvedValueOnce("yarn").mockResolvedValueOnce(CANCEL);
 
-    await expect(createNewApp({})).rejects.toThrow(ProcessExit);
+    await expect(createNewApp({ interactive: true })).rejects.toThrow(ProcessExit);
     expect(cancel).toHaveBeenCalledWith("Database selection cancelled");
   });
 
@@ -326,7 +326,7 @@ describe("createNewApp — cancellation guards", () => {
     select.mockResolvedValueOnce("yarn").mockResolvedValueOnce("mongodb");
     multiselect.mockResolvedValueOnce(CANCEL);
 
-    await expect(createNewApp({})).rejects.toThrow(ProcessExit);
+    await expect(createNewApp({ interactive: true })).rejects.toThrow(ProcessExit);
     expect(cancel).toHaveBeenCalledWith("Feature selection cancelled");
   });
 
@@ -335,7 +335,7 @@ describe("createNewApp — cancellation guards", () => {
     select.mockResolvedValueOnce("yarn").mockResolvedValueOnce("mongodb");
     multiselect.mockResolvedValueOnce(["test"]).mockResolvedValueOnce(CANCEL);
 
-    await expect(createNewApp({})).rejects.toThrow(ProcessExit);
+    await expect(createNewApp({ interactive: true })).rejects.toThrow(ProcessExit);
     expect(cancel).toHaveBeenCalledWith("AI provider selection cancelled");
   });
 
@@ -350,7 +350,7 @@ describe("createNewApp — cancellation guards", () => {
     // default mock (undefined) -> useJWT false. No cancel guard trips.
     confirm.mockResolvedValueOnce(CANCEL);
 
-    await createNewApp({});
+    await createNewApp({ interactive: true });
 
     expect(cancel).not.toHaveBeenCalled();
     const app = capturedApp();
@@ -366,7 +366,7 @@ describe("createNewApp — cancellation guards", () => {
     multiselect.mockResolvedValueOnce(["test"]).mockResolvedValueOnce([]);
     confirm.mockResolvedValueOnce(true).mockResolvedValueOnce(CANCEL);
 
-    await createNewApp({});
+    await createNewApp({ interactive: true });
 
     expect(cancel).not.toHaveBeenCalled();
     const app = capturedApp();
@@ -378,7 +378,7 @@ describe("createNewApp — cancellation guards", () => {
     // confirm returns `false` -> `=== true` is false -> useGit false, no cancel.
     primeHappyPath({ git: false });
 
-    await createNewApp({});
+    await createNewApp({ interactive: true });
 
     expect(capturedApp().options.useGit).toBe(false);
     expect(cancel).not.toHaveBeenCalled();
@@ -610,14 +610,95 @@ describe("createNewApp — non-TTY stdin (no keyboard to prompt at)", () => {
     expect(createWarlockApp).not.toHaveBeenCalled();
   });
 
-  it("still prompts normally when a TTY IS present and --yes was not passed, even if flags are given", async () => {
+  it("--interactive still runs the full wizard when a TTY IS present and --yes was not passed, even if flags are given", async () => {
     hasInteractiveStdin.mockReturnValue(true);
     primeHappyPath({ name: "interactive-app" });
 
-    await createNewApp({ name: "ignored-by-interactive-path" });
+    await createNewApp({
+      interactive: true,
+      name: "ignored-by-interactive-path",
+    });
 
     // The interactive branch never reads cli.name — it always prompts.
     expect(text).toHaveBeenCalledTimes(1);
     expect(capturedApp().name).toBe("interactive-app");
+  });
+});
+
+describe("createNewApp — default TTY path (at most one structural question)", () => {
+  /**
+   * With a TTY present but neither `--yes` nor `--interactive`/`--customize`,
+   * the default path must ask AT MOST ONE question — the structural
+   * API-only vs full-stack-web fork — and take every other answer from a
+   * flag or its default, exactly like the non-interactive path.
+   */
+  beforeEach(() => {
+    hasInteractiveStdin.mockReturnValue(true);
+  });
+
+  it("asks only the stack question when the project name is already known", async () => {
+    select.mockResolvedValueOnce("api");
+
+    await createNewApp({ name: "default-app" });
+
+    expect(text).not.toHaveBeenCalled();
+    expect(select).toHaveBeenCalledTimes(1);
+    expect(multiselect).not.toHaveBeenCalled();
+    expect(confirm).not.toHaveBeenCalled();
+
+    const app = capturedApp();
+    expect(app.name).toBe("default-app");
+    expect(app.options.databaseDriver).toBe("mongodb");
+    expect(app.options.features).toEqual([]);
+    expect(app.options.agents).toEqual(["claude"]);
+    expect(app.options.useGit).toBe(false);
+    expect(app.options.useJWT).toBe(false);
+  });
+
+  it("prompts for the project name first when it is missing, still asking only one further question", async () => {
+    text.mockResolvedValueOnce("typed-app");
+    select.mockResolvedValueOnce("api");
+
+    await createNewApp({});
+
+    expect(text).toHaveBeenCalledTimes(1);
+    expect(select).toHaveBeenCalledTimes(1);
+    expect(capturedApp().name).toBe("typed-app");
+  });
+
+  it("asks nothing at all when --stack is also already answered by a flag", async () => {
+    await createNewApp({ name: "flagged-app", stack: "api" });
+
+    expect(text).not.toHaveBeenCalled();
+    expect(select).not.toHaveBeenCalled();
+    expect(multiselect).not.toHaveBeenCalled();
+    expect(confirm).not.toHaveBeenCalled();
+  });
+
+  it("includes the web feature by default when the structural answer is web", async () => {
+    await createNewApp({ name: "web-app", stack: "web" });
+
+    expect(capturedApp().options.features).toEqual(["web"]);
+  });
+
+  it("still honors an explicit --features over the stack's implicit default", async () => {
+    await createNewApp({ name: "web-app", stack: "web", features: ["test"] });
+
+    expect(capturedApp().options.features).toEqual(["test"]);
+  });
+
+  it("resolves the package manager, database, and agents from flags without prompting for them", async () => {
+    await createNewApp({
+      name: "flagged-app",
+      stack: "api",
+      pm: "pnpm",
+      db: "postgres",
+      agents: ["claude"],
+    });
+
+    expect(setPackageManager).toHaveBeenCalledWith("pnpm");
+    const app = capturedApp();
+    expect(app.options.databaseDriver).toBe("postgres");
+    expect(app.options.agents).toEqual(["claude"]);
   });
 });

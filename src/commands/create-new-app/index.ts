@@ -20,6 +20,7 @@ import {
   getDefaultFeatureKeys,
   getFeatureOptions,
 } from "../../features/features-map";
+import { resolveAgentTargets } from "../../features/agent-kit-targets";
 import { App } from "../../helpers/app";
 import {
   ALLOWED_PACKAGE_MANAGERS,
@@ -32,10 +33,11 @@ import {
 } from "../../helpers/package-manager";
 import { packageRoot } from "../../helpers/paths";
 import { hasInteractiveStdin } from "../../helpers/tty";
+import { askStack } from "../../prompts/ask-stack";
 import { showIntroBanner } from "../../ui/banner";
 import { createWarlockApp } from "../create-warlock-app";
 import getAppPath from "./get-app-path";
-import { AppOptions, App as AppType, CliFlags } from "./types";
+import { AppOptions, App as AppType, CliFlags, Stack } from "./types";
 
 export default async function createNewApp(cli: CliFlags = {}) {
   // Start detecting package managers in the background to avoid delay later
@@ -78,6 +80,27 @@ export default async function createNewApp(cli: CliFlags = {}) {
     return;
   }
 
+  // `--interactive` (alias `--customize`) restores the full long-form wizard
+  // below. Everyone else with a TTY falls through to the default path, which
+  // asks at most ONE structural question — see createDefaultInteractive.
+  if (cli.interactive) {
+    await createFullWizard(cli, pmDetectionPromise);
+    return;
+  }
+
+  await createDefaultInteractive(cli, pmDetectionPromise);
+}
+
+/**
+ * The full long-form wizard (`--interactive` / `--customize`): every prompt,
+ * one after another. This is the ORIGINAL default flow, preserved verbatim —
+ * only its trigger moved from "any TTY" to an explicit opt-in flag, per the
+ * rule that a reversible choice never prompts by default.
+ */
+async function createFullWizard(
+  cli: CliFlags,
+  pmDetectionPromise: Promise<void>,
+) {
   // Step 1: Project name
   const appName = await text({
     message: "What shall we call your project?",
@@ -175,6 +198,16 @@ export default async function createNewApp(cli: CliFlags = {}) {
     process.exit(0);
   }
 
+  // agent-kit targets are not part of the long-form wizard (a reversible,
+  // low-stakes choice) — they still come from --agents, defaulting to claude.
+  let agents: string[];
+  try {
+    agents = await resolveAgentTargets(cli.agents);
+  } catch (error) {
+    cancel((error as Error).message);
+    process.exit(1);
+  }
+
   // Build app details
   const appDetails: Required<AppType> = {
     appName: appName,
@@ -188,10 +221,77 @@ export default async function createNewApp(cli: CliFlags = {}) {
       aiProviders: selectedAiProviders as string[],
       useGit,
       useJWT,
+      agents,
     },
   };
 
   // Create the app
+  await scaffold(appDetails);
+}
+
+/**
+ * The default TTY path: neither `--yes` nor `--interactive` was given, but a
+ * terminal is available. Asks the project name when missing (a required
+ * answer with no sane default — same treatment as the non-interactive path)
+ * plus the ONE structural question (API-only vs full-stack web) when `--stack`
+ * was not already supplied. Every other choice is resolved exactly like
+ * `createNonInteractive` — flags, with defaults, never a prompt.
+ */
+async function createDefaultInteractive(
+  cli: CliFlags,
+  pmDetectionPromise: Promise<void>,
+) {
+  let appName = cli.name;
+
+  if (!appName) {
+    const answer = await text({
+      message: "What shall we call your project?",
+      placeholder: "my-warlock-app",
+    });
+
+    if (isCancel(answer) || !answer.trim()) {
+      cancel("A project name is required to continue");
+      process.exit(0);
+    }
+
+    appName = answer as string;
+  }
+
+  const appPath = getAppPath(appName);
+  if (!appPath) return;
+
+  const stack: Stack = cli.stack ?? (await askStack());
+
+  await pmDetectionPromise;
+
+  const packageManager = cli.pm ?? getPreferredPackageManager();
+
+  if (!isValidPackageManager(packageManager)) {
+    cancel(
+      `Unknown package manager "${packageManager}" — expected one of: ${ALLOWED_PACKAGE_MANAGERS.join(", ")}`,
+    );
+    process.exit(1);
+  }
+
+  setPackageManager(packageManager);
+
+  let options: AppOptions;
+
+  try {
+    options = await resolveAppOptions({ ...cli, stack });
+  } catch (error) {
+    cancel((error as Error).message);
+    process.exit(1);
+  }
+
+  const appDetails: Required<AppType> = {
+    appName,
+    appType: "warlock",
+    appPath,
+    pkgManager: getPackageManager(),
+    options,
+  };
+
   await scaffold(appDetails);
 }
 
@@ -209,16 +309,25 @@ async function scaffold(appDetails: Required<AppType>) {
   }
 }
 
+/** Everything {@link resolveNonInteractiveOptions} can resolve without the network. */
+export type SyncAppOptions = Omit<AppOptions, "agents">;
+
 /**
- * Resolve the full set of `AppOptions` from parsed CLI flags — applying the
- * non-interactive defaults, validating the database driver and feature/provider
- * keys, and handling the `none` (no database) selection.
+ * Resolve every flag-or-default `AppOptions` field EXCEPT `agents` from parsed
+ * CLI flags — applying the non-interactive defaults, validating the database
+ * driver and feature/provider keys, and handling the `none` (no database)
+ * selection. `agents` is resolved separately by {@link resolveAppOptions}
+ * because it can require a network fetch; this function stays synchronous so
+ * the rest of the flag → app mapping remains trivially unit-testable.
  *
- * Pure and side-effect free (no prompts, no `process.exit`) so the flag → app
- * mapping is unit-testable. Throws on an unknown driver or feature key so the
- * caller can fail fast before any file is written.
+ * `--stack=web` (or the equivalent wizard answer) seeds the `web` feature by
+ * default — the one structural choice — but an explicit `--features` always
+ * wins, so a user who spells out the feature list is never second-guessed.
+ *
+ * Throws on an unknown driver or feature key so the caller can fail fast
+ * before any file is written.
  */
-export function resolveNonInteractiveOptions(cli: CliFlags): AppOptions {
+export function resolveNonInteractiveOptions(cli: CliFlags): SyncAppOptions {
   const databaseDriver = cli.db ?? "mongodb";
   const noDatabase = isNoDatabase(databaseDriver);
   const driver = noDatabase ? undefined : getDatabaseDriver(databaseDriver);
@@ -227,7 +336,8 @@ export function resolveNonInteractiveOptions(cli: CliFlags): AppOptions {
     throw new Error(`Unknown database driver "${databaseDriver}"`);
   }
 
-  const features = cli.features ?? [];
+  const stack: Stack = cli.stack ?? "api";
+  const features = cli.features ?? (stack === "web" ? ["web"] : []);
   const aiProviders = cli.ai ?? [];
 
   const allowedKeys = getAllFeatureKeys();
@@ -247,6 +357,19 @@ export function resolveNonInteractiveOptions(cli: CliFlags): AppOptions {
     useGit: cli.git ?? false,
     useJWT: cli.jwt ?? false,
   };
+}
+
+/**
+ * Resolve the FULL `AppOptions` — {@link resolveNonInteractiveOptions} plus
+ * the validated `agents` list. Async because a non-default `--agents`
+ * selection may need {@link resolveAgentTargets}'s network fetch; the default
+ * (`claude`) never does.
+ */
+export async function resolveAppOptions(cli: CliFlags): Promise<AppOptions> {
+  const options = resolveNonInteractiveOptions(cli);
+  const agents = await resolveAgentTargets(cli.agents);
+
+  return { ...options, agents };
 }
 
 /**
@@ -292,7 +415,7 @@ async function createNonInteractive(cli: CliFlags) {
   let options: AppOptions;
 
   try {
-    options = resolveNonInteractiveOptions(cli);
+    options = await resolveAppOptions(cli);
   } catch (error) {
     cancel((error as Error).message);
     process.exit(1);

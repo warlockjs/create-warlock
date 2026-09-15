@@ -60,6 +60,7 @@ function makeFakeApp(
     aiProviders: [],
     useGit: false,
     useJWT: false,
+    agents: ["claude"],
     ...options,
   };
 
@@ -85,6 +86,9 @@ function makeFakeApp(
       return this;
     }),
     configureWebStarter: vi.fn(function (this: unknown) {
+      return this;
+    }),
+    configureAgentKitTargets: vi.fn(function (this: unknown) {
       return this;
     }),
     install: vi.fn(() => ({
@@ -132,6 +136,30 @@ describe("createWarlockApp — template + base install", () => {
     await run(fake);
 
     expect(fake.configureWebStarter).toHaveBeenCalledWith(true);
+  });
+
+  it("configures agent-kit targets from the resolved options", async () => {
+    const fake = makeFakeApp({ agents: ["claude", "cursor"] });
+
+    await run(fake);
+
+    expect(fake.configureAgentKitTargets).toHaveBeenCalledWith([
+      "claude",
+      "cursor",
+    ]);
+  });
+
+  it("prints the decisions summary after a successful scaffold", async () => {
+    const logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const fake = makeFakeApp({ agents: ["claude"] });
+
+    await run(fake);
+
+    const printed = logSpy.mock.calls.map(call => String(call[0])).join("\n");
+    expect(printed).toContain("Using yarn");
+    expect(printed).toContain("agent-kit targets: claude");
+
+    logSpy.mockRestore();
   });
 
   it("invokes the base install at least once (so the warlock binary exists)", async () => {

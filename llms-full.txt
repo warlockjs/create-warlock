@@ -8,52 +8,48 @@
 
 ---
 name: create-a-warlock-project
-description: 'Scaffold a brand-new Warlock.js project with `create-warlock` — the interactive wizard and its non-interactive flag set. A single `--yes` command scaffolds the entire app from flags. Every flag (`--name`, `--db`, `--pm`, `--features`, `--ai`, `--git/--no-git`, `--jwt/--no-jwt`, `--no-db`, `--yes`), every valid database-driver / feature / AI-provider key, opting out of a database (`--db=none` / `--no-db`, which removes `src/config/database.ts`), and the directory tree the template emits. Triggers: `create-warlock`, `npm create warlock`, `npx create-warlock`; "scaffold a warlock app", "start a new warlock project", "create-warlock flags", "non-interactive warlock scaffold", "scaffold without a database", "which features can I pass to create-warlock". Skip: running an already-created project (`@warlock.js/core/run-app/SKILL.md`); adding a feature to an existing project (`warlock add`, `@warlock.js/core/add-connector/SKILL.md`); generating a module inside a project (`@warlock.js/core/create-module/SKILL.md`).'
+description: 'Scaffold a brand-new Warlock.js project with `create-warlock` — fully headless by default (at most one prompt — API-only vs full-stack web) plus `--interactive`/`--customize` for the full long-form wizard. Every flag (`--name`, `--stack`, `--db`, `--pm`, `--features`, `--ai`, `--agents`, `--git/--no-git`, `--jwt/--no-jwt`, `--no-db`, `--yes`, `--interactive`), every valid database-driver / feature / AI-provider / agent-kit-target key, opting out of a database (`--db=none` / `--no-db`, which removes `src/config/database.ts`), the post-scaffold decisions summary, and the directory tree the template emits. Triggers: `create-warlock`, `npm create warlock`, `npx create-warlock`; "scaffold a warlock app", "start a new warlock project", "create-warlock flags", "non-interactive warlock scaffold", "scaffold without a database", "which features can I pass to create-warlock", "agent-kit targets". Skip: running an already-created project (`@warlock.js/core/run-app/SKILL.md`); adding a feature to an existing project (`warlock add`, `@warlock.js/core/add-connector/SKILL.md`); generating a module inside a project (`@warlock.js/core/create-module/SKILL.md`).'
 ---
 
 # create-warlock — scaffold a new project
 
-`create-warlock` builds a fresh Warlock.js project: it copies the `warlock` template, substitutes the project name, wires the chosen database driver into `.env` (or, when you opt out with `--db=none`, removes `src/config/database.ts`), then delegates every optional package install to the project's own `warlock add` so dependency versions are never duplicated by the scaffolder.
+`create-warlock` builds a fresh Warlock.js project: it copies the `warlock` template, substitutes the project name, wires the chosen database driver into `.env` (or, when you opt out with `--db=none`, removes `src/config/database.ts`), derives `agent-kit` targets into the generated project, then delegates every optional package install to the project's own `warlock add` so dependency versions are never duplicated by the scaffolder.
 
 ## The shape
 
 ```bash
-# Interactive wizard (recommended for humans)
-npm create warlock@latest
-# or: npx create-warlock
+# Default: at most ONE prompt (API-only vs full-stack web) — everything else is a flag/default
+npx create-warlock my-app
 
-# Non-interactive (CI, agents, reproducible setups) — one command scaffolds the whole app
+# Fully headless — one command scaffolds the whole app, no prompts at all
 npx create-warlock my-app --yes --db=postgres --features=test,redis --ai=ai-openai
+
+# The one structural fork
+npx create-warlock my-web-app --yes --stack=web
 
 # No database at all
 npx create-warlock my-api --yes --no-db --features=test
+
+# The full long-form wizard, one prompt at a time
+npx create-warlock --interactive
 ```
 
 The first positional argument is the project name; it also becomes the directory created under the current working directory. If that directory already exists, the command aborts — it never overwrites.
 
-## Interactive flow
+## Three modes
 
-The wizard asks, in order:
-
-1. **Project name** — required.
-2. **Package manager** — chosen from the managers detected on the system (npm is always offered; yarn / pnpm appear if installed).
-3. **Database driver** — a single select: a driver, or **None** to scaffold without a database (see keys below).
-4. **Features** — a multiselect of optional packages (`react` is pre-checked).
-5. **AI providers** — a multiselect; picking any one pulls `@warlock.js/ai` automatically.
-6. **Initialize Git?** — yes/no.
-7. **Generate JWT secret keys?** — yes/no. If no, the cache is warmed instead.
-
-## Non-interactive flags
-
-Pass `--yes` (or `-y`) to skip every prompt and build from flags with defaults.
+1. **Default (a TTY, no `--yes`, no `--interactive`)** — asks the project name (if not already given) plus AT MOST ONE structural question: API-only or full-stack web (`--stack`). This is the only choice that changes the generated app's shape; every other choice below is reversible within minutes of scaffolding, so it is a flag with a sensible default, never a prompt.
+2. **`--yes` (or no TTY at all — CI, a script, an agent harness)** — fully headless. Every answer comes from a flag or its default; nothing is ever prompted, and stdin is never read.
+3. **`--interactive` (alias `--customize`)** — the full long-form wizard: project name, package manager, database driver, features, AI providers, git, JWT — one prompt after another, exactly like earlier `create-warlock` releases.
 
 **Without a terminal, `--yes` is not required.** When stdin is not a TTY — CI, a
-script, a container, an agent harness — the scaffolder does not try to prompt.
-If the flags already answer everything it needs, it simply scaffolds. Prompting
-is the fallback, not the precondition.
+script, a container, an agent harness — the scaffolder does not try to prompt,
+regardless of which of the three modes was requested. If the flags already
+answer everything it needs, it simply scaffolds. Prompting is the fallback,
+not the precondition.
 
 Only a question that genuinely cannot be answered stops the run, and in practice
-that is just the project name, the one prompt with no default:
+that is just the project name, the one required answer with no default:
 
 ```
 A project name is required and no terminal is available to ask for one. Pass it as
@@ -61,21 +57,51 @@ the first argument or --name=<name>. Non-interactive flags: --yes, --pm=<npm|yar
 --db=<driver>|--no-db, --features=<list>, --ai=<list>, --git|--no-git, --jwt|--no-jwt.
 ```
 
-| Flag                     | Takes value | Default        | Purpose                                                              |
-| ------------------------ | ----------- | -------------- | ------------------------------------------------------------------- |
-| `<positional>` / `--name`| yes         | — (required)   | Project name + target directory.                                    |
-| `--db`                   | yes         | `mongodb`      | Database driver key (`mongodb`, `postgres`, or `none`).             |
-| `--no-db`                | no          | —              | Opt out of a database — shorthand for `--db=none`.                  |
-| `--pm`                   | yes         | auto-detected  | Package manager — must be one of `npm` / `yarn` / `pnpm` / `bun`; anything else is rejected before scaffolding starts. |
-| `--features`             | yes (CSV)   | none           | Comma-separated optional feature keys.                              |
-| `--ai`                   | yes (CSV)   | none           | Comma-separated AI provider keys (auto-pulls `@warlock.js/ai`).     |
-| `--git` / `--no-git`     | no          | off            | Initialize a Git repo (`git init` + `main` branch + initial commit).|
-| `--jwt` / `--no-jwt`     | no          | off            | Generate JWT secrets via the project's `jwt` script.               |
-| `--yes` / `-y`           | no          | off            | Non-interactive mode.                                               |
+## After scaffolding: the decisions summary
 
-Value flags accept either `--db=postgres` or `--db postgres`. Unknown `--features` / `--ai` keys fail fast before any install.
+Because almost every choice defaults silently, `create-warlock` prints what it
+decided right after scaffolding, e.g.:
 
-`--help`/`-h` and `--version`/`-v` short-circuit before anything else — no prompt, filesystem write, or network call, and `--help` wins even over a positional project name. `--version` prints the installed `create-warlock` version.
+```
+Using npm · database: none · agent-kit targets: claude
+  change these — package manager: --pm, database: --db/--no-db, agents: --agents,
+  features: --features, ai: --ai, git: --git/--no-git, jwt: --jwt/--no-jwt — or
+  re-run with --interactive for the full wizard.
+```
+
+## Flags
+
+| Flag                       | Takes value | Default        | Purpose                                                              |
+| --------------------------- | ----------- | -------------- | ------------------------------------------------------------------- |
+| `<positional>` / `--name`  | yes         | — (required)   | Project name + target directory.                                    |
+| `--stack`                  | yes         | `api`          | `api` or `web` — the one structural question; `web` seeds the `web` feature by default. |
+| `--db`                     | yes         | `mongodb`      | Database driver key (`mongodb`, `postgres`, or `none`).             |
+| `--no-db`                  | no          | —              | Opt out of a database — shorthand for `--db=none`.                  |
+| `--pm`                     | yes         | inferred (`npm_config_user_agent` / system) | Package manager — must be one of `npm` / `yarn` / `pnpm` / `bun`; anything else is rejected before scaffolding starts. |
+| `--features`                | yes (CSV)   | none, or `["web"]` when `--stack=web` and `--features` is not given | Comma-separated optional feature keys. An explicit `--features` always wins over the `--stack` default. |
+| `--ai`                      | yes (CSV)   | none           | Comma-separated AI provider keys (auto-pulls `@warlock.js/ai`).     |
+| `--agents`                  | yes (CSV)   | `claude`       | Comma-separated `agent-kit` targets — see below.                    |
+| `--git` / `--no-git`        | no          | off            | Initialize a Git repo (`git init` + `main` branch + initial commit).|
+| `--jwt` / `--no-jwt`        | no          | off            | Generate JWT secrets via the project's `jwt` script.               |
+| `--yes` / `-y`              | no          | off            | Fully headless mode.                                                 |
+| `--interactive`, `--customize` | no       | off            | Restore the full long-form wizard.                                   |
+
+Value flags accept either `--db=postgres` or `--db postgres`. Unknown `--features` / `--ai` / `--agents` keys fail fast before any install.
+
+`--help`/`-h` and `--version`/`-v` short-circuit before anything else — no prompt, filesystem write, or network call, and `--help` wins even over a positional project name. `--version` prints the installed `create-warlock` version. `--help` lists every flag above together with its default.
+
+## `--agents` and agent-kit targets
+
+`--agents` picks which `agent-kit` targets the generated project derives
+docs/skills for (written into the scaffolded `package.json`'s `agentKit.targets`
+when it differs from the default). The default, `claude`, is a tiny built-in
+fallback that always works — even fully offline. Any other target
+(`cursor`, `codex`, `kiro`, `copilot`, `antigravity`, `opencode`, `amp`,
+`goose`, …) is validated against the list published at
+https://mongez.js.org/agent-kit/llms.txt, fetched once and cached locally. If
+that fetch fails for an explicitly requested non-default target, the run fails
+visibly and names every target it *could* determine — it never silently
+guesses.
 
 ## Valid keys
 
@@ -118,11 +144,12 @@ The template ships a working auth module (login / logout / logout-all / refresh 
 
 ## Setup steps the scaffolder runs
 
-1. Copy template → substitute name → wire `DB_DRIVER` / `DB_PORT` into `.env` (or, for `--db=none`, remove `src/config/database.ts`).
+1. Copy template → substitute name → wire `DB_DRIVER` / `DB_PORT` into `.env` (or, for `--db=none`, remove `src/config/database.ts`) → record non-default `--agents` targets into `package.json`'s `agentKit.targets`.
 2. Install base dependencies (so the `warlock` binary exists).
 3. `warlock add <driver> <features...> <ai...> --no-install`, then one batched install. The `<driver>` is omitted for `--db=none`.
 4. `git init` (if `--git`).
 5. `jwt` script (if `--jwt`) — otherwise `warlock --warm-cache`.
+6. Print the decisions summary.
 
 Failures surface the error and halt; there is no rollback. After it finishes, `cd my-app` and run the dev server.
 

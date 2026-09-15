@@ -47,6 +47,7 @@ function makeApplication(
       aiProviders: [],
       useGit: false,
       useJWT: false,
+      agents: ["claude"],
       ...overrides,
     },
   };

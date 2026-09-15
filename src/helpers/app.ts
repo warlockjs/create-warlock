@@ -358,6 +358,31 @@ export class App {
   }
 
   /**
+   * Record non-default `agent-kit` targets into the generated `package.json`'s
+   * `agentKit.targets` block.
+   *
+   * The template's own `postinstall` (`agent-kit init && agent-kit sync`)
+   * already targets `claude` with no flags, so the single-target default case
+   * needs no template edit at all — this only writes when the selection is
+   * anything else, keeping the scaffold diff-free for the common path.
+   */
+  public configureAgentKitTargets(agents: string[]) {
+    const isDefault = agents.length === 1 && agents[0] === "claude";
+    if (isDefault) return this;
+
+    const packageJsonPath = path.resolve(this.path, "package.json");
+    if (!fileExists(packageJsonPath)) return this;
+
+    const packageJson = getJsonFile(packageJsonPath) as {
+      agentKit?: { targets?: string[] };
+    };
+    packageJson.agentKit = { ...packageJson.agentKit, targets: agents };
+    putJsonFile(packageJsonPath, packageJson);
+
+    return this;
+  }
+
+  /**
    * Install the selected optional features by delegating to the project's own
    * `warlock add`. `--no-install` records every dependency in package.json and
    * ejects configs / scripts / setup hooks WITHOUT installing — the caller runs

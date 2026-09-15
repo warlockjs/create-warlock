@@ -20,6 +20,7 @@ import {
 } from "../../ui/report";
 import { spinner } from "../../ui/spinner";
 import { spinnerMessages } from "../../ui/spinners";
+import { printDecisionsSummary } from "../../summary";
 
 /**
  * What the scaffold actually achieved. `ok` is false when ANY step the user
@@ -87,6 +88,7 @@ export async function createWarlockApp(
     }
 
     application.configureWebStarter(features.includes("web"));
+    application.configureAgentKitTargets(options.agents ?? ["claude"]);
   } catch (error) {
     templateSpinner.stop(spinnerMessages.templateFailed);
 
@@ -300,6 +302,8 @@ export async function createWarlockApp(
       packageManager: getPackageManager(),
     });
 
+    printDecisionsSummary({ packageManager: getPackageManager(), options });
+
     return { ok: false, problems };
   }
 
@@ -309,6 +313,8 @@ export async function createWarlockApp(
     features: installedFeatures,
     packageManager: getPackageManager(),
   });
+
+  printDecisionsSummary({ packageManager: getPackageManager(), options });
 
   return { ok: true, problems };
 }
