@@ -1,5 +1,5 @@
 import type { AppProps } from "@warlock.js/web";
-import { Head, Scripts } from "@warlock.js/web";
+import { Head, Scripts, useLocale, useTextDirection } from "@warlock.js/web";
 import "./app.css";
 
 /**
@@ -9,8 +9,11 @@ import "./app.css";
  * again in the browser during hydration, where neither exists.
  */
 export default function App({ children }: AppProps) {
+  const locale = useLocale();
+  const direction = useTextDirection();
+
   return (
-    <html lang="en">
+    <html lang={locale} dir={direction}>
       <head>
         {/*
           Placement only. The framework injects the page's `metadata`, the

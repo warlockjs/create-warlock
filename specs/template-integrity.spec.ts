@@ -335,3 +335,28 @@ describe("template typecheck prerequisites", () => {
     }
   });
 });
+
+describe("locale switching never falls back to a banned import or a reload", () => {
+  it("never imports @mongez/http — use the framework's own request/response surface", () => {
+    const offenders = templateSourceFiles().filter((file) =>
+      /from\s*["']@mongez\/http["']/.test(stripComments(read(file))),
+    );
+
+    expect(offenders).toEqual([]);
+  });
+
+  it("never pairs a locale change with location.reload or a hash-based reload", () => {
+    // The regression this guards: a locale switcher that posts the new locale
+    // then forces the browser to re-fetch the whole document via
+    // `location.hash` / `location.reload()` instead of using the framework's
+    // `changeLocaleCode`, which swaps the page in without a reload.
+    const localeReloadPattern =
+      /\blocale\b[\s\S]{0,400}?location\.(reload|hash)|location\.(reload|hash)[\s\S]{0,400}?\blocale\b/i;
+
+    const offenders = templateSourceFiles().filter((file) =>
+      localeReloadPattern.test(stripComments(read(file))),
+    );
+
+    expect(offenders).toEqual([]);
+  });
+});

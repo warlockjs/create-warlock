@@ -37,7 +37,7 @@ export default function HomePage({ data }: HomePageProps) {
       <HomeHeader />
       <HeroSection statusMessage={data.statusMessage} />
       <ContentSections capabilities={data.capabilities} packages={data.packages} />
-      <ContactSection locale={data.locale} />
+      <ContactSection />
       <HomeFooter />
     </main>
   );

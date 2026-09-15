@@ -1,4 +1,3 @@
-import { http } from "@mongez/http";
 import { type FormSubmitOptions, type InferFormValues } from "@mongez/react-form";
 import { useState } from "react";
 import type { contactSchema } from "../../../shared/contact.schema";
@@ -12,6 +11,11 @@ type ContactResponse = {
     email: string;
     characters: number;
   };
+};
+
+type ContactErrorBody = {
+  message?: string;
+  errors?: unknown;
 };
 
 type ContactStatus = {
@@ -29,21 +33,28 @@ export function useContactForm() {
     setStatus({ state: "submitting", message: "Sending to the backend…" });
 
     try {
-      const result = await http.post<ContactResponse>("/api/contact", values as ContactValues);
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values as ContactValues),
+      });
 
-      if (result.error) {
-        if (result.error.isValidationError) {
-          setFormErrors(result.error, form);
+      const body = (await response.json().catch(() => ({}))) as ContactErrorBody &
+        Partial<ContactResponse>;
+
+      if (!response.ok) {
+        if (response.status === 422) {
+          setFormErrors({ body }, form);
         }
 
         setStatus({
           state: "error",
-          message: result.error.message || "The request was not accepted.",
+          message: body.message || "The request was not accepted.",
         });
         return;
       }
 
-      setStatus({ state: "success", message: result.data?.message });
+      setStatus({ state: "success", message: body.message ?? "" });
       form.reset();
     } catch (error) {
       setStatus({

@@ -1,22 +1,43 @@
 import { Form } from "@mongez/react-form";
-import { useTrans } from "@warlock.js/web";
+import { changeLocaleCode, useLocale, useTextDirection, useTrans } from "@warlock.js/web";
+import { useState } from "react";
 import { contactSchema } from "../../../shared/contact.schema";
-import type { LocaleCode } from "../../../shared/locales";
 import { useContactForm } from "../hooks/use-contact-form";
-import { useLocaleSwitcher } from "../hooks/use-locale-switcher";
 import { ContactField, ContactSubmitButton } from "./contact-form-controls";
 
-type ContactSectionProps = { locale: LocaleCode };
-
-export function ContactSection({ locale }: ContactSectionProps) {
+export function ContactSection() {
   const { status: contactStatus, submitContact } = useContactForm();
-  const { error: localeError, isSwitching, switchLocale } = useLocaleSwitcher();
+  const locale = useLocale();
+  const direction = useTextDirection();
   const translate = useTrans();
+  const [isSwitchingLocale, setIsSwitchingLocale] = useState(false);
+  const [localeError, setLocaleError] = useState("");
+
+  /**
+   * Switch locale via the framework's `changeLocaleCode` — no reload, no
+   * manual cookie write. The control is disabled while the request is in
+   * flight, and a rejection leaves the current locale in place while
+   * surfacing an error instead of throwing.
+   */
+  async function toggleLocale() {
+    const nextLocale = locale === "en" ? "ar" : "en";
+
+    setIsSwitchingLocale(true);
+    setLocaleError("");
+
+    try {
+      await changeLocaleCode(nextLocale);
+    } catch (error) {
+      setLocaleError(error instanceof Error ? error.message : "Could not update the locale.");
+    } finally {
+      setIsSwitchingLocale(false);
+    }
+  }
   return (
     <section
       className="warlock-section warlock-contact"
       id="contact"
-      dir={locale === "ar" ? "rtl" : "ltr"}
+      dir={direction}
     >
       <div className="warlock-contact-copy">
         <p className="warlock-overline">{translate("contact.overline")}</p>
@@ -62,8 +83,8 @@ export function ContactSection({ locale }: ContactSectionProps) {
           <button
             className="warlock-locale-toggle"
             type="button"
-            disabled={isSwitching}
-            onClick={() => switchLocale(locale === "en" ? "ar" : "en")}
+            disabled={isSwitchingLocale}
+            onClick={toggleLocale}
           >
             {translate("contact.toggle")}
           </button>
