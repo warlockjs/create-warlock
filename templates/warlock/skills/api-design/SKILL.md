@@ -354,11 +354,11 @@ createLeadController.validation = {
 
 | Route kind                       | Controller type                       | What it adds                          |
 | -------------------------------- | ------------------------------------- | ------------------------------------- |
-| Guarded (auth required) + body   | `GuardedRequestHandler<Schema>`       | typed `request.validated()` + `request.user` |
+| Guarded (auth required) + body   | `GuardedRequestHandler<Schema>`       | typed `request.validated()` + `request.locals.user` |
 | Public + body                    | `RequestHandler<Request<Schema>>`     | typed `request.validated()`           |
 | Read / list (no body)            | `RequestHandler`                      | nothing extra                         |
 
-`GuardedRequestHandler<Schema>` (defined in `app/auth/requests/guarded.request.ts`) is `RequestHandler<GuardedRequest<Schema>>` — it both types the validated payload and guarantees `request.user` is present.
+`GuardedRequestHandler<Schema>` (defined in `app/auth/requests/guarded.request.ts`) is `RequestHandler<GuardedRequest<Schema>>` — it both types the validated payload and guarantees `request.locals.user` is present.
 
 ### 6.3 Accessing inputs
 

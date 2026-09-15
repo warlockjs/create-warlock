@@ -9,7 +9,7 @@ import { logoutAllService } from "../services/auth.service";
  * Guarded route — see the note on `logoutController`.
  */
 export const logoutAllController: GuardedRequestHandler = async ({ request, response }) => {
-  await logoutAllService(request.user);
+  await logoutAllService(request.locals.user);
 
   return response.success({
     message: t("auth.loggedOutAll"),

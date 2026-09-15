@@ -110,7 +110,7 @@ Three things that trip everyone up on a fresh app:
   field is required" message), but it is redundant on a plain field, so the
   generated code and these docs don't use it.
 - **Declare server-set foreign keys on the MODEL schema.** A controller that
-  sets a column the client doesn't send (e.g. `authorId: request.user.id`) must
+  sets a column the client doesn't send (e.g. `authorId: request.locals.user.id`) must
   still have that column declared on the model's seal schema
   (`authorId: v.number()`), or `Model.create()` rejects it as an unknown key.
   The client-facing request schema and the model schema are separate, so this

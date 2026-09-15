@@ -95,7 +95,7 @@ AuthN proves who you are. AuthZ decides what you can do. Conflating them is how 
 const order = await ordersRepository.find({ id, userId: request.input("userId") });
 
 // ✅ identity from the authenticated session
-const user = request.user;
+const user = request.locals.user;
 const order = await ordersRepository.find({ id, userId: user.id });
 ```
 

@@ -11,7 +11,7 @@ import { type GuardedRequestHandler } from "app/auth/requests/guarded.request";
  */
 export const meController: GuardedRequestHandler = async ({ request, response }) => {
   return response.success({
-    user: request.user,
+    user: request.locals.user,
   });
 };
 

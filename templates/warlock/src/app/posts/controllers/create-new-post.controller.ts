@@ -8,7 +8,7 @@ export const createNewPostController: GuardedRequestHandler<CreatePostSchema> = 
 }) => {
   const post = await Post.create({
     ...request.validated(),
-    authorId: request.user.id,
+    authorId: request.locals.user.id,
   });
 
   return response.successCreate({

@@ -53,20 +53,26 @@ declare module "@warlock.js/core" {
    * ```
    */
   interface RequestLocals {}
+}
 
+declare module "@warlock.js/auth" {
   /**
-   * The authenticated user — `request.user`.
+   * The authenticated user — `request.locals.user`.
    *
-   * The auth middleware assigns the resolved user model here. Declaring its
-   * shape gives unguarded handlers (ones that may or may not have a user) a
-   * real type instead of `{}`.
+   * `@warlock.js/auth` already augments core's `RequestLocals` with an
+   * optional `user?: RequestUser` key; this augments `RequestUser` itself
+   * (owned by `@warlock.js/auth`, not core — core removed its own `request.user`
+   * and the `RequestUser` it used to declare). The auth middleware assigns the
+   * resolved user model here. Declaring its shape gives unguarded handlers
+   * (ones that may or may not have a user) a real type instead of `{}`.
    *
-   * This does NOT make `request.user` non-optional: the framework declares it
-   * as `user?: RequestUser`, and augmentation can add members but cannot remove
+   * This does NOT make `request.locals.user` non-optional: it stays
+   * `user?: RequestUser`, and augmentation can add members but cannot remove
    * the `?`. For routes that are actually behind the auth guard, type the
    * handler as `GuardedRequestHandler` (see
-   * `src/app/auth/requests/guarded.request.ts`) — that narrows `request.user`
-   * to the app's `User` model AND drops the `| undefined`.
+   * `src/app/auth/requests/guarded.request.ts`) — that narrows
+   * `request.locals.user` to the app's `User` model AND drops the
+   * `| undefined`.
    *
    * @example
    * ```ts

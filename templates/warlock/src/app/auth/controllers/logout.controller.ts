@@ -7,11 +7,11 @@ import { logoutService } from "../services/auth.service";
  * POST /auth/logout
  *
  * Typed as `GuardedRequestHandler` because the route sits inside `guarded()`
- * (see `../routes.ts`). A plain `RequestHandler` types `request.user` as
- * `RequestUser | undefined`, which is not assignable to `logoutService`.
+ * (see `../routes.ts`). A plain `RequestHandler` types `request.locals.user`
+ * as `RequestUser | undefined`, which is not assignable to `logoutService`.
  */
 export const logoutController: GuardedRequestHandler = async ({ request, response }) => {
-  await logoutService(request.user);
+  await logoutService(request.locals.user);
 
   return response.success({
     message: t("auth.loggedOut"),
