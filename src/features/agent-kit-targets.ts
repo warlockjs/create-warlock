@@ -125,7 +125,9 @@ export async function fetchRemoteAgentKitTargets(
     if (docResponse.ok) {
       const doc = await docResponse.text();
       for (const match of doc.matchAll(/--target[= ]([a-z][a-z0-9-]*)/gi)) {
-        targets.add(match[1].toLowerCase());
+        const target = match[1];
+
+        if (target) targets.add(target.toLowerCase());
       }
     }
   }
