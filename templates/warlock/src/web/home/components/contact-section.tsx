@@ -34,11 +34,7 @@ export function ContactSection() {
     }
   }
   return (
-    <section
-      className="warlock-section warlock-contact"
-      id="contact"
-      dir={direction}
-    >
+    <section className="warlock-section warlock-contact" id="contact" dir={direction}>
       <div className="warlock-contact-copy">
         <p className="warlock-overline">{translate("contact.overline")}</p>
         <h2>{translate("contact.title")}</h2>
