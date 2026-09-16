@@ -67,6 +67,18 @@ export const features: FeatureOption[] = [
     hint: "RBAC permission checks, ABAC policies, and roles — pairs with auth",
     group: "Auth & Access",
   },
+  {
+    key: "auth-google",
+    label: "Google sign-in",
+    hint: "Google OAuth sign-in for @warlock.js/auth",
+    group: "Auth & Access",
+  },
+  {
+    key: "auth-passkeys",
+    label: "Passkey sign-in",
+    hint: "WebAuthn passkey login for @warlock.js/auth",
+    group: "Auth & Access",
+  },
 
   // Rendering & Mail
   {
@@ -143,6 +155,12 @@ export const features: FeatureOption[] = [
     group: "Jobs & Messaging",
   },
   {
+    key: "queue",
+    label: "Queue (BullMQ)",
+    hint: "Durable Redis-backed background jobs with retries and workers",
+    group: "Jobs & Messaging",
+  },
+  {
     key: "herald",
     label: "Herald (RabbitMQ)",
     hint: "Message broker for event-driven architecture",
@@ -193,9 +211,21 @@ export type AiProviderOption = {
  */
 export const aiProviders: AiProviderOption[] = [
   { key: "ai-openai", label: "OpenAI", hint: "GPT models via the OpenAI API" },
-  { key: "ai-google", label: "Google (Gemini)", hint: "Gemini models via Google AI" },
-  { key: "ai-anthropic", label: "Anthropic (Claude)", hint: "Claude models via the Anthropic API" },
-  { key: "ai-bedrock", label: "AWS Bedrock", hint: "Foundation models via Amazon Bedrock" },
+  {
+    key: "ai-google",
+    label: "Google (Gemini)",
+    hint: "Gemini models via Google AI",
+  },
+  {
+    key: "ai-anthropic",
+    label: "Anthropic (Claude)",
+    hint: "Claude models via the Anthropic API",
+  },
+  {
+    key: "ai-bedrock",
+    label: "AWS Bedrock",
+    hint: "Foundation models via Amazon Bedrock",
+  },
   { key: "ai-ollama", label: "Ollama", hint: "Local models via Ollama" },
 ];
 
@@ -239,7 +269,9 @@ export function getFeatureOptions() {
  * Keys pre-checked in the feature multiselect.
  */
 export function getDefaultFeatureKeys(): string[] {
-  return features.filter(feature => feature.defaultSelected).map(feature => feature.key);
+  return features
+    .filter(feature => feature.defaultSelected)
+    .map(feature => feature.key);
 }
 
 /**

