@@ -19,6 +19,9 @@ export const userSchema = v.object({
   // compile error, not a silent write. Optional: a user who has never logged
   // in (freshly registered or freshly seeded) has no lastLogin yet.
   lastLogin: v.date().optional(),
+  // Stamped by `@warlock.js/auth`'s `verifyEmail()` (the `auth.verification.field`
+  // default). Absent/undefined means unverified — see the `verified` scope below.
+  emailVerifiedAt: v.date().optional(),
 });
 
 export type UserSchema = Infer<typeof userSchema>;
@@ -59,7 +62,7 @@ export class User extends Auth<UserSchema> {
     });
 
     this.addScope("verified", (query) => {
-      query.where("emailVerified", true);
+      query.whereNotNull("emailVerifiedAt");
     });
   }
 }

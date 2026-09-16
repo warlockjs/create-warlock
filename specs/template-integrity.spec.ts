@@ -350,6 +350,42 @@ describe("template typecheck prerequisites", () => {
   });
 });
 
+describe("user model's verified scope matches @warlock.js/auth's emailVerifiedAt semantics", () => {
+  // @warlock.js/auth (74c2517) stamps `auth.verification.field` — default
+  // `emailVerifiedAt`, a nullable Date — on `verifyEmail()`, and its own
+  // `isEmailVerified()` treats "verified" as the field holding a value. The
+  // scaffold's `verified` scope, schema and migration must agree with that:
+  // there is no `emailVerified` boolean anywhere in the framework surface.
+  const userModel = () => read("src/app/users/models/user/user.model.ts");
+  const userMigration = () => read(migrationTemplates[0]);
+
+  it("never queries a boolean emailVerified column — auth stamps emailVerifiedAt instead", () => {
+    expect(stripComments(userModel())).not.toMatch(/\bemailVerified\b(?!At)/);
+  });
+
+  it("verified scope checks emailVerifiedAt is not null", () => {
+    const source = stripComments(userModel());
+    const scopeMatch = source.match(
+      /addScope\(\s*["']verified["'],\s*\(query\)\s*=>\s*\{([\s\S]*?)\}\s*\)/,
+    );
+
+    expect(scopeMatch).not.toBeNull();
+    expect(scopeMatch![1]).toMatch(/whereNotNull\(\s*["']emailVerifiedAt["']\s*\)/);
+  });
+
+  it("user schema declares emailVerifiedAt as an optional date", () => {
+    const source = stripComments(userModel());
+
+    expect(source).toMatch(/emailVerifiedAt:\s*v\.date\(\)\.optional\(\)/);
+  });
+
+  it("user migration declares emailVerifiedAt as a nullable timestamp", () => {
+    const source = stripComments(userMigration());
+
+    expect(source).toMatch(/emailVerifiedAt:\s*timestamp\(\)\.nullable\(\)/);
+  });
+});
+
 describe("locale switching never falls back to a banned import or a reload", () => {
   it("never imports @mongez/http — use the framework's own request/response surface", () => {
     const offenders = templateSourceFiles().filter((file) =>
