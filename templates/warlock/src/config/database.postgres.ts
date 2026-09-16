@@ -14,6 +14,10 @@ const databaseConfigurations: ConnectionOptions<never, PostgresPoolConfig> = {
   defaultDeleteStrategy: "permanent",
 
   clientOptions: {
+    // `PostgresPoolConfig` extends the connection config, so `database` is
+    // required here too even though it duplicates the top-level value above.
+    database: env("DB_NAME"),
+
     // Native `pg` pool options — tune these for your workload.
     // max: 10,
     // min: 0,

@@ -4,6 +4,13 @@ All notable changes to `create-warlock` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@warlock.js/*` packages are released in lockstep — every package shares the same version number, so a version below may list only the changes that affected this package.
 
+## 5.13.0 - 2026-09-17
+
+### Fixed
+
+- A `--db=postgres` scaffold shipped `src/config/database.ts` with an empty `clientOptions: {}`. Cascade's `PostgresPoolConfig` extends `PostgresConnectionConfig`, whose `database` field is required (not optional, unlike Mongo's `MongoClientOptions`), so `{}` failed `tsc --noEmit` on that exact line before a single line of app code ran. `templates/warlock/src/config/database.postgres.ts` now sets `database` inside `clientOptions` too. Verified against a real `npm create warlock@5.12.0 --stack=web --db=postgres --jwt` scaffold installed from the registry: this was the only `tsc` error once devDependencies installed correctly (see below), and it is gone after the fix. Guarded by a new static check in `specs/template-integrity.spec.ts`.
+- Investigated a separate report that a `--stack=web --db=postgres --jwt` scaffold lacked `@warlock.js/web` and `@types/react`/`@types/react-dom`. **Not reproducible** against the published 5.12.0 template: `package.json` lists all three correctly, and a clean install (`npm ci` with `NODE_ENV` unset) installs them. The only way to reproduce the missing `@types/*` packages was installing with `NODE_ENV=production` set, which makes npm skip `devDependencies` entirely — an environment condition on the installing machine, not a scaffold defect. No template change made for this report.
+
 ## 5.12.0 - 2026-09-16
 
 ### Changed

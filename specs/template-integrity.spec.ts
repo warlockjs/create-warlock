@@ -334,6 +334,20 @@ describe("template typecheck prerequisites", () => {
       expect(lastBlockComment![0]).toMatch(/any authenticated user/i);
     }
   });
+
+  it("postgres database config's clientOptions carries a database key — PostgresPoolConfig requires it", () => {
+    // `PostgresPoolConfig` (cascade) is `PostgresConnectionConfig & {...}`, and
+    // `PostgresConnectionConfig.database` is a REQUIRED string, not optional —
+    // unlike Mongo's `MongoClientOptions`, which needs no such key. An empty
+    // `clientOptions: {}` on the postgres template is `{}` assigned to a type
+    // that requires `database`, so a freshly scaffolded `--db=postgres` project
+    // fails `tsc --noEmit` on this file before a single line of app code runs.
+    const source = stripComments(read("src/config/database.postgres.ts"));
+    const clientOptionsMatch = source.match(/clientOptions:\s*\{([\s\S]*?)\n {2}\},/);
+
+    expect(clientOptionsMatch).not.toBeNull();
+    expect(clientOptionsMatch![1]).toMatch(/\bdatabase\s*:/);
+  });
 });
 
 describe("locale switching never falls back to a banned import or a reload", () => {
