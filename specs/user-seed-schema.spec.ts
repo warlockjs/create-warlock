@@ -2,33 +2,19 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-// create-warlock does not depend on @warlock.js/seal (it scaffolds it into
-// generated apps, it doesn't consume it), so there is no linked copy in this
-// package's own node_modules to resolve a bare specifier against. This is a
-// monorepo sibling package whose `main`/`module` point straight at its own
-// TypeScript source (no build step), so it's imported by relative path —
-// the same real `v`/`validate` the template's generated app runs.
-import { v, validate } from "../../seal/src/index.ts";
 
 /**
  * Regression coverage for the 5.12.0 `npm run seed` defect on a fresh scaffold
  * (postgres + jwt): the template's `userSchema` declared `image` and
- * `lastLogin` as REQUIRED, but neither the seed data nor the password-login
- * flow ever supplies them — a user who never logged in has no `lastLogin`,
- * and a freshly-registered user may have no `image` yet (it is enforced at
- * the CONTROLLER's `create-user.schema.ts` layer, not the model layer).
+ * `lastLogin` as required, but the seed never supplies them — a seeded user
+ * has never logged in and has no avatar yet.
  *
- * This spec proves the template's seed record validates against the
- * template's own model schema. It mirrors `userSchema` from
- * `templates/warlock/src/app/users/models/user/user.model.ts` field-for-field
- * (importing the template file directly isn't workable here: the template is
- * an uncompiled scaffold tree, not a module this spec's own dependency graph
- * can resolve — `app/users/resources/user.resource.ts` et al. — so, per the
- * existing `template-integrity.spec.ts` convention, the template source is
- * read as text and cross-checked against this mirrored schema instead of
- * imported). It validates with the REAL `@warlock.js/seal` `v` used by the
- * template (create-warlock's own workspace copy), so this is a genuine
- * validation run, not a text match.
+ * The template is an uncompiled scaffold tree, and create-warlock does not
+ * depend on `@warlock.js/seal`, so this spec reads both template files as text
+ * (the `template-integrity.spec.ts` convention) and checks the contract that
+ * matters: every field the model requires unconditionally is written by the
+ * seed. It must stay self-contained — CI checks out this repository alone, so
+ * nothing may be imported from a sibling package's source tree.
  */
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -38,53 +24,75 @@ function read(relativePath: string): string {
   return readFileSync(path.join(templateRoot, relativePath), "utf8");
 }
 
-// Mirrors templates/warlock/src/app/users/models/user/user.model.ts#userSchema
-const userSchema = v.object({
-  name: v.string().required(),
-  email: v.email().requiredIfEmpty("id"),
-  image: v.string().optional(),
-  password: v.string().min(6).requiredIfEmpty("id"),
-  lastLogin: v.date().optional(),
-});
+/**
+ * Field names in `userSchema = v.object({...})` whose rule chain can reject a
+ * create without the field: not `.optional()`, and not conditional on `id`
+ * (`requiredIfEmpty("id")` is satisfied on create only by supplying the field,
+ * so it counts as required for a seed, which never passes an id).
+ */
+function requiredModelFields(modelSource: string): string[] {
+  const schemaBody = modelSource.match(
+    /userSchema\s*=\s*v\.object\(\{([\s\S]*?)\n\}\);/,
+  );
 
-describe("template user seed data validates against the template user model schema", () => {
-  it("keeps the mirrored schema in sync with the template's optional/required markers", () => {
-    // Guards the mirror itself against silent drift: if the template adds
-    // `.optional()` to a field (the fix) or changes required-ness some other
-    // way, this test forces the mirror above to be updated to match, so the
-    // validation below stays honest about what the template actually declares.
-    const modelSource = read("src/app/users/models/user/user.model.ts");
-
-    expect(modelSource).toMatch(/name:\s*v\.string\(\)\.required\(\)/);
-    expect(modelSource).toMatch(/email:\s*v\.email\(\)\.requiredIfEmpty\("id"\)/);
-    // Regression guard: image and lastLogin must stay optional at the model
-    // layer — a fresh registration and a never-logged-in seed both write a
-    // record without them (see the fix rationale above the schema mirror).
-    expect(modelSource).toMatch(/image:\s*v\.string\(\)\.optional\(\),/);
-    expect(modelSource).toMatch(
-      /password:\s*v\.string\(\)\.min\(6\)\.requiredIfEmpty\("id"\)/,
+  if (!schemaBody) {
+    throw new Error(
+      "Could not locate `userSchema = v.object({...})` in the template user model.",
     );
-    expect(modelSource).toMatch(/lastLogin:\s*v\.date\(\)\.optional\(\),/);
+  }
+
+  const fields: string[] = [];
+
+  for (const line of schemaBody[1].split("\n")) {
+    const field = line.match(/^\s*(\w+):\s*v\.(.+?),?\s*$/);
+
+    if (!field) {
+      continue;
+    }
+
+    if (!field[2].includes(".optional()")) {
+      fields.push(field[1]);
+    }
+  }
+
+  return fields;
+}
+
+/** Keys of the object literal passed to `User.create({...})` in the seed. */
+function seededFields(seedSource: string): string[] {
+  const createBody = seedSource.match(/User\.create\(\{([\s\S]*?)\}\)/);
+
+  if (!createBody) {
+    throw new Error(
+      "Could not locate `User.create({...})` in the template users seed.",
+    );
+  }
+
+  return [...createBody[1].matchAll(/^\s*(\w+):/gm)].map(match => match[1]);
+}
+
+describe("template users seed satisfies the template user model", () => {
+  it("parses the model's fields, so an empty result can never pass vacuously", () => {
+    const required = requiredModelFields(
+      read("src/app/users/models/user/user.model.ts"),
+    );
+
+    expect(required).toEqual(
+      expect.arrayContaining(["name", "email", "password"]),
+    );
   });
 
-  it("validates the exact record templates/warlock/src/app/users/seeds/users.seed.ts creates", async () => {
-    // Mirrors the User.create({...}) call in users.seed.ts: no image, no
-    // lastLogin — a brand-new seeded user has never logged in and was never
-    // assigned an avatar.
-    const seedSource = read("src/app/users/seeds/users.seed.ts");
+  it("writes every field the model requires", () => {
+    const required = requiredModelFields(
+      read("src/app/users/models/user/user.model.ts"),
+    );
+    const seeded = seededFields(read("src/app/users/seeds/users.seed.ts"));
 
-    expect(seedSource).not.toMatch(/image:/);
-    expect(seedSource).not.toMatch(/lastLogin:/);
+    const missing = required.filter(field => !seeded.includes(field));
 
-    const seedRecord = {
-      name: "User 1",
-      email: "user1@gmail.com",
-      password: "password-1",
-    };
-
-    const result = await validate(userSchema, seedRecord);
-
-    expect(result.errors, JSON.stringify(result.errors)).toEqual([]);
-    expect(result.isValid).toBe(true);
+    expect(
+      missing,
+      `users.seed.ts omits required model fields: ${missing.join(", ")}`,
+    ).toEqual([]);
   });
 });
