@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - `create-warlock` asks at most one question (API-only or full-stack web); every other choice is a flag with a default, printed after scaffolding. Fully non-interactive with `--yes`; `--interactive` restores the long form; `--agents` picks agent-kit targets (default `claude`).
 
+### Fixed
+
+- `npm run seed` failed on a fresh scaffold: the generated `userSchema` required `image` and `lastLogin`, but neither the seed data nor a password login ever supplies them. Both are now `.optional()` on the model — `image` is still required at registration by the controller's own `create-user.schema.ts`, and `lastLogin` is only ever written by the social-login handler, so a user who has never logged in correctly has neither.
+
 ## 5.11.0 - 2026-09-14
 
 ### Removed

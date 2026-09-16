@@ -7,13 +7,18 @@ import { UserResource } from "app/users/resources/user.resource";
 export const userSchema = v.object({
   name: v.string().required(),
   email: v.email().requiredIfEmpty("id"),
-  image: v.string(),
+  // Required at the controller layer (`create-user.schema.ts`) on
+  // registration, but not here: a freshly-registered user's record is
+  // written before that upload completes, and a seeded/social-login user may
+  // never get an avatar at all.
+  image: v.string().optional(),
   password: v.string().min(6).requiredIfEmpty("id").addTransformer(useHashedPassword()),
   // Written by the social-login handler (`app/users/services/login-social.ts`).
   // A field only reachable through `save({ merge })` still has to be declared
   // here — `merge` is typed against this schema, so an undeclared key is a
-  // compile error, not a silent write.
-  lastLogin: v.date(),
+  // compile error, not a silent write. Optional: a user who has never logged
+  // in (freshly registered or freshly seeded) has no lastLogin yet.
+  lastLogin: v.date().optional(),
 });
 
 export type UserSchema = Infer<typeof userSchema>;
