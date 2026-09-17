@@ -100,6 +100,12 @@ export const features: FeatureOption[] = [
     group: "Rendering & Mail",
   },
   {
+    key: "sitemap",
+    label: "Sitemap",
+    hint: "Runtime sitemap.xml generation from the page registry — requires app.publicUrl or PUBLIC_APP_URL (pulls web)",
+    group: "Rendering & Mail",
+  },
+  {
     key: "react",
     label: "React (rendering & mails)",
     hint: "React + ReactDOM for non-interactive rendering and HTML/email generation",
