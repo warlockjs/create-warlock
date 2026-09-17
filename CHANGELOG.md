@@ -4,11 +4,11 @@ All notable changes to `create-warlock` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@warlock.js/*` packages are released in lockstep — every package shares the same version number, so a version below may list only the changes that affected this package.
 
-## Unreleased
+## 5.14.0 - 2026-09-17
 
-### Breaking
+### Changed
 
-- The web starter's `src/web/root.tsx` hydration mount point is now `<div id="vessel">` (was `<div id="root">`), matching `@warlock.js/web`'s BREAKING rename: `#root` collided with common embeds and third-party widgets. Scaffolds generated from an older template with CSS or tests targeting `#root` must update to `#vessel`.
+- **BREAKING:** the web starter's `src/web/root.tsx` renders the hydration mount as `<div id="vessel">` (was `#root`).
 
 ## 5.13.0 - 2026-09-17
 
