@@ -399,7 +399,7 @@ async function driveChrome({ chrome, baseUrl, profile }) {
     await waitForExpression(
       cdp,
       sessionId,
-      `Object.keys(document.querySelector("#root") ?? {}).some(key => key.startsWith("__reactContainer$"))`,
+      `Object.keys(document.querySelector("#vessel") ?? {}).some(key => key.startsWith("__reactContainer$"))`,
       30_000,
     );
     report.checks.reactRootAttached = true;

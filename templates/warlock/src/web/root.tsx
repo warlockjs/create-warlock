@@ -30,16 +30,16 @@ export default function App({ children }: AppProps) {
         {/*
           REQUIRED — this is the hydration mount point, not a styling wrapper.
 
-          The browser runtime looks up `#root` and hydrates that element only.
+          The browser runtime looks up `#vessel` and hydrates that element only.
           Remove this div, or rename the id, and the page still renders from the
           server but never becomes interactive: the runtime throws in the console
           and nothing on screen changes.
 
           Wrap it in your own markup freely, and put anything that must live
           outside the hydrated tree (a static footer, a portal target) outside
-          it — just keep an element with `id="root"` around {children}.
+          it — just keep an element with `id="vessel"` around {children}.
         */}
-        <div id="root">{children}</div>
+        <div id="vessel">{children}</div>
         {/*
           The hydration payload and module tags. Written explicitly because
           placement occasionally matters — a CSP nonce, or ordering against
