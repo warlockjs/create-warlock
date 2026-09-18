@@ -4,6 +4,13 @@ All notable changes to `create-warlock` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@warlock.js/*` packages are released in lockstep — every package shares the same version number, so a version below may list only the changes that affected this package.
 
+## 5.15.0 - 2026-09-18
+
+### Added
+
+- The feature picker offers **Sitemap** — runtime `sitemap.xml` generation from the page registry.
+- The feature picker offers **Bull Board**, the queue dashboard. `warlock add bull-board` shipped in 5.14 but the scaffolder never offered it, so a new app could not select it at creation time.
+
 ## 5.14.0 - 2026-09-17
 
 ### Changed
