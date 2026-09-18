@@ -167,6 +167,12 @@ export const features: FeatureOption[] = [
     group: "Jobs & Messaging",
   },
   {
+    key: "bull-board",
+    label: "Bull Board (queue dashboard)",
+    hint: "Web dashboard for inspecting queues and jobs — enabled outside production only, and refuses to mount unguarded (pulls queue)",
+    group: "Jobs & Messaging",
+  },
+  {
     key: "herald",
     label: "Herald (RabbitMQ)",
     hint: "Message broker for event-driven architecture",
