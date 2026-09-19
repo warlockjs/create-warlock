@@ -1,0 +1,79 @@
+{
+  // Typechecks the scaffold template AGAINST THE MONOREPO'S OWN SOURCE, not a
+  // published version. `templates/warlock/` has no `node_modules` of its own —
+  // point `tsc` at it unmodified and every `@warlock.js/*` import is an
+  // unresolved module (a wall of TS2307s), or worse, silently `any` if you paper
+  // over that with `skipLibCheck`/`noImplicitAny: false`. Either way the one bug
+  // this exists to catch — the template drifting from the framework's actual
+  // current API surface, e.g. importing a driver the framework removed — stays
+  // invisible.
+  //
+  // So every `@warlock.js/*` specifier the template imports is redirected via
+  // `paths` straight to that package's own `./src/index.ts` (or the exact
+  // subpath its `package.json` `exports` map points at) as it sits in this
+  // checkout, right now. Third-party packages (react, @mongez/*, ...) are left
+  // unmapped: TypeScript's own node_modules walk-up finds them at the monorepo
+  // root, because `templates/warlock/src` sits underneath it.
+  //
+  // This is complementary to, not a replacement for, `scripts/typecheck-scaffold.mjs`:
+  // that gate installs the framework from the registry and catches "the published
+  // framework moved out from under the template" days after a release. This one
+  // catches "the template drifted from the workspace's uncommitted source" on every
+  // commit, before anything is published.
+  "compilerOptions": {
+    "target": "ESNext",
+    // "dom" alone, matching templates/warlock/tsconfig.json, drops `Headers.entries()`
+    // and friends. The template itself never calls those, but this config also
+    // typechecks whatever framework source the template's imports reach (e.g.
+    // core's storage utilities reach into @warlock.js/ai's `redactHeaders`), and
+    // those packages compile against `["ES2022", "DOM", "DOM.Iterable"]` (see
+    // core/tsconfig.json, ai/tsconfig.json). Matching that here, rather than the
+    // template's narrower list, keeps this a check of real code instead of a
+    // false positive from a lib gap nobody who published these packages hit.
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "experimentalDecorators": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "downlevelIteration": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "isolatedModules": true,
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      // The template's own aliases (templates/warlock/tsconfig.json), rebased
+      // from that file's location to this one's.
+      "web/*": ["./templates/warlock/src/web/*"],
+      "app/*": ["./templates/warlock/src/app/*"],
+      "@shared/*": ["./templates/warlock/src/shared/*"],
+
+      // Every @warlock.js/* package the template imports, redirected to this
+      // checkout's source. Bare specifier first, then the specific subpaths
+      // the template actually imports (verified against each package's
+      // package.json `exports`/`main`).
+      "@warlock.js/auth": ["../auth/src/index.ts"],
+      "@warlock.js/cache": ["../cache/src/index.ts"],
+      "@warlock.js/cascade": ["../cascade/src/index.ts"],
+      "@warlock.js/core": ["../core/src/index.ts"],
+      "@warlock.js/core/tests": ["../core/src/tests/index.ts"],
+      "@warlock.js/fs": ["../fs/src/index.ts"],
+      "@warlock.js/logger": ["../logger/src/index.ts"],
+      "@warlock.js/scheduler": ["../scheduler/src/index.ts"],
+      "@warlock.js/seal": ["../seal/src/index.ts"],
+      "@warlock.js/web": ["../web/src/index.ts"]
+    }
+  },
+  "include": [
+    "templates/warlock/src/**/*.ts",
+    "templates/warlock/src/**/*.tsx",
+    "templates/warlock/warlock.config.ts"
+  ],
+  "exclude": ["node_modules"]
+}

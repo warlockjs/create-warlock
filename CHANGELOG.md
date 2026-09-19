@@ -59,6 +59,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
   Genuine multi-tenancy still needs per-tenant isolation — do that with a tenant id your own middleware has already validated against your tenants table (e.g. `request.locals.tenant`), never the raw `Origin`, `Host`, a header, or query input. See the updated template's `src/config/cache.ts` for a commented example. Guarded by a new check in `specs/template-integrity.spec.ts`.
 
+### Added
+
+- `pnpm typecheck:template` runs `tsc --noEmit` on `templates/warlock/src/` against this checkout's own `@warlock.js/*` source (via `tsconfig.template-check.json`), catching a template import that no longer exists in the framework — the class of bug that let a removed-but-still-used import pass all 291 tests. Enforced on every run by `specs/template-typecheck.spec.ts`, complementing the slower registry-install `typecheck:scaffold` gate.
+
 ## 5.15.0 - 2026-09-18
 
 ### Added

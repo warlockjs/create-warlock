@@ -21,6 +21,7 @@
     "format:template": "node scripts/format-check-template.mjs",
     "format:template:fix": "node scripts/format-check-template.mjs --write",
     "typecheck:scaffold": "node scripts/typecheck-scaffold.mjs",
+    "typecheck:template": "node scripts/typecheck-template.mjs",
     "llms": "node scripts/generate-llms.mjs",
     "update": "node node_modules/tsx/dist/cli.mjs version-checker.ts",
     "typecheck": "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit"
