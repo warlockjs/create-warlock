@@ -16,7 +16,7 @@ export async function askStack(): Promise<Stack> {
       {
         value: "api",
         label: "API only",
-        hint: "A REST/GraphQL API, no server-rendered pages",
+        hint: "A REST API, no server-rendered pages",
       },
       {
         value: "web",
