@@ -6,6 +6,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## 5.17.0 - Unreleased
 
+### Security
+
+- **BREAKING:** the scaffolded `GET /uploads/*` route resized images to any `?w=&h=` a client sent. This was a denial-of-service vector, because every new size forced a full decode and resize and nothing was cached. The route also resolved the path without a containment check. The generated `src/app/uploads/controllers/fetch-uploaded-file.controller.ts` is gone. `src/app/uploads/routes.ts` now mounts core's `uploadedFileController`, which keeps the request inside the storage root and only renders the named variants the app declares. `?w=` and `?h=` now return 400. **Existing projects should apply the same change:**
+
+  ```diff
+  // src/app/uploads/routes.ts
+  - import { router } from "@warlock.js/core";
+  - import { fetchUploadedFileController } from "./controllers/fetch-uploaded-file.controller";
+  -
+  - router.get("/uploads/*", fetchUploadedFileController);
+  + import { router, uploadedFileController } from "@warlock.js/core";
+  +
+  + router.get("/uploads/*", uploadedFileController);
+  ```
+
+  Then delete `src/app/uploads/controllers/fetch-uploaded-file.controller.ts`. To keep resized images, declare named variants in `src/config/uploads.ts` (the template has no such file, so create one) and replace `?w=320` in your URLs with `?variant=thumb`:
+
+  ```ts
+  // src/config/uploads.ts
+  import type { UploadsConfigurations } from "@warlock.js/core";
+
+  const uploadsConfigurations: UploadsConfigurations = {
+    images: {
+      variants: {
+        thumb: { width: 320 },
+        card: { width: 640 },
+        hero: { width: 1280 },
+      },
+      formats: ["webp"], // allows &format=webp
+    },
+  };
+
+  export default uploadsConfigurations;
+  ```
+
 ### Fixed
 
 - The scaffolded `src/config/cache.ts` namespaced every cache key by `request.originDomain || request.header("domain") || request.input("domain")`. A browser GET carries no `Origin` while a CSRF-protected POST does, so the same visitor resolved two different prefixes and a write could never invalidate what a read had cached — repository caches and page-cache tags went silently stale (verified live on a real app). None of those three inputs are server-validated either, so any visitor could pick `?domain=anything` or a `domain` header to land in an arbitrary namespace and grow the in-memory store without bound. `globalPrefix` is now a fixed, app-owned string derived from `APP_NAME`, with no request data read at all. **Existing projects should apply the same change** to `src/config/cache.ts`:
