@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "warlock dev",
-    "build": "tsc && warlock build",
+    "build": "warlock generate.typings && tsc && warlock build",
     "start": "warlock start",
     "seed": "warlock seed",
     "migrate": "warlock migrate",
@@ -24,7 +24,7 @@
     "serve": "yarn build && nohup warlock start > /dev/null 2>&1",
     "lint": "npx eslint --fix ./src --max-warnings=0",
     "format": "npx prettier --write ./src/**/*.{js,jsx,ts,tsx,css,md,json} --config ./.prettierrc.json",
-    "tsc": "npx tsc --noEmit",
+    "tsc": "warlock generate.typings && npx tsc --noEmit",
     "postinstall": "agent-kit init && agent-kit sync || echo skills-sync-skipped",
     "skills:sync": "agent-kit sync",
     "skills:watch": "agent-kit watch",
