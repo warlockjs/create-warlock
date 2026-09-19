@@ -62,6 +62,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 
 - `pnpm typecheck:template` runs `tsc --noEmit` on `templates/warlock/src/` against this checkout's own `@warlock.js/*` source (via `tsconfig.template-check.json`), catching a template import that no longer exists in the framework — the class of bug that let a removed-but-still-used import pass all 291 tests. Enforced on every run by `specs/template-typecheck.spec.ts`, complementing the slower registry-install `typecheck:scaffold` gate.
+- The scaffolded `src/config/http.ts` now sets `trustProxy: false` explicitly, with a comment on when/how to enable it behind a proxy or load balancer, and ships a commented-out, nonce-based `csp` starter block so both are discoverable instead of silently absent.
 
 ## 5.15.0 - 2026-09-18
 

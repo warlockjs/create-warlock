@@ -136,7 +136,7 @@ my-app/
       ├─ auth/                  # controllers, schema, services, requests, utils, OTP model + migration
       ├─ users/                 # model, migration, resource, repository, create + list controllers, schema, events, seeds, commands
       ├─ posts/                 # sample module — model, migration, resource, schema, create + update controllers
-      ├─ uploads/               # file-serving controller (fetch-uploaded-file)
+      ├─ uploads/               # routes.ts mounts core's uploadedFileController; named image variants go in src/config/uploads.ts
       └─ shared/                # router/locale utils, home page, scheduler
 ```
 
