@@ -5,39 +5,37 @@ import {
   RedisCacheDriver,
   type CacheConfigurations,
 } from "@warlock.js/cache";
-import { DatabaseCacheDriver, env, useRequestStore } from "@warlock.js/core";
+import { DatabaseCacheDriver, env } from "@warlock.js/core";
 
 /**
- * Namespace every cache key by the caller's domain, so two tenants hitting the
- * same app never read each other's cached values.
+ * Namespace every cache key by this app, fixed at boot.
  *
- * This used to branch on `request.client` first. That property does not exist:
- * it survived from v4, where `Request` carried a `[key: string]: any` index
- * signature that made any property name compile. v5 removed the index signature
- * and the branch became a type error.
+ * This used to derive the prefix from `request.originDomain` / the `domain`
+ * header / `?domain=` input. That broke two ways at once: a browser GET has
+ * no `Origin` while a CSRF-protected POST does, so the two resolved to
+ * different prefixes and a write could never invalidate what a read had
+ * cached — repository caches and page-cache tags went silently stale. Worse,
+ * none of those three inputs are server-validated, so any visitor could pick
+ * `?domain=anything` and grow the store under an arbitrary namespace forever.
  *
- * It was deleted rather than renamed. The obvious "fix" — pointing it at
- * `request.locals.client` — compiles and is worse than the bug: nothing in the
- * framework populates `request.locals`, so the branch would be permanently
- * `undefined` and silently dead. `originDomain` below is real (it is derived
- * from the `Origin` header) and already covers the multi-tenant case, so the
- * scaffold prefixes on that and models nothing the framework does not provide.
+ * A cache prefix has to come from something the app decides, not something
+ * a request carries.
  */
-const globalPrefix = () => {
-  const { request } = useRequestStore();
+const globalPrefix = () => env("APP_NAME", "store");
 
-  let cachePrefix = "store";
-
-  if (!request) return cachePrefix;
-
-  const domain = request.originDomain || request.header("domain") || request.input("domain");
-
-  if (!domain) return cachePrefix;
-
-  cachePrefix = `${cachePrefix}.${domain}`;
-
-  return cachePrefix;
-};
+/**
+ * Genuine multi-tenancy (one deployment, many tenants, isolated caches) needs
+ * a tenant id the app has already validated server-side — e.g. set on
+ * `request.locals.tenant` by the app's own tenant middleware after resolving
+ * the host against its tenants table — never the raw `Origin`/`Host`, a
+ * header, or query input, none of which the framework trusts.
+ *
+ * const globalPrefix = () => {
+ *   const { request } = useRequestStore();
+ *   const tenant = request?.locals.tenant; // set by app tenant middleware, already validated
+ *   return tenant ? `${env("APP_NAME", "store")}.${tenant}` : env("APP_NAME", "store");
+ * };
+ */
 
 const cacheConfigurations: CacheConfigurations<"database"> = {
   // Driven by CACHE_DRIVER so the shipped .env (`memory`) actually wins.

@@ -410,3 +410,24 @@ describe("locale switching never falls back to a banned import or a reload", () 
     expect(offenders).toEqual([]);
   });
 });
+
+describe("cache config's globalPrefix is fixed and app-owned, not request-derived", () => {
+  // `originDomain`, the `domain` header and `?domain=` input are either
+  // request-shaped (a GET has no Origin, a POST does — the same visitor gets
+  // two prefixes) or outright visitor-controlled (any `?domain=` value picks
+  // a namespace). Either way the default scaffold must not read them: a
+  // fresh app's cache prefix has to be the same for every request.
+  const cacheConfig = () => stripComments(read("src/config/cache.ts"));
+
+  it("default globalPrefix never reads originDomain, a domain header, or domain input", () => {
+    const source = cacheConfig();
+    const globalPrefixMatch = source.match(
+      /const globalPrefix = \(\) => env\("APP_NAME"[\s\S]*?;/,
+    );
+
+    expect(globalPrefixMatch).not.toBeNull();
+    expect(source).not.toMatch(/originDomain/);
+    expect(source).not.toMatch(/header\(\s*["']domain["']\s*\)/);
+    expect(source).not.toMatch(/input\(\s*["']domain["']\s*\)/);
+  });
+});

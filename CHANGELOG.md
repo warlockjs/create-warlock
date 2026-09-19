@@ -4,6 +4,26 @@ All notable changes to `create-warlock` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@warlock.js/*` packages are released in lockstep — every package shares the same version number, so a version below may list only the changes that affected this package.
 
+## 5.16.1 - Unreleased
+
+### Fixed
+
+- The scaffolded `src/config/cache.ts` namespaced every cache key by `request.originDomain || request.header("domain") || request.input("domain")`. A browser GET carries no `Origin` while a CSRF-protected POST does, so the same visitor resolved two different prefixes and a write could never invalidate what a read had cached — repository caches and page-cache tags went silently stale (verified live on a real app). None of those three inputs are server-validated either, so any visitor could pick `?domain=anything` or a `domain` header to land in an arbitrary namespace and grow the in-memory store without bound. `globalPrefix` is now a fixed, app-owned string derived from `APP_NAME`, with no request data read at all. **Existing projects should apply the same change** to `src/config/cache.ts`:
+
+  ```diff
+  - const globalPrefix = () => {
+  -   const { request } = useRequestStore();
+  -   let cachePrefix = "store";
+  -   if (!request) return cachePrefix;
+  -   const domain = request.originDomain || request.header("domain") || request.input("domain");
+  -   if (!domain) return cachePrefix;
+  -   return `${cachePrefix}.${domain}`;
+  - };
+  + const globalPrefix = () => env("APP_NAME", "store");
+  ```
+
+  Genuine multi-tenancy still needs per-tenant isolation — do that with a tenant id your own middleware has already validated against your tenants table (e.g. `request.locals.tenant`), never the raw `Origin`, `Host`, a header, or query input. See the updated template's `src/config/cache.ts` for a commented example. Guarded by a new check in `specs/template-integrity.spec.ts`.
+
 ## 5.15.0 - 2026-09-18
 
 ### Added
