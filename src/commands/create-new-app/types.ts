@@ -1,6 +1,14 @@
 /** The one structural fork that changes the generated app's shape. */
 export type Stack = "api" | "web";
 
+/**
+ * What the "What are we building?" menu can return: a stack, or `customize` —
+ * which is a FLOW, not a stack, and hands the run to the full wizard. It is
+ * deliberately not a `--stack` value: `--stack=customize --yes` would have no
+ * coherent meaning.
+ */
+export type StackChoice = Stack | "customize";
+
 export type AppOptions = {
   databaseDriver: string;
   databasePort: number;

@@ -1,11 +1,4 @@
-import {
-  cancel,
-  confirm,
-  isCancel,
-  multiselect,
-  select,
-  text,
-} from "@clack/prompts";
+import { cancel, confirm, isCancel, multiselect, select } from "@clack/prompts";
 import { colors } from "@mongez/copper";
 import { getJsonFile } from "@warlock.js/fs";
 import {
@@ -33,11 +26,18 @@ import {
 } from "../../helpers/package-manager";
 import { packageRoot } from "../../helpers/paths";
 import { hasInteractiveStdin } from "../../helpers/tty";
+import { askProjectName } from "../../prompts/ask-project-name";
 import { askStack } from "../../prompts/ask-stack";
 import { showIntroBanner } from "../../ui/banner";
 import { createWarlockApp } from "../create-warlock-app";
 import getAppPath from "./get-app-path";
-import { AppOptions, App as AppType, CliFlags, Stack } from "./types";
+import {
+  AppOptions,
+  App as AppType,
+  CliFlags,
+  Stack,
+  StackChoice,
+} from "./types";
 
 export default async function createNewApp(cli: CliFlags = {}) {
   // Start detecting package managers in the background to avoid delay later
@@ -101,16 +101,11 @@ async function createFullWizard(
   cli: CliFlags,
   pmDetectionPromise: Promise<void>,
 ) {
-  // Step 1: Project name
-  const appName = await text({
-    message: "What shall we call your project?",
-    placeholder: "my-warlock-app",
-  });
-
-  if (isCancel(appName) || !appName.trim()) {
-    cancel("A project name is required to continue");
-    process.exit(0);
-  }
+  // Step 1: Project name — but only when it is not already known. It arrives
+  // answered from `--name`/the positional arg, and from the default path when
+  // the user picked "Customize" AFTER being asked for a name. Re-asking for an
+  // answer we already hold is the double-prompt this branch exists to avoid.
+  const appName = cli.name ?? (await askProjectName());
 
   const appPath = getAppPath(appName);
   if (!appPath) return;
@@ -241,26 +236,22 @@ async function createDefaultInteractive(
   cli: CliFlags,
   pmDetectionPromise: Promise<void>,
 ) {
-  let appName = cli.name;
-
-  if (!appName) {
-    const answer = await text({
-      message: "What shall we call your project?",
-      placeholder: "my-warlock-app",
-    });
-
-    if (isCancel(answer) || !answer.trim()) {
-      cancel("A project name is required to continue");
-      process.exit(0);
-    }
-
-    appName = answer as string;
-  }
+  const appName = cli.name ?? (await askProjectName());
 
   const appPath = getAppPath(appName);
   if (!appPath) return;
 
-  const stack: Stack = cli.stack ?? (await askStack());
+  const choice: StackChoice = cli.stack ?? (await askStack());
+
+  // "Customize" is not a third stack — it is the wizard, chosen from the menu
+  // instead of from a flag nobody was told about. Hand over the name we just
+  // collected so the wizard starts at its SECOND question.
+  if (choice === "customize") {
+    await createFullWizard({ ...cli, name: appName }, pmDetectionPromise);
+    return;
+  }
+
+  const stack: Stack = choice;
 
   await pmDetectionPromise;
 

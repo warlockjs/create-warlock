@@ -21,7 +21,7 @@ export const FLAG_DEFINITIONS: FlagDefinition[] = [
   {
     usage: "--stack=<api|web>",
     description:
-      "API-only or full-stack web — the one structural choice that changes the app's shape",
+      "API-only or full-stack web — the one structural choice that changes the app's shape. Customizing everything else is a flow, not a stack: use --customize",
     defaultValue: "api",
   },
   {
@@ -65,8 +65,9 @@ export const FLAG_DEFINITIONS: FlagDefinition[] = [
     defaultValue: "false",
   },
   {
-    usage: "--interactive, --customize",
-    description: "Restore the full long-form interactive prompt flow",
+    usage: "--customize, --interactive",
+    description:
+      'Full long-form wizard — every choice asked one by one. Also selectable as "Customize" in the "What are we building?" menu',
     defaultValue: "false",
   },
   {

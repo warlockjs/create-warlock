@@ -1,5 +1,5 @@
 import { cancel, isCancel, select } from "@clack/prompts";
-import type { Stack } from "../commands/create-new-app/types";
+import type { StackChoice } from "../commands/create-new-app/types";
 
 /**
  * The ONE structural question the default (non-`--interactive`) interactive
@@ -8,8 +8,13 @@ import type { Stack } from "../commands/create-new-app/types";
  * of the generated project — every other choice (database, features,
  * package manager, agent-kit targets, …) is reversible within minutes and
  * ships as a flag with a default instead.
+ *
+ * The third entry is not a third stack: `customize` selects the FLOW, handing
+ * the run to the full wizard (`--customize`) so every one of those reversible
+ * choices gets asked instead of defaulted. It sits in this menu because a flag
+ * nobody is told about is a feature nobody has.
  */
-export async function askStack(): Promise<Stack> {
+export async function askStack(): Promise<StackChoice> {
   const answer = await select({
     message: "What are we building?",
     options: [
@@ -23,6 +28,11 @@ export async function askStack(): Promise<Stack> {
         label: "Full-stack web",
         hint: "API + server-rendered React pages (SSR)",
       },
+      {
+        value: "customize",
+        label: "Customize",
+        hint: "Pick database, features, AI providers, agent targets and package manager one by one",
+      },
     ],
     initialValue: "api",
   });
@@ -32,5 +42,5 @@ export async function askStack(): Promise<Stack> {
     process.exit(0);
   }
 
-  return answer as Stack;
+  return answer as StackChoice;
 }

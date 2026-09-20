@@ -117,6 +117,11 @@ function capturedApp(): App {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // `clearAllMocks` clears recorded CALLS but not a pending
+  // `mockResolvedValueOnce` queue — so a test that primes an answer it never
+  // consumes silently hands that answer to the NEXT test, which then fails
+  // somewhere unrelated. Drain the prompt queues explicitly.
+  [text, select, multiselect, confirm].forEach(mock => mock.mockReset());
   // Re-seed the defaults the mocks lost on clear.
   getSystemPackageManagers.mockReturnValue(["npm", "yarn", "pnpm"]);
   getPreferredPackageManager.mockReturnValue("yarn");
@@ -614,14 +619,26 @@ describe("createNewApp — non-TTY stdin (no keyboard to prompt at)", () => {
     hasInteractiveStdin.mockReturnValue(true);
     primeHappyPath({ name: "interactive-app" });
 
-    await createNewApp({
-      interactive: true,
-      name: "ignored-by-interactive-path",
-    });
+    await createNewApp({ interactive: true });
 
-    // The interactive branch never reads cli.name — it always prompts.
     expect(text).toHaveBeenCalledTimes(1);
     expect(capturedApp().name).toBe("interactive-app");
+    // Still the full wizard: every other question was asked too.
+    expect(multiselect).toHaveBeenCalledTimes(2);
+    expect(confirm).toHaveBeenCalledTimes(2);
+  });
+
+  it("--interactive does NOT re-ask for a name that was already given on the command line", async () => {
+    hasInteractiveStdin.mockReturnValue(true);
+    primeHappyPath();
+
+    await createNewApp({ interactive: true, name: "named-on-the-cli" });
+
+    expect(text).not.toHaveBeenCalled();
+    expect(capturedApp().name).toBe("named-on-the-cli");
+    // The rest of the wizard still runs — only the answered question is skipped.
+    expect(multiselect).toHaveBeenCalledTimes(2);
+    expect(confirm).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -664,6 +681,51 @@ describe("createNewApp — default TTY path (at most one structural question)", 
     expect(text).toHaveBeenCalledTimes(1);
     expect(select).toHaveBeenCalledTimes(1);
     expect(capturedApp().name).toBe("typed-app");
+  });
+
+  it('offers "Customize" as a third entry in the structural question', async () => {
+    select.mockResolvedValueOnce("api");
+
+    await createNewApp({ name: "menu-app" });
+
+    const options = (
+      select.mock.calls[0][0] as { options: { value: string }[] }
+    ).options;
+
+    expect(options.map(option => option.value)).toEqual([
+      "api",
+      "web",
+      "customize",
+    ]);
+  });
+
+  it('picking "Customize" from the menu hands over to the full wizard without re-asking the name', async () => {
+    text.mockResolvedValueOnce("menu-app");
+    select
+      .mockResolvedValueOnce("customize") // the structural question
+      .mockResolvedValueOnce("yarn") // wizard: package manager
+      .mockResolvedValueOnce("postgres"); // wizard: database driver
+    multiselect
+      .mockResolvedValueOnce(["test"]) // wizard: features
+      .mockResolvedValueOnce(["openai"]); // wizard: ai providers
+    confirm
+      .mockResolvedValueOnce(true) // wizard: git
+      .mockResolvedValueOnce(true); // wizard: jwt
+
+    await createNewApp({});
+
+    // The name was asked ONCE, by the default path, and carried into the wizard.
+    expect(text).toHaveBeenCalledTimes(1);
+
+    const app = capturedApp();
+    expect(app.name).toBe("menu-app");
+    // Answers came from the wizard's prompts, not the non-interactive defaults:
+    // mongodb/[]/false is what the default path would have produced.
+    expect(app.options.databaseDriver).toBe("postgres");
+    expect(app.options.features).toEqual(["test"]);
+    expect(app.options.aiProviders).toEqual(["openai"]);
+    expect(app.options.useGit).toBe(true);
+    expect(app.options.useJWT).toBe(true);
   });
 
   it("asks nothing at all when --stack is also already answered by a flag", async () => {
