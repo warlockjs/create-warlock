@@ -31,7 +31,7 @@ export async function askStack(): Promise<SetupChoice> {
       {
         value: "customize",
         label: "Customize",
-        hint: "Pick database, features, AI providers, agent targets and package manager one by one",
+        hint: "Pick package manager, database, features and AI providers one by one",
       },
     ],
     initialValue: "api",

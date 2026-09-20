@@ -10,7 +10,6 @@ import {
   getAiPackageOptions,
   getAiProviderOptions,
   getAllFeatureKeys,
-  getDefaultFeatureKeys,
   getFeatureOptions,
 } from "../../features/features-map";
 import { resolveAgentTargets } from "../../features/agent-kit-targets";
@@ -27,6 +26,7 @@ import {
 import { packageRoot } from "../../helpers/paths";
 import { hasInteractiveStdin } from "../../helpers/tty";
 import { assertFlagCombinations } from "../../flags/assert-flag-combinations";
+import { seedFromFlags } from "../../flags/seed-from-flags";
 import { askProjectName } from "../../prompts/ask-project-name";
 import { askStack } from "../../prompts/ask-stack";
 import { showIntroBanner } from "../../ui/banner";
@@ -115,6 +115,20 @@ async function createFullWizard(
   const appPath = getAppPath(appName);
   if (!appPath) return;
 
+  // A flag passed alongside --customize is an answer given early, not a
+  // contradiction: it pre-selects the matching prompt instead of being
+  // dropped. Validate the ones that CAN be wrong through the same function
+  // the non-interactive path uses, so an unknown driver or feature key fails
+  // here rather than showing a prompt that quietly ignores it.
+  try {
+    resolveNonInteractiveOptions(cli);
+  } catch (error) {
+    cancel((error as Error).message);
+    process.exit(1);
+  }
+
+  const seeds = seedFromFlags(cli);
+
   // Step 2: Package Manager selection
   await pmDetectionPromise; // Ensure detection is complete
 
@@ -124,7 +138,7 @@ async function createFullWizard(
       value: pm,
       label: pm,
     })),
-    initialValue: getPreferredPackageManager(),
+    initialValue: seeds.packageManager,
   });
 
   if (isCancel(packageManager)) {
@@ -138,6 +152,7 @@ async function createFullWizard(
   const databaseDriver = await select({
     message: "Choose your database driver",
     options: getDatabaseDriverOptions(),
+    initialValue: seeds.databaseDriver,
   });
 
   if (isCancel(databaseDriver)) {
@@ -151,7 +166,7 @@ async function createFullWizard(
   const selectedFeatures = await multiselect({
     message: "Select optional features to include",
     options: getFeatureOptions(),
-    initialValues: getDefaultFeatureKeys(),
+    initialValues: seeds.features,
     required: false,
   });
 
@@ -168,6 +183,7 @@ async function createFullWizard(
     message:
       "Add AI packages? Providers + capabilities — the core AI package is included automatically",
     options: [...getAiProviderOptions(), ...getAiPackageOptions()],
+    initialValues: seeds.aiProviders,
     required: false,
   });
 
@@ -180,6 +196,7 @@ async function createFullWizard(
   const useGit =
     (await confirm({
       message: "Initialize a Git repository?",
+      initialValue: seeds.useGit,
     })) === true;
 
   if (isCancel(useGit)) {
@@ -191,6 +208,7 @@ async function createFullWizard(
   const useJWT =
     (await confirm({
       message: "Generate JWT secret keys?",
+      initialValue: seeds.useJWT,
     })) === true;
 
   if (isCancel(useJWT)) {

@@ -662,17 +662,61 @@ describe("createNewApp — non-TTY stdin (no keyboard to prompt at)", () => {
     expect(createWarlockApp).not.toHaveBeenCalled();
   });
 
-  it("refuses --customize together with --stack, which the wizard would drop", async () => {
+  /**
+   * Every flag below used to be ACCEPTED and then ignored by the wizard — the
+   * run succeeded with the wrong answer, which is worse than refusing it.
+   * They are answers given early: each one opens its prompt on that value.
+   */
+  it("pre-selects every wizard prompt from the flags instead of dropping them", async () => {
+    hasInteractiveStdin.mockReturnValue(true);
+    primeHappyPath();
+
+    await createNewApp({
+      interactive: true,
+      name: "seeded-app",
+      pm: "pnpm",
+      db: "postgres",
+      features: ["test"],
+      ai: ["ai-openai"],
+      git: false,
+      jwt: false,
+    });
+
+    const [pmPrompt, dbPrompt] = select.mock.calls.map(call => call[0]);
+    expect(pmPrompt.initialValue).toBe("pnpm");
+    expect(dbPrompt.initialValue).toBe("postgres");
+
+    const [featuresPrompt, aiPrompt] = multiselect.mock.calls.map(
+      call => call[0],
+    );
+    expect(featuresPrompt.initialValues).toEqual(["test"]);
+    expect(aiPrompt.initialValues).toEqual(["ai-openai"]);
+
+    const [gitPrompt, jwtPrompt] = confirm.mock.calls.map(call => call[0]);
+    expect(gitPrompt.initialValue).toBe(false);
+    expect(jwtPrompt.initialValue).toBe(false);
+  });
+
+  it("carries --stack=web into the wizard as a pre-ticked web feature, since the wizard has no stack question", async () => {
+    hasInteractiveStdin.mockReturnValue(true);
+    primeHappyPath();
+
+    await createNewApp({ interactive: true, name: "x", stack: "web" });
+
+    const featuresPrompt = multiselect.mock.calls[0][0];
+    expect(featuresPrompt.initialValues).toContain("web");
+  });
+
+  it("refuses an unknown --db before showing a prompt that would ignore it", async () => {
     hasInteractiveStdin.mockReturnValue(true);
 
     await expect(
-      createNewApp({ interactive: true, stack: "web", name: "x" }),
+      createNewApp({ interactive: true, name: "x", db: "not-a-driver" }),
     ).rejects.toThrow(ProcessExit);
 
-    const message = String(cancel.mock.calls[0][0]);
-    expect(message).toContain("--customize");
-    expect(message).toContain("--stack");
+    expect(String(cancel.mock.calls[0][0])).toContain("not-a-driver");
     expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(select).not.toHaveBeenCalled();
     expect(createWarlockApp).not.toHaveBeenCalled();
   });
 
