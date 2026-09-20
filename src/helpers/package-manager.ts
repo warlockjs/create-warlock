@@ -59,16 +59,28 @@ async function checkManager(manager: string): Promise<boolean> {
 }
 
 /**
+ * Every allow-listed manager that has to be PROBED. npm is excluded because
+ * it is assumed present.
+ *
+ * Both detectors read this one list. They used to hold their own literal
+ * copies, and the copies drifted: `bun` reached the allow-list and `--help`
+ * without reaching either probe, so `--pm=bun` passed the spelling check and
+ * then could never appear among the options that would honour it.
+ */
+const PROBED_PACKAGE_MANAGERS = ALLOWED_PACKAGE_MANAGERS.filter(
+  manager => manager !== "npm",
+);
+
+/**
  * Detect available package managers asynchronously and cache results
  */
 export async function detectPackageManagers() {
-  const managers = ["npm"];
-  const checks = [checkManager("yarn"), checkManager("pnpm")];
+  const found = await Promise.all(PROBED_PACKAGE_MANAGERS.map(checkManager));
+  const available = PROBED_PACKAGE_MANAGERS.filter((_, index) => found[index]);
+  const managers = ["npm", ...available];
 
-  const [hasYarn, hasPnpm] = await Promise.all(checks);
-
-  if (hasYarn) managers.push("yarn");
-  if (hasPnpm) managers.push("pnpm");
+  const hasYarn = available.includes("yarn");
+  const hasPnpm = available.includes("pnpm");
 
   cachedSystemManagers = managers;
 
@@ -91,24 +103,9 @@ export async function detectPackageManagers() {
 export function getSystemPackageManagers(): string[] {
   if (cachedSystemManagers) return cachedSystemManagers;
 
-  const managers = ["npm"]; // npm is assumed to be always available
-
-  if (isInstalled("yarn")) {
-    managers.push("yarn");
-  }
-
-  if (isInstalled("pnpm")) {
-    managers.push("pnpm");
-  }
-
-  // bun is in ALLOWED_PACKAGE_MANAGERS and advertised by --help, so it has to
-  // be detectable too — otherwise --pm=bun passes the spelling check and then
-  // never appears as an option that could honour it.
-  if (isInstalled("bun")) {
-    managers.push("bun");
-  }
-
-  return managers;
+  // Same list the async detector probes, so the two can no longer disagree
+  // about which managers exist. npm is assumed to be always available.
+  return ["npm", ...PROBED_PACKAGE_MANAGERS.filter(isInstalled)];
 }
 
 /**
