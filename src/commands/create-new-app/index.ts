@@ -15,17 +15,19 @@ import {
 import { resolveAgentTargets } from "../../features/agent-kit-targets";
 import { App } from "../../helpers/app";
 import {
-  ALLOWED_PACKAGE_MANAGERS,
   detectPackageManagers,
   getPackageManager,
   getPreferredPackageManager,
   getSystemPackageManagers,
-  isValidPackageManager,
   setPackageManager,
 } from "../../helpers/package-manager";
 import { packageRoot } from "../../helpers/paths";
 import { hasInteractiveStdin } from "../../helpers/tty";
 import { assertFlagCombinations } from "../../flags/assert-flag-combinations";
+import {
+  assertPackageManagerAllowed,
+  assertPackageManagerAvailable,
+} from "../../flags/assert-package-manager";
 import { seedFromFlags } from "../../flags/seed-from-flags";
 import { askProjectName } from "../../prompts/ask-project-name";
 import { askStack } from "../../prompts/ask-stack";
@@ -131,6 +133,10 @@ async function createFullWizard(
 
   // Step 2: Package Manager selection
   await pmDetectionPromise; // Ensure detection is complete
+
+  // Only now can availability be judged: detection is what fills
+  // getSystemPackageManagers(), and the prompt below is built from it.
+  assertPackageManagerAvailable(cli.pm);
 
   const packageManager = await select({
     message: "Which package manager do you want to use?",
@@ -280,12 +286,7 @@ async function createDefaultInteractive(
 
   const packageManager = cli.pm ?? getPreferredPackageManager();
 
-  if (!isValidPackageManager(packageManager)) {
-    cancel(
-      `Unknown package manager "${packageManager}" — expected one of: ${ALLOWED_PACKAGE_MANAGERS.join(", ")}`,
-    );
-    process.exit(1);
-  }
+  assertPackageManagerAllowed(cli.pm);
 
   setPackageManager(packageManager);
 
@@ -417,12 +418,7 @@ async function createNonInteractive(cli: CliFlags) {
 
   const packageManager = cli.pm ?? getPreferredPackageManager();
 
-  if (!isValidPackageManager(packageManager)) {
-    cancel(
-      `Unknown package manager "${packageManager}" — expected one of: ${ALLOWED_PACKAGE_MANAGERS.join(", ")}`,
-    );
-    process.exit(1);
-  }
+  assertPackageManagerAllowed(cli.pm);
 
   setPackageManager(packageManager);
 

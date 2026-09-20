@@ -707,6 +707,51 @@ describe("createNewApp — non-TTY stdin (no keyboard to prompt at)", () => {
     expect(featuresPrompt.initialValues).toContain("web");
   });
 
+  /**
+   * `bun` is in ALLOWED_PACKAGE_MANAGERS, so it passes the spelling check —
+   * but the wizard's prompt is built from getSystemPackageManagers(), so an
+   * undetected manager can never appear as an option and the seed would be
+   * accepted and then silently dropped.
+   */
+  it("refuses a --pm the machine does not have, rather than seeding an option the prompt cannot offer", async () => {
+    hasInteractiveStdin.mockReturnValue(true);
+    getSystemPackageManagers.mockReturnValue(["npm", "yarn", "pnpm"]);
+
+    await expect(
+      createNewApp({ interactive: true, name: "x", pm: "bun" }),
+    ).rejects.toThrow(ProcessExit);
+
+    const message = String(cancel.mock.calls[0][0]);
+    expect(message).toContain("bun");
+    expect(message).toContain("npm, yarn, pnpm");
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(select).not.toHaveBeenCalled();
+    expect(createWarlockApp).not.toHaveBeenCalled();
+  });
+
+  it("accepts a --pm the machine DOES have, and seeds the prompt with it", async () => {
+    hasInteractiveStdin.mockReturnValue(true);
+    getSystemPackageManagers.mockReturnValue(["npm", "yarn", "pnpm", "bun"]);
+    primeHappyPath();
+
+    await createNewApp({ interactive: true, name: "x", pm: "bun" });
+
+    expect(cancel).not.toHaveBeenCalled();
+    expect(select.mock.calls[0][0].initialValue).toBe("bun");
+  });
+
+  it("refuses a misspelled --pm in the wizard before any prompt", async () => {
+    hasInteractiveStdin.mockReturnValue(true);
+
+    await expect(
+      createNewApp({ interactive: true, name: "x", pm: "yarnn" }),
+    ).rejects.toThrow(ProcessExit);
+
+    expect(String(cancel.mock.calls[0][0])).toContain("yarnn");
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(select).not.toHaveBeenCalled();
+  });
+
   it("refuses an unknown --db before showing a prompt that would ignore it", async () => {
     hasInteractiveStdin.mockReturnValue(true);
 

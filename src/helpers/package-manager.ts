@@ -101,6 +101,13 @@ export function getSystemPackageManagers(): string[] {
     managers.push("pnpm");
   }
 
+  // bun is in ALLOWED_PACKAGE_MANAGERS and advertised by --help, so it has to
+  // be detectable too — otherwise --pm=bun passes the spelling check and then
+  // never appears as an option that could honour it.
+  if (isInstalled("bun")) {
+    managers.push("bun");
+  }
+
   return managers;
 }
 
