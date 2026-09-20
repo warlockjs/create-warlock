@@ -29,6 +29,20 @@ export const DEFAULT_AGENT_KIT_TARGET = "claude";
 
 const AGENT_KIT_LLMS_URL = "https://mongez.js.org/agent-kit/llms.txt";
 
+/**
+ * How long the whole remote lookup may take.
+ *
+ * An unbounded `fetch` does not fail on a stalled network — it WAITS, and a
+ * caller that only handles rejection never gets to run its fallback. The
+ * scaffolder's wizard asks this question six answers in, so "hangs forever"
+ * is strictly worse than "gives up and offers the built-ins".
+ *
+ * Each request carries an abort signal so the socket is actually torn down,
+ * and {@link getValidAgentKitTargets} additionally races the whole operation,
+ * because an injected `fetchImpl` is under no obligation to honour a signal.
+ */
+export const AGENT_KIT_FETCH_TIMEOUT_MS = 5_000;
+
 /** Local cache of the last successfully fetched/derived target list. */
 function cacheFilePath(): string {
   const base = process.env.XDG_CACHE_HOME ?? path.join(homedir(), ".cache");
@@ -101,8 +115,11 @@ function readInstalledPackageTargets(): string[] | undefined {
  */
 export async function fetchRemoteAgentKitTargets(
   fetchImpl: typeof fetch = fetch,
+  timeoutMs: number = AGENT_KIT_FETCH_TIMEOUT_MS,
 ): Promise<string[]> {
-  const indexResponse = await fetchImpl(AGENT_KIT_LLMS_URL);
+  const indexResponse = await fetchImpl(AGENT_KIT_LLMS_URL, {
+    signal: AbortSignal.timeout(timeoutMs),
+  });
   if (!indexResponse.ok) {
     throw new Error(
       `agent-kit llms.txt request failed with HTTP ${indexResponse.status}`,
@@ -121,7 +138,9 @@ export async function fetchRemoteAgentKitTargets(
   const targets = new Set<string>();
 
   if (docUrl) {
-    const docResponse = await fetchImpl(docUrl);
+    const docResponse = await fetchImpl(docUrl, {
+      signal: AbortSignal.timeout(timeoutMs),
+    });
     if (docResponse.ok) {
       const doc = await docResponse.text();
       for (const match of doc.matchAll(/--target[= ]([a-z][a-z0-9-]*)/gi)) {
@@ -151,6 +170,7 @@ export async function fetchRemoteAgentKitTargets(
  */
 export async function getValidAgentKitTargets(
   fetchImpl: typeof fetch = fetch,
+  timeoutMs: number = AGENT_KIT_FETCH_TIMEOUT_MS,
 ): Promise<string[]> {
   const installed = readInstalledPackageTargets();
   if (installed && installed.length > 0) {
@@ -158,7 +178,10 @@ export async function getValidAgentKitTargets(
   }
 
   try {
-    const fetched = await fetchRemoteAgentKitTargets(fetchImpl);
+    const fetched = await withTimeout(
+      fetchRemoteAgentKitTargets(fetchImpl, timeoutMs),
+      timeoutMs,
+    );
     writeCache(fetched);
     return dedupe([...BUILTIN_AGENT_KIT_TARGETS, ...fetched]);
   } catch (fetchError) {
@@ -171,6 +194,40 @@ export async function getValidAgentKitTargets(
         (fetchError as Error).message
       }`,
     );
+  }
+}
+
+/**
+ * Reject if `work` has not settled within `timeoutMs`.
+ *
+ * The abort signals on each request cover the real network; this covers the
+ * case they cannot — a `fetchImpl` that ignores its signal, or a promise that
+ * simply never settles. Without it "bounded" would be a property of the
+ * happy path only.
+ */
+export async function withTimeout<T>(
+  work: Promise<T>,
+  timeoutMs: number,
+): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+
+  try {
+    return await Promise.race([
+      work,
+      new Promise<never>((_resolve, reject) => {
+        timer = setTimeout(
+          () =>
+            reject(
+              new Error(
+                `agent-kit target lookup timed out after ${timeoutMs}ms`,
+              ),
+            ),
+          timeoutMs,
+        );
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
   }
 }
 

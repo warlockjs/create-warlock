@@ -30,9 +30,12 @@ vi.mock("node:fs", () => ({
 }));
 
 import {
+  AGENT_KIT_FETCH_TIMEOUT_MS,
   BUILTIN_AGENT_KIT_TARGETS,
   DEFAULT_AGENT_KIT_TARGET,
+  getValidAgentKitTargets,
   resolveAgentTargets,
+  withTimeout,
 } from "../src/features/agent-kit-targets";
 
 function fakeFetch(bodies: Record<string, string>) {
@@ -135,5 +138,70 @@ describe("resolveAgentTargets", () => {
 
   it("built-in fallback always contains the default target", () => {
     expect(BUILTIN_AGENT_KIT_TARGETS).toContain(DEFAULT_AGENT_KIT_TARGET);
+  });
+});
+
+/**
+ * An unbounded `fetch` does not FAIL on a stalled network, it waits — so a
+ * caller that only catches rejection never reaches its fallback. The
+ * scaffolder asks this question six answers into the wizard, where hanging
+ * forever is strictly worse than giving up and offering the built-ins.
+ */
+describe("the remote lookup is bounded", () => {
+  it("rejects a promise that never settles, once the bound elapses", async () => {
+    const started = Date.now();
+
+    await expect(withTimeout(new Promise(() => {}), 50)).rejects.toThrow(
+      /timed out after 50ms/,
+    );
+
+    expect(Date.now() - started).toBeLessThan(2000);
+  });
+
+  it("passes a settled value straight through", async () => {
+    await expect(withTimeout(Promise.resolve("done"), 50)).resolves.toBe(
+      "done",
+    );
+  });
+
+  it("settles the whole lookup within the bound when fetch never responds", async () => {
+    // Whether it ends in the cache, the built-ins or a rejection depends on
+    // what else this machine has; what must hold everywhere is that it ENDS.
+    const neverSettles = vi.fn(() => new Promise<Response>(() => {}));
+    const started = Date.now();
+
+    await getValidAgentKitTargets(neverSettles as any, 50).catch(
+      () => undefined,
+    );
+
+    expect(Date.now() - started).toBeLessThan(2000);
+    expect(neverSettles).toHaveBeenCalled();
+  });
+
+  it("passes an abort signal to every request, so a real socket is torn down", async () => {
+    const seen: (RequestInit | undefined)[] = [];
+    const fetchImpl = vi.fn(async (url: string, init?: RequestInit) => {
+      seen.push(init);
+      const bodies: Record<string, string> = {
+        [LLMS_TXT_URL]: LLMS_TXT,
+        [AGENT_INTEGRATIONS_DOC_URL]: AGENT_INTEGRATIONS_DOC,
+      };
+      const body = bodies[url];
+      if (body === undefined) {
+        return { ok: false, status: 404, text: async () => "" } as Response;
+      }
+      return { ok: true, status: 200, text: async () => body } as Response;
+    });
+
+    await getValidAgentKitTargets(fetchImpl as any);
+
+    expect(seen).toHaveLength(2);
+    for (const init of seen) {
+      expect(init?.signal).toBeInstanceOf(AbortSignal);
+    }
+  });
+
+  it("states a default bound rather than leaving it implicit", () => {
+    expect(AGENT_KIT_FETCH_TIMEOUT_MS).toBeGreaterThan(0);
   });
 });
