@@ -29,6 +29,7 @@ import {
   assertPackageManagerAvailable,
 } from "../../flags/assert-package-manager";
 import { seedFromFlags } from "../../flags/seed-from-flags";
+import { askAgentTargets } from "../../prompts/ask-agent-targets";
 import { askProjectName } from "../../prompts/ask-project-name";
 import { askStack } from "../../prompts/ask-stack";
 import { showIntroBanner } from "../../ui/banner";
@@ -222,15 +223,10 @@ async function createFullWizard(
     process.exit(0);
   }
 
-  // agent-kit targets are not part of the long-form wizard (a reversible,
-  // low-stakes choice) — they still come from --agents, defaulting to claude.
-  let agents: string[];
-  try {
-    agents = await resolveAgentTargets(cli.agents);
-  } catch (error) {
-    cancel((error as Error).message);
-    process.exit(1);
-  }
+  // Step 7: agent-kit targets. Asked here rather than left to --agents,
+  // because Customize means every choice is offered (owner ruling, seq 1028).
+  // --agents pre-ticks the selection, like every other flag.
+  const agents = await askAgentTargets(cli.agents);
 
   // Build app details
   const appDetails: Required<AppType> = {

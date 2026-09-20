@@ -88,6 +88,26 @@ vi.mock("../src/helpers/tty", () => ({
   hasInteractiveStdin: (...args: unknown[]) => hasInteractiveStdin(...args),
 }));
 
+// --- agent-kit targets ------------------------------------------------------
+// The real module reads the installed @mongez/agent-kit and falls back to a
+// NETWORK fetch, so leaving it unmocked makes every wizard test do I/O and
+// depend on connectivity. The valid-target lookup is a mock so the offline
+// branch can be driven deliberately.
+const getValidAgentKitTargets = vi.fn(async () => [
+  "claude",
+  "codex",
+  "cursor",
+]);
+
+vi.mock("../src/features/agent-kit-targets", () => ({
+  BUILTIN_AGENT_KIT_TARGETS: ["claude"],
+  DEFAULT_AGENT_KIT_TARGET: "claude",
+  getValidAgentKitTargets: (...args: unknown[]) =>
+    getValidAgentKitTargets(...args),
+  resolveAgentTargets: async (requested?: string[]) =>
+    requested && requested.length > 0 ? requested : ["claude"],
+}));
+
 // --- the installer we must NEVER actually run -------------------------------
 const createWarlockApp = vi.fn(async () => undefined);
 
@@ -153,6 +173,7 @@ function primeHappyPath(
     db?: unknown;
     features?: unknown;
     ai?: unknown;
+    agents?: unknown;
     git?: unknown;
     jwt?: unknown;
   } = {},
@@ -163,7 +184,8 @@ function primeHappyPath(
     .mockResolvedValueOnce(overrides.db ?? "postgres"); // database driver
   multiselect
     .mockResolvedValueOnce(overrides.features ?? ["test"]) // features
-    .mockResolvedValueOnce(overrides.ai ?? ["openai"]); // ai providers
+    .mockResolvedValueOnce(overrides.ai ?? ["openai"]) // ai providers
+    .mockResolvedValueOnce(overrides.agents ?? ["claude"]); // agent-kit targets
   confirm
     .mockResolvedValueOnce(overrides.git ?? true) // git
     .mockResolvedValueOnce(overrides.jwt ?? true); // jwt
@@ -350,7 +372,10 @@ describe("createNewApp — cancellation guards", () => {
     // The wizard therefore proceeds instead of aborting on a cancelled git prompt.
     text.mockResolvedValueOnce("my-app");
     select.mockResolvedValueOnce("yarn").mockResolvedValueOnce("mongodb");
-    multiselect.mockResolvedValueOnce(["test"]).mockResolvedValueOnce([]);
+    multiselect
+      .mockResolvedValueOnce(["test"])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce(["claude"]); // agent-kit targets
     // First confirm (git) is cancelled; second confirm (jwt) falls back to the
     // default mock (undefined) -> useJWT false. No cancel guard trips.
     confirm.mockResolvedValueOnce(CANCEL);
@@ -368,7 +393,10 @@ describe("createNewApp — cancellation guards", () => {
     // confirm, so the flow completes with useJWT=false instead of aborting.
     text.mockResolvedValueOnce("my-app");
     select.mockResolvedValueOnce("yarn").mockResolvedValueOnce("mongodb");
-    multiselect.mockResolvedValueOnce(["test"]).mockResolvedValueOnce([]);
+    multiselect
+      .mockResolvedValueOnce(["test"])
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce(["claude"]); // agent-kit targets
     confirm.mockResolvedValueOnce(true).mockResolvedValueOnce(CANCEL);
 
     await createNewApp({ interactive: true });
@@ -624,7 +652,7 @@ describe("createNewApp — non-TTY stdin (no keyboard to prompt at)", () => {
     expect(text).toHaveBeenCalledTimes(1);
     expect(capturedApp().name).toBe("interactive-app");
     // Still the full wizard: every other question was asked too.
-    expect(multiselect).toHaveBeenCalledTimes(2);
+    expect(multiselect).toHaveBeenCalledTimes(3);
     expect(confirm).toHaveBeenCalledTimes(2);
   });
 
@@ -740,6 +768,88 @@ describe("createNewApp — non-TTY stdin (no keyboard to prompt at)", () => {
     expect(select.mock.calls[0][0].initialValue).toBe("bun");
   });
 
+  /**
+   * Customize asks about everything, coding agents included (owner ruling,
+   * seq 1028). The list is fetched, so the offline branch matters: losing six
+   * already-given answers to a failed HTTP request is not acceptable.
+   */
+  it("asks which coding agents to set up, offering the fetched targets", async () => {
+    getValidAgentKitTargets.mockResolvedValueOnce([
+      "claude",
+      "codex",
+      "cursor",
+    ]);
+    primeHappyPath({ agents: ["codex"] });
+
+    await createNewApp({ interactive: true });
+
+    const agentsPrompt = multiselect.mock.calls[2][0];
+    expect(
+      agentsPrompt.options.map((option: { value: string }) => option.value),
+    ).toEqual(["claude", "codex", "cursor"]);
+    expect(agentsPrompt.initialValues).toEqual(["claude"]);
+    expect(capturedApp().options.agents).toEqual(["codex"]);
+  });
+
+  it("pre-ticks --agents rather than asking from scratch", async () => {
+    primeHappyPath({ agents: ["cursor"] });
+
+    await createNewApp({ interactive: true, agents: ["cursor"] });
+
+    expect(multiselect.mock.calls[2][0].initialValues).toEqual(["cursor"]);
+  });
+
+  it("falls back to the built-in targets when the list cannot be fetched, and says so", async () => {
+    getValidAgentKitTargets.mockRejectedValueOnce(new Error("offline"));
+    primeHappyPath();
+
+    await createNewApp({ interactive: true });
+
+    const agentsPrompt = multiselect.mock.calls[2][0];
+    expect(
+      agentsPrompt.options.map((option: { value: string }) => option.value),
+    ).toEqual(["claude"]);
+    expect(String(agentsPrompt.message)).toContain("offline");
+    // The run COMPLETES — six answered questions are not thrown away.
+    expect(capturedApp().options.agents).toEqual(["claude"]);
+  });
+
+  it("refuses an --agents target the fetched list does not contain", async () => {
+    getValidAgentKitTargets.mockResolvedValueOnce(["claude", "codex"]);
+    primeHappyPath();
+
+    await expect(
+      createNewApp({ interactive: true, agents: ["not-an-agent"] }),
+    ).rejects.toThrow(ProcessExit);
+
+    const message = String(cancel.mock.calls[0][0]);
+    expect(message).toContain("not-an-agent");
+    expect(message).toContain("claude, codex");
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
+
+  it("offers an unrecognised --agents target when the list could NOT be fetched, instead of refusing on no authority", async () => {
+    getValidAgentKitTargets.mockRejectedValueOnce(new Error("offline"));
+    primeHappyPath({ agents: ["some-new-agent"] });
+
+    await createNewApp({ interactive: true, agents: ["some-new-agent"] });
+
+    expect(cancel).not.toHaveBeenCalled();
+    const agentsPrompt = multiselect.mock.calls[2][0];
+    expect(
+      agentsPrompt.options.map((option: { value: string }) => option.value),
+    ).toEqual(["claude", "some-new-agent"]);
+    expect(capturedApp().options.agents).toEqual(["some-new-agent"]);
+  });
+
+  it("falls back to the default target when nothing is ticked", async () => {
+    primeHappyPath({ agents: [] });
+
+    await createNewApp({ interactive: true });
+
+    expect(capturedApp().options.agents).toEqual(["claude"]);
+  });
+
   it("refuses a misspelled --pm in the wizard before any prompt", async () => {
     hasInteractiveStdin.mockReturnValue(true);
 
@@ -774,7 +884,7 @@ describe("createNewApp — non-TTY stdin (no keyboard to prompt at)", () => {
     expect(text).not.toHaveBeenCalled();
     expect(capturedApp().name).toBe("named-on-the-cli");
     // The rest of the wizard still runs — only the answered question is skipped.
-    expect(multiselect).toHaveBeenCalledTimes(2);
+    expect(multiselect).toHaveBeenCalledTimes(3);
     expect(confirm).toHaveBeenCalledTimes(2);
   });
 });
@@ -844,7 +954,8 @@ describe("createNewApp — default TTY path (at most one structural question)", 
       .mockResolvedValueOnce("postgres"); // wizard: database driver
     multiselect
       .mockResolvedValueOnce(["test"]) // wizard: features
-      .mockResolvedValueOnce(["openai"]); // wizard: ai providers
+      .mockResolvedValueOnce(["openai"]) // wizard: ai providers
+      .mockResolvedValueOnce(["claude"]); // wizard: agent-kit targets
     confirm
       .mockResolvedValueOnce(true) // wizard: git
       .mockResolvedValueOnce(true); // wizard: jwt
