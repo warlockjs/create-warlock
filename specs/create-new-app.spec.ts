@@ -628,6 +628,54 @@ describe("createNewApp — non-TTY stdin (no keyboard to prompt at)", () => {
     expect(confirm).toHaveBeenCalledTimes(2);
   });
 
+  /**
+   * Every one of these used to resolve in SILENCE: --yes won the branch above
+   * and --customize was dropped without a word, so the run looked like it had
+   * succeeded while asking none of the questions the flag was passed for.
+   */
+  it("refuses --customize together with --yes, naming both flags", async () => {
+    hasInteractiveStdin.mockReturnValue(true);
+
+    await expect(
+      createNewApp({ interactive: true, yes: true, name: "x" }),
+    ).rejects.toThrow(ProcessExit);
+
+    const message = String(cancel.mock.calls[0][0]);
+    expect(message).toContain("--customize");
+    expect(message).toContain("--yes");
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(createWarlockApp).not.toHaveBeenCalled();
+    expect(select).not.toHaveBeenCalled();
+  });
+
+  it("refuses --customize when stdin is not a TTY, instead of silently scaffolding defaults", async () => {
+    hasInteractiveStdin.mockReturnValue(false);
+
+    await expect(
+      createNewApp({ interactive: true, name: "x" }),
+    ).rejects.toThrow(ProcessExit);
+
+    const message = String(cancel.mock.calls[0][0]);
+    expect(message).toContain("--customize");
+    expect(message).toContain("TTY");
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(createWarlockApp).not.toHaveBeenCalled();
+  });
+
+  it("refuses --customize together with --stack, which the wizard would drop", async () => {
+    hasInteractiveStdin.mockReturnValue(true);
+
+    await expect(
+      createNewApp({ interactive: true, stack: "web", name: "x" }),
+    ).rejects.toThrow(ProcessExit);
+
+    const message = String(cancel.mock.calls[0][0]);
+    expect(message).toContain("--customize");
+    expect(message).toContain("--stack");
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(createWarlockApp).not.toHaveBeenCalled();
+  });
+
   it("--interactive does NOT re-ask for a name that was already given on the command line", async () => {
     hasInteractiveStdin.mockReturnValue(true);
     primeHappyPath();

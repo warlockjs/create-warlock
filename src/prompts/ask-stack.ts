@@ -1,5 +1,5 @@
 import { cancel, isCancel, select } from "@clack/prompts";
-import type { StackChoice } from "../commands/create-new-app/types";
+import type { SetupChoice } from "../commands/create-new-app/types";
 
 /**
  * The ONE structural question the default (non-`--interactive`) interactive
@@ -14,7 +14,7 @@ import type { StackChoice } from "../commands/create-new-app/types";
  * choices gets asked instead of defaulted. It sits in this menu because a flag
  * nobody is told about is a feature nobody has.
  */
-export async function askStack(): Promise<StackChoice> {
+export async function askStack(): Promise<SetupChoice> {
   const answer = await select({
     message: "What are we building?",
     options: [
@@ -42,5 +42,5 @@ export async function askStack(): Promise<StackChoice> {
     process.exit(0);
   }
 
-  return answer as StackChoice;
+  return answer as SetupChoice;
 }

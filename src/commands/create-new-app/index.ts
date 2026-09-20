@@ -26,6 +26,7 @@ import {
 } from "../../helpers/package-manager";
 import { packageRoot } from "../../helpers/paths";
 import { hasInteractiveStdin } from "../../helpers/tty";
+import { assertFlagCombinations } from "../../flags/assert-flag-combinations";
 import { askProjectName } from "../../prompts/ask-project-name";
 import { askStack } from "../../prompts/ask-stack";
 import { showIntroBanner } from "../../ui/banner";
@@ -36,7 +37,7 @@ import {
   App as AppType,
   CliFlags,
   Stack,
-  StackChoice,
+  SetupChoice,
 } from "./types";
 
 export default async function createNewApp(cli: CliFlags = {}) {
@@ -58,6 +59,10 @@ export default async function createNewApp(cli: CliFlags = {}) {
     cancel("Node.js version must be at least 20.0.0");
     process.exit(0);
   }
+
+  // Refuse contradictory flag combinations LOUDLY, before anything else looks
+  // at them — `--customize --yes` used to drop `--customize` without a word.
+  assertFlagCombinations(cli);
 
   // Non-interactive path: build everything from flags and skip the prompts.
   //
@@ -241,7 +246,7 @@ async function createDefaultInteractive(
   const appPath = getAppPath(appName);
   if (!appPath) return;
 
-  const choice: StackChoice = cli.stack ?? (await askStack());
+  const choice: SetupChoice = cli.stack ?? (await askStack());
 
   // "Customize" is not a third stack — it is the wizard, chosen from the menu
   // instead of from a flag nobody was told about. Hand over the name we just

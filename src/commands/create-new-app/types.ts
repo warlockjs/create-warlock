@@ -7,7 +7,7 @@ export type Stack = "api" | "web";
  * deliberately not a `--stack` value: `--stack=customize --yes` would have no
  * coherent meaning.
  */
-export type StackChoice = Stack | "customize";
+export type SetupChoice = Stack | "customize";
 
 export type AppOptions = {
   databaseDriver: string;
