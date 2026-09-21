@@ -116,7 +116,8 @@ describe("the ESLint config emitted by a real no-web scaffold", () => {
     expect(output).toContain(
       "Parsing error: Declaration or statement expected",
     );
-  }, 60_000);
+    // Observed at 64.01s alone; 120s leaves room for ordinary machine load.
+  }, 120_000);
 
   it("assigns only TS forms to the TypeScript parser and states every other scaffold form", () => {
     const config = readFileSync(

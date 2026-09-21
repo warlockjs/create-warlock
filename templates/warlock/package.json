@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@mongez/reinforcements": "^4.0.1",
-    "@mongez/localization": "^3.4.7",
+    "@mongez/localization": "^3.5.0",
     "@mongez/supportive-is": "^2.1.4",
     "@warlock.js/auth": "0.0.0-set-by-scaffolder",
     "@warlock.js/cache": "0.0.0-set-by-scaffolder",

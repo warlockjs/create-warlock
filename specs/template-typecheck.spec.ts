@@ -17,30 +17,29 @@ import { describe, expect, it } from "vitest";
  *
  * `tsc` over ~20 template files plus everything their imports transitively
  * reach (most of `@warlock.js/core`, `@warlock.js/web`, etc., from source)
- * takes on the order of two minutes on a cold run — a generous timeout here
- * guards against a genuine hang without flaking on normal machine load.
+ * took 152.48s alone; the 300s timeout leaves room for ordinary machine load
+ * while still guarding against a genuine hang.
  */
 
-const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const packageRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "..",
+);
 
 describe("templates/warlock/ typechecks against this checkout's framework source", () => {
-  it(
-    "tsc --noEmit exits clean",
-    () => {
-      const result = spawnSync(
-        process.execPath,
-        [path.join(packageRoot, "scripts", "typecheck-template.mjs")],
-        { cwd: packageRoot, encoding: "utf8" },
+  it("tsc --noEmit exits clean", () => {
+    const result = spawnSync(
+      process.execPath,
+      [path.join(packageRoot, "scripts", "typecheck-template.mjs")],
+      { cwd: packageRoot, encoding: "utf8" },
+    );
+
+    if (result.status !== 0) {
+      throw new Error(
+        `templates/warlock/ failed to typecheck (exit ${result.status}):\n\n${result.stdout}\n${result.stderr}`,
       );
+    }
 
-      if (result.status !== 0) {
-        throw new Error(
-          `templates/warlock/ failed to typecheck (exit ${result.status}):\n\n${result.stdout}\n${result.stderr}`,
-        );
-      }
-
-      expect(result.status).toBe(0);
-    },
-    180_000,
-  );
+    expect(result.status).toBe(0);
+  }, 300_000);
 });
