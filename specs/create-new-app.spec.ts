@@ -915,6 +915,25 @@ describe("createNewApp — non-TTY stdin (no keyboard to prompt at)", () => {
   });
 });
 
+describe("createNewApp — explicit package-manager values", () => {
+  it.each([
+    ["non-interactive", { name: "empty-pm", yes: true }],
+    ["default TTY", { name: "empty-pm", stack: "api" as const }],
+    ["full wizard", { name: "empty-pm", interactive: true }],
+  ])("refuses an empty --pm before %s scaffolding", async (_path, flags) => {
+    await expect(createNewApp({ ...flags, pm: "" })).rejects.toThrow(
+      ProcessExit,
+    );
+
+    expect(cancel).toHaveBeenCalledWith(
+      expect.stringContaining("--pm flag requires"),
+    );
+    expect(setPackageManager).not.toHaveBeenCalled();
+    expect(createWarlockApp).not.toHaveBeenCalled();
+    expect(select).not.toHaveBeenCalled();
+  });
+});
+
 describe("createNewApp — default TTY path (at most one structural question)", () => {
   /**
    * With a TTY present but neither `--yes` nor `--interactive`/`--customize`,

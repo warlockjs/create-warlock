@@ -81,7 +81,10 @@ export function parseFlags(argv: string[]): CliFlags {
         flags.db = NO_DATABASE;
         break;
       case "pm":
-        flags.pm = value;
+        // Keep an explicitly supplied but valueless `--pm` distinguishable
+        // from omitting the flag. The command validator rejects this empty
+        // value instead of silently selecting the preferred manager.
+        flags.pm = value ?? "";
         break;
       case "features":
         flags.features = splitList(value);

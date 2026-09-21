@@ -109,6 +109,13 @@ describe("parseFlags — additional edge cases", () => {
     expect(parseFlags(["app", "--pm", "pnpm"]).pm).toBe("pnpm");
   });
 
+  it.each([["--pm"], ["--pm="]])(
+    "preserves an explicitly valueless %s for command validation",
+    flag => {
+      expect(parseFlags(["app", flag]).pm).toBe("");
+    },
+  );
+
   it("yields an empty list for a bare --ai with no following value", () => {
     // --ai is value-taking; with no value, splitList(undefined) -> [] (not
     // undefined), unlike scalar flags such as --db which stay undefined.

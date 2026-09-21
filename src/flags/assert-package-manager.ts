@@ -37,7 +37,14 @@ export function assertPackageManagerAllowed(
 export function assertPackageManagerAvailable(
   requested: string | undefined,
 ): void {
-  if (!requested) return;
+  if (requested === undefined) return;
+
+  if (!requested.trim()) {
+    cancel(
+      "The --pm flag requires a package manager value (npm, yarn, pnpm, or bun).",
+    );
+    process.exit(1);
+  }
 
   assertPackageManagerAllowed(requested);
 
