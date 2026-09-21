@@ -37,7 +37,7 @@ Place `locales.json` dictionaries with the feature they describe; site copy
 belongs at the common physical source ancestor and admin-only copy belongs
 under the admin layout. Warlock discovers these dictionaries automatically
 and supplies the selected locale through request translation helpers and
-`useTranslate()`. An optional nonempty `$group` replaces the inferred static
+`useTrans()`. An optional nonempty `$group` replaces the inferred static
 directory namespace. Every flattened translation key must have one owner;
 ancestor and child dictionaries cannot redefine the same key. Keep legacy
 `register()` dictionaries only where global translations are still needed.
