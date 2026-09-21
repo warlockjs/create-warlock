@@ -13,7 +13,7 @@ const HELP_TEXT = buildHelpText();
  * Parse the scaffolder's own CLI flags for non-interactive mode.
  *
  * @example
- * create-warlock my-app --db=postgres --features=test,herald --ai=openai,anthropic --yes
+ * create-warlock my-app --db=postgres --features=test,herald --ai=ai-openai,ai-anthropic --yes
  */
 export function parseFlags(argv: string[]): CliFlags {
   const flags: CliFlags = {};
@@ -28,8 +28,12 @@ export function parseFlags(argv: string[]): CliFlags {
     }
 
     const equalIndex = arg.indexOf("=");
-    const key = (equalIndex === -1 ? arg : arg.slice(0, equalIndex)).replace(/^-+/, "");
-    let value: string | undefined = equalIndex === -1 ? undefined : arg.slice(equalIndex + 1);
+    const key = (equalIndex === -1 ? arg : arg.slice(0, equalIndex)).replace(
+      /^-+/,
+      "",
+    );
+    let value: string | undefined =
+      equalIndex === -1 ? undefined : arg.slice(equalIndex + 1);
 
     // Value-taking flags may use either `--key=value` or `--key value`.
     if (valueFlags.includes(key) && value === undefined) {

@@ -1,6 +1,7 @@
 import { cancel, confirm, isCancel, multiselect, select } from "@clack/prompts";
 import { colors } from "@mongez/copper";
 import { getJsonFile } from "@warlock.js/fs";
+import { resolveAgentTargets } from "../../features/agent-kit-targets";
 import {
   getDatabaseDriver,
   getDatabaseDriverOptions,
@@ -12,7 +13,9 @@ import {
   getAllFeatureKeys,
   getFeatureOptions,
 } from "../../features/features-map";
-import { resolveAgentTargets } from "../../features/agent-kit-targets";
+import { assertFlagCombinations } from "../../flags/assert-flag-combinations";
+import { assertPackageManagerAvailable } from "../../flags/assert-package-manager";
+import { seedFromFlags } from "../../flags/seed-from-flags";
 import { App } from "../../helpers/app";
 import {
   detectPackageManagers,
@@ -23,12 +26,6 @@ import {
 } from "../../helpers/package-manager";
 import { packageRoot } from "../../helpers/paths";
 import { hasInteractiveStdin } from "../../helpers/tty";
-import { assertFlagCombinations } from "../../flags/assert-flag-combinations";
-import {
-  assertPackageManagerAllowed,
-  assertPackageManagerAvailable,
-} from "../../flags/assert-package-manager";
-import { seedFromFlags } from "../../flags/seed-from-flags";
 import { askAgentTargets } from "../../prompts/ask-agent-targets";
 import { askProjectName } from "../../prompts/ask-project-name";
 import { askStack } from "../../prompts/ask-stack";
@@ -39,8 +36,8 @@ import {
   AppOptions,
   App as AppType,
   CliFlags,
-  Stack,
   SetupChoice,
+  Stack,
 } from "./types";
 
 export default async function createNewApp(cli: CliFlags = {}) {
@@ -282,7 +279,7 @@ async function createDefaultInteractive(
 
   const packageManager = cli.pm ?? getPreferredPackageManager();
 
-  assertPackageManagerAllowed(cli.pm);
+  assertPackageManagerAvailable(cli.pm);
 
   setPackageManager(packageManager);
 
@@ -335,7 +332,7 @@ export type SyncAppOptions = Omit<AppOptions, "agents">;
  * default — the one structural choice — but an explicit `--features` always
  * wins, so a user who spells out the feature list is never second-guessed.
  *
- * Throws on an unknown driver or feature key so the caller can fail fast
+ * Throws on an unknown driver, feature, or AI key so the caller can fail fast
  * before any file is written.
  */
 export function resolveNonInteractiveOptions(cli: CliFlags): SyncAppOptions {
@@ -352,12 +349,28 @@ export function resolveNonInteractiveOptions(cli: CliFlags): SyncAppOptions {
   const aiProviders = cli.ai ?? [];
 
   const allowedKeys = getAllFeatureKeys();
-  const invalidKeys = [...features, ...aiProviders].filter(
-    key => !allowedKeys.includes(key),
-  );
+  const invalidFeatureKeys = features.filter(key => !allowedKeys.includes(key));
+  const errors: string[] = [];
 
-  if (invalidKeys.length > 0) {
-    throw new Error(`Unknown feature(s): ${invalidKeys.join(",")}`);
+  if (invalidFeatureKeys.length > 0) {
+    errors.push(`Unknown feature(s): ${invalidFeatureKeys.join(",")}`);
+  }
+
+  const aiFeatureKeys = [
+    ...getAiProviderOptions(),
+    ...getAiPackageOptions(),
+  ].map(option => option.value);
+  const invalidAiKeys = aiProviders.filter(key => !aiFeatureKeys.includes(key));
+
+  if (invalidAiKeys.length > 0) {
+    errors.push(
+      `Unknown AI feature(s): ${invalidAiKeys.join(",")}. ` +
+        `Valid AI choices: ${aiFeatureKeys.join(", ")}`,
+    );
+  }
+
+  if (errors.length > 0) {
+    throw new Error(errors.join("\n"));
   }
 
   return {
@@ -400,7 +413,7 @@ async function createNonInteractive(cli: CliFlags) {
     cancel(
       "A project name is required and no terminal is available to ask for one. " +
         "Pass it as the first argument or --name=<name>. Non-interactive flags: " +
-        "--yes, --pm=<npm|yarn|pnpm>, --db=<driver>|--no-db, --features=<list>, " +
+        "--yes, --pm=<npm|yarn|pnpm|bun>, --db=<driver>|--no-db, --features=<list>, " +
         "--ai=<list>, --git|--no-git, --jwt|--no-jwt.",
     );
     process.exit(1);
@@ -414,7 +427,7 @@ async function createNonInteractive(cli: CliFlags) {
 
   const packageManager = cli.pm ?? getPreferredPackageManager();
 
-  assertPackageManagerAllowed(cli.pm);
+  assertPackageManagerAvailable(cli.pm);
 
   setPackageManager(packageManager);
 

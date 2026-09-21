@@ -71,6 +71,23 @@ const PROBED_PACKAGE_MANAGERS = ALLOWED_PACKAGE_MANAGERS.filter(
   manager => manager !== "npm",
 );
 
+const PREFERRED_PACKAGE_MANAGERS = ["pnpm", "yarn", "npm"] as const;
+
+/**
+ * A running non-npm manager is already usable. Every fallback must be present
+ * in the detector's installed set, so both sync and async paths agree.
+ */
+function preferredPackageManager(
+  isAvailable: (manager: AllowedPackageManager) => boolean,
+): string {
+  const runningPm = detectPackageManager()?.name;
+  if (runningPm && runningPm !== "npm" && isValidPackageManager(runningPm)) {
+    return runningPm;
+  }
+
+  return PREFERRED_PACKAGE_MANAGERS.find(isAvailable) ?? "npm";
+}
+
 /**
  * Detect available package managers asynchronously and cache results
  */
@@ -79,22 +96,10 @@ export async function detectPackageManagers() {
   const available = PROBED_PACKAGE_MANAGERS.filter((_, index) => found[index]);
   const managers = ["npm", ...available];
 
-  const hasYarn = available.includes("yarn");
-  const hasPnpm = available.includes("pnpm");
-
   cachedSystemManagers = managers;
-
-  // Determine preference
-  const runningPm = detectPackageManager()?.name;
-  if (runningPm && runningPm !== "npm") {
-    cachedPreferredManager = runningPm;
-  } else if (hasYarn) {
-    cachedPreferredManager = "yarn";
-  } else if (hasPnpm) {
-    cachedPreferredManager = "pnpm";
-  } else {
-    cachedPreferredManager = "npm";
-  }
+  cachedPreferredManager = preferredPackageManager(manager =>
+    managers.includes(manager),
+  );
 }
 
 /**
@@ -113,20 +118,9 @@ export function getSystemPackageManagers(): string[] {
  */
 export function getPreferredPackageManager(): string {
   if (cachedPreferredManager) return cachedPreferredManager;
-
-  // Priority 1: The manager currently running the script
-  const runningPm = detectPackageManager()?.name;
-  if (runningPm && runningPm !== "npm") return runningPm;
-
-  // Priority 2: pnpm (if installed) — the framework's own package manager, so a
-  // scaffolded app defaults to the same tooling Warlock itself is developed with.
-  if (isInstalled("pnpm")) return "pnpm";
-
-  // Priority 3: Yarn (if installed)
-  if (isInstalled("yarn")) return "yarn";
-
-  // Priority 4: npm (default)
-  return "npm";
+  return preferredPackageManager(
+    manager => manager === "npm" || isInstalled(manager),
+  );
 }
 
 export function setPackageManager(packageManager: string) {

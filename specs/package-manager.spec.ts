@@ -167,6 +167,18 @@ describe("detectPackageManagers (async probe + caching)", () => {
     expect(pm.getPreferredPackageManager()).toBe("pnpm");
   });
 
+  it("uses pnpm over yarn after async detection, matching the synchronous preference", async () => {
+    whichPmMock.mockReturnValue(undefined);
+    setInstalled(["npm", "yarn", "pnpm"]);
+    const pm = await loadModule();
+
+    expect(pm.getPreferredPackageManager()).toBe("pnpm");
+
+    await pm.detectPackageManagers();
+
+    expect(pm.getPreferredPackageManager()).toBe("pnpm");
+  });
+
   it("detects only yarn when pnpm is missing (async form)", async () => {
     whichPmMock.mockReturnValue(undefined);
     setInstalled(["npm", "yarn"]);

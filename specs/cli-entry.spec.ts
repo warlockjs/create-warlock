@@ -14,8 +14,8 @@ vi.mock("../src/commands/create-new-app", () => ({
   default: (...args: unknown[]) => createNewApp(...args),
 }));
 
-import createApp, { parseFlags } from "../src/index";
 import { buildHelpText } from "../src/flags/definitions";
+import createApp, { parseFlags } from "../src/index";
 
 let originalArgv: string[];
 
@@ -64,7 +64,7 @@ describe("createApp (binary entry)", () => {
       "--db",
       "mongodb",
       "--features=test,herald",
-      "--ai=openai",
+      "--ai=ai-openai",
       "--pm=pnpm",
       "--no-git",
       "--jwt",
@@ -77,7 +77,7 @@ describe("createApp (binary entry)", () => {
       name: "shop",
       db: "mongodb",
       features: ["test", "herald"],
-      ai: ["openai"],
+      ai: ["ai-openai"],
       pm: "pnpm",
       git: false,
       jwt: true,
@@ -173,6 +173,21 @@ describe("--help lists every flag together with its default", () => {
 
     expect(help).toContain("default:");
   });
+
+  it("lists the accepted prefixed AI keys, including capability packages", () => {
+    const help = buildHelpText();
+
+    for (const key of [
+      "ai-openai",
+      "ai-tools",
+      "ai-panoptic",
+      "ai-workspace",
+    ]) {
+      expect(help).toContain(key);
+    }
+
+    expect(help).not.toContain("e.g. openai,anthropic");
+  });
 });
 
 describe("createApp — --help / --version early exit", () => {
@@ -188,7 +203,9 @@ describe("createApp — --help / --version early exit", () => {
   let logSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    exitSpy = vi.spyOn(process, "exit").mockImplementation((() => undefined) as never);
+    exitSpy = vi
+      .spyOn(process, "exit")
+      .mockImplementation((() => undefined) as never);
     logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
   });
 
@@ -240,7 +257,13 @@ describe("createApp — --help / --version early exit", () => {
   });
 
   it("--help wins over a positional project name and other flags", () => {
-    process.argv = ["node", "create-app.js", "my-app", "--db=postgres", "--help"];
+    process.argv = [
+      "node",
+      "create-app.js",
+      "my-app",
+      "--db=postgres",
+      "--help",
+    ];
 
     createApp();
 

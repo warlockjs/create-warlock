@@ -6,10 +6,8 @@ import {
 } from "../helpers/package-manager";
 
 /**
- * Is `--pm` SPELLED like a package manager we support? The check every path
- * runs, and the only one the non-interactive paths run: passing `--pm=bun` on
- * a machine without bun is the caller's problem to hit at install time, and
- * tightening that is a separate decision.
+ * Is `--pm` spelled like a package manager we support? Availability validation
+ * calls this first, so an unknown executable is rejected before installation.
  */
 export function assertPackageManagerAllowed(
   requested: string | undefined,
@@ -25,11 +23,10 @@ export function assertPackageManagerAllowed(
 }
 
 /**
- * Is `--pm` spelled right AND actually on this machine? The wizard needs the
- * stronger question, because its prompt is built from
- * {@link getSystemPackageManagers}: a value that is allowed but undetected
- * never appears among the options, so the flag is accepted and then silently
- * dropped — worse than being refused.
+ * Is `--pm` spelled right AND actually on this machine? Every CLI path uses
+ * this stronger check before it selects a manager or begins scaffolding. The
+ * scaffold always installs dependencies; accepting a known-unavailable
+ * executable would leave a known partial project behind.
  *
  * `bun` is the case that makes this concrete. It is in
  * {@link ALLOWED_PACKAGE_MANAGERS}, so the spelling check passes.

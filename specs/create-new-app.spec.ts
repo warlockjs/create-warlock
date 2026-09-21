@@ -303,7 +303,9 @@ describe("createNewApp — cancellation guards", () => {
   it("aborts when the project name is cancelled", async () => {
     text.mockResolvedValueOnce(CANCEL);
 
-    await expect(createNewApp({ interactive: true })).rejects.toThrow(ProcessExit);
+    await expect(createNewApp({ interactive: true })).rejects.toThrow(
+      ProcessExit,
+    );
     expect(cancel).toHaveBeenCalledWith(
       "A project name is required to continue",
     );
@@ -313,7 +315,9 @@ describe("createNewApp — cancellation guards", () => {
   it("aborts when the project name is blank (whitespace only)", async () => {
     text.mockResolvedValueOnce("   ");
 
-    await expect(createNewApp({ interactive: true })).rejects.toThrow(ProcessExit);
+    await expect(createNewApp({ interactive: true })).rejects.toThrow(
+      ProcessExit,
+    );
     expect(cancel).toHaveBeenCalledWith(
       "A project name is required to continue",
     );
@@ -335,7 +339,9 @@ describe("createNewApp — cancellation guards", () => {
     text.mockResolvedValueOnce("my-app");
     select.mockResolvedValueOnce(CANCEL);
 
-    await expect(createNewApp({ interactive: true })).rejects.toThrow(ProcessExit);
+    await expect(createNewApp({ interactive: true })).rejects.toThrow(
+      ProcessExit,
+    );
     expect(cancel).toHaveBeenCalledWith("Package manager selection cancelled");
     expect(setPackageManager).not.toHaveBeenCalled();
   });
@@ -344,7 +350,9 @@ describe("createNewApp — cancellation guards", () => {
     text.mockResolvedValueOnce("my-app");
     select.mockResolvedValueOnce("yarn").mockResolvedValueOnce(CANCEL);
 
-    await expect(createNewApp({ interactive: true })).rejects.toThrow(ProcessExit);
+    await expect(createNewApp({ interactive: true })).rejects.toThrow(
+      ProcessExit,
+    );
     expect(cancel).toHaveBeenCalledWith("Database selection cancelled");
   });
 
@@ -353,7 +361,9 @@ describe("createNewApp — cancellation guards", () => {
     select.mockResolvedValueOnce("yarn").mockResolvedValueOnce("mongodb");
     multiselect.mockResolvedValueOnce(CANCEL);
 
-    await expect(createNewApp({ interactive: true })).rejects.toThrow(ProcessExit);
+    await expect(createNewApp({ interactive: true })).rejects.toThrow(
+      ProcessExit,
+    );
     expect(cancel).toHaveBeenCalledWith("Feature selection cancelled");
   });
 
@@ -362,7 +372,9 @@ describe("createNewApp — cancellation guards", () => {
     select.mockResolvedValueOnce("yarn").mockResolvedValueOnce("mongodb");
     multiselect.mockResolvedValueOnce(["test"]).mockResolvedValueOnce(CANCEL);
 
-    await expect(createNewApp({ interactive: true })).rejects.toThrow(ProcessExit);
+    await expect(createNewApp({ interactive: true })).rejects.toThrow(
+      ProcessExit,
+    );
     expect(cancel).toHaveBeenCalledWith("AI provider selection cancelled");
   });
 
@@ -479,7 +491,9 @@ describe("createNonInteractive (--yes)", () => {
     expect(cancel).toHaveBeenCalledWith(expect.stringContaining("--yes"));
   });
 
-  it("accepts every allow-listed --pm value", async () => {
+  it("accepts every detected --pm value", async () => {
+    getSystemPackageManagers.mockReturnValue(["npm", "yarn", "pnpm", "bun"]);
+
     for (const pm of ["npm", "yarn", "pnpm", "bun"]) {
       setPackageManager.mockClear();
       cancel.mockClear();
@@ -489,6 +503,18 @@ describe("createNonInteractive (--yes)", () => {
       expect(cancel).not.toHaveBeenCalled();
       expect(setPackageManager).toHaveBeenCalledWith(pm);
     }
+  });
+
+  it("refuses an unavailable --pm before non-interactive scaffolding begins", async () => {
+    await expect(
+      createNewApp({ yes: true, name: "app", pm: "bun" }),
+    ).rejects.toThrow(ProcessExit);
+
+    expect(cancel).toHaveBeenCalledWith(
+      expect.stringContaining('Package manager "bun"'),
+    );
+    expect(setPackageManager).not.toHaveBeenCalled();
+    expect(createWarlockApp).not.toHaveBeenCalled();
   });
 
   it("exits 1 on a --pm value outside the allow-list instead of reaching setPackageManager", async () => {
@@ -983,6 +1009,32 @@ describe("createNewApp — default TTY path (at most one structural question)", 
     expect(select).not.toHaveBeenCalled();
     expect(multiselect).not.toHaveBeenCalled();
     expect(confirm).not.toHaveBeenCalled();
+  });
+
+  it("accepts every detected --pm value before default TTY scaffolding", async () => {
+    getSystemPackageManagers.mockReturnValue(["npm", "yarn", "pnpm", "bun"]);
+
+    for (const pm of ["npm", "yarn", "pnpm", "bun"]) {
+      setPackageManager.mockClear();
+      createWarlockApp.mockClear();
+
+      await createNewApp({ name: "default-app", stack: "api", pm });
+
+      expect(setPackageManager).toHaveBeenCalledWith(pm);
+      expect(createWarlockApp).toHaveBeenCalledTimes(1);
+    }
+  });
+
+  it("refuses an unavailable --pm before default TTY scaffolding begins", async () => {
+    await expect(
+      createNewApp({ name: "default-app", stack: "api", pm: "bun" }),
+    ).rejects.toThrow(ProcessExit);
+
+    expect(cancel).toHaveBeenCalledWith(
+      expect.stringContaining('Package manager "bun"'),
+    );
+    expect(setPackageManager).not.toHaveBeenCalled();
+    expect(createWarlockApp).not.toHaveBeenCalled();
   });
 
   it("includes the web feature by default when the structural answer is web", async () => {
