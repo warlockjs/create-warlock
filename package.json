@@ -18,7 +18,7 @@
     "fix": "node node_modules/eslint/bin/eslint.js --fix -c ./.eslintrc.json ./src --max-warnings=0",
     "format": "node node_modules/prettier/bin/prettier.cjs --write \"./src/**/*.{js,jsx,ts,tsx,css,md,json}\" --config ./.prettierrc.json",
     "format:check": "node node_modules/prettier/bin/prettier.cjs --check \"./src/**/*.{js,jsx,ts,tsx,css,md,json}\" --config ./.prettierrc.json",
-    "test": "npm run format:check && node scripts/format-check-template.mjs && node node_modules/vitest/vitest.mjs run",
+    "test": "node scripts/test.mjs",
     "format:template": "node scripts/format-check-template.mjs",
     "format:template:fix": "node scripts/format-check-template.mjs --write",
     "typecheck:scaffold": "node scripts/typecheck-scaffold.mjs",
