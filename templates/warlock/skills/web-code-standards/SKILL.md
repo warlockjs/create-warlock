@@ -76,9 +76,15 @@ export default function PostsPage() {
 }
 ```
 
+When code navigates by a page name, `href(name, params, query)` validates the
+published route table at runtime. `href("posts.indxe")` is a string that
+TypeScript accepts, then the helper throws with the known route names. Generated
+route-name and parameter types are not available in 5.17.
+
 Layouts use one `config satisfies LayoutConfig` object for `prefix`,
 `middleware`, `metadata`, and a sitemap default. Roots use one
-`config satisfies RootConfig` object for `middleware` only: root modules do
+`config satisfies RootConfig` object for `middleware` and the static `strictMode`
+flag: root modules do
 not declare routes, prefixes, metadata, validation, cache, or sitemap policy.
 
 ```tsx

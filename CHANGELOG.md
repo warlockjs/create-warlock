@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 
 - Web scaffold pages use the 5.17 `config` export with `PageConfig`, keeping loaders and components as separate exports. New apps depend on `@mongez/localization:^3.5.0` for scoped route translations.
+- New Web scaffolds set `strictMode: true` in `src/web/root.tsx`'s `RootConfig`, so the hydrated page, layout, and navigation tree receives React's development Strict Mode checks. Existing applications keep the framework default of `false` until they opt in.
 - The CLI's source formatting check is part of `test`. Interactive project naming and preset selection preserve the entered name when Customize advances to package-manager selection.
 
 ### Security

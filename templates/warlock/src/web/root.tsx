@@ -1,12 +1,15 @@
-import type { AppProps } from "@warlock.js/web";
+import type { AppProps, RootConfig } from "@warlock.js/web";
 import { Head, Scripts, useLocale, useTextDirection } from "@warlock.js/web";
 import "./app.css";
+
+/** Enable React's development checks for the hydrated page/layout tree. */
+export const config = { strictMode: true } satisfies RootConfig;
 
 /**
  * The application root.
  *
- * NOT async, and it receives no request/response: it renders on the server and
- * again in the browser during hydration, where neither exists.
+ * Synchronous server document. Only its children inside #vessel are hydrated;
+ * put interactive state in a page or layout beneath that boundary.
  */
 export default function App({ children }: AppProps) {
   const locale = useLocale();
