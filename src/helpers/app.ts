@@ -293,9 +293,17 @@ export class App {
         "src/shared/locale.schema.ts",
         "src/shared/locales.ts",
         "postcss.config.mjs",
+        "skills/web-code-standards",
       ]) {
         remove(entry);
       }
+
+      const agentsPath = path.resolve(this.path, "AGENTS.md");
+      const agents = getFile(agentsPath) as string;
+      putFile(
+        agentsPath,
+        agents.replace(/^.*\*\*web-code-standards\*\*.*\r?\n/m, ""),
+      );
 
       const tsconfigPath = path.resolve(this.path, "tsconfig.json");
       const tsconfig = getFile(tsconfigPath) as string;

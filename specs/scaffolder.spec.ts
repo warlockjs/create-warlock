@@ -439,6 +439,12 @@ describe("App template emission", () => {
       ),
     ).toBe(true);
     expect(existsSync(path.join(appPath, "src/web"))).toBe(false);
+    expect(
+      existsSync(path.join(appPath, "skills/web-code-standards/SKILL.md")),
+    ).toBe(false);
+    expect(readFileSync(path.join(appPath, "AGENTS.md"), "utf8")).not.toContain(
+      "web-code-standards",
+    );
     expect(existsSync(path.join(appPath, "src/app/shared/routes.ts"))).toBe(
       false,
     );
@@ -451,6 +457,12 @@ describe("App template emission", () => {
     app.use("warlock").configureWebStarter(true);
 
     expect(existsSync(path.join(appPath, "src/web/root.tsx"))).toBe(true);
+    expect(
+      existsSync(path.join(appPath, "skills/web-code-standards/SKILL.md")),
+    ).toBe(true);
+    expect(readFileSync(path.join(appPath, "AGENTS.md"), "utf8")).toContain(
+      "web-code-standards",
+    );
     expect(existsSync(path.join(appPath, "src/web/home/index.page.tsx"))).toBe(
       true,
     );

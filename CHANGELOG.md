@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## 5.17.0 - Unreleased
 
+### Changed
+
+- Web scaffold pages use the 5.17 `config` export with `PageConfig`, keeping loaders and components as separate exports. New apps depend on `@mongez/localization:^3.5.0` for scoped route translations.
+- The CLI's source formatting check is part of `test`. Interactive project naming and preset selection preserve the entered name when Customize advances to package-manager selection.
+
 ### Security
 
 - **BREAKING:** the scaffolded `GET /uploads/*` route resized images to any `?w=&h=` a client sent. This was a denial-of-service vector, because every new size forced a full decode and resize and nothing was cached. The route also resolved the path without a containment check. The generated `src/app/uploads/controllers/fetch-uploaded-file.controller.ts` is gone. `src/app/uploads/routes.ts` now mounts core's `uploadedFileController`, which keeps the request inside the storage root and only renders the named variants the app declares. `?w=` and `?h=` now return 400. **Existing projects should apply the same change:**
