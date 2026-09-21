@@ -9,6 +9,7 @@ import {
   runPackageManagerCommand,
 } from "../../helpers/package-manager";
 import { resolveWarlockVersions } from "../../helpers/warlock-versions";
+import { printDecisionsSummary } from "../../summary";
 import { showSuccessScreen } from "../../ui/banner";
 import {
   failFatally,
@@ -20,7 +21,6 @@ import {
 } from "../../ui/report";
 import { spinner } from "../../ui/spinner";
 import { spinnerMessages } from "../../ui/spinners";
-import { printDecisionsSummary } from "../../summary";
 
 /**
  * What the scaffold actually achieved. `ok` is false when ANY step the user

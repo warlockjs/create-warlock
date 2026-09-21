@@ -48,7 +48,9 @@ export function insertImportInSortedPosition(
     return `${statement}\n${source}`;
   }
 
-  const successor = matches.find(match => (match[1] as string).localeCompare(specifier) > 0);
+  const successor = matches.find(
+    match => (match[1] as string).localeCompare(specifier) > 0,
+  );
 
   if (successor) {
     return `${source.slice(0, successor.index)}${statement}\n${source.slice(successor.index)}`;

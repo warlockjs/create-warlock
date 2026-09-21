@@ -1,6 +1,6 @@
 import { colors } from "@mongez/copper";
-import { getDatabaseLabel } from "./features/database-drivers";
 import { AppOptions } from "./commands/create-new-app/types";
+import { getDatabaseLabel } from "./features/database-drivers";
 
 /** What decisions.spec.ts / the terminal actually needs to render the summary. */
 export type Decisions = {
@@ -13,7 +13,10 @@ export type Decisions = {
  * each decision — required because almost every choice is now a default
  * rather than a prompt, so this is the only place a user sees them.
  */
-export function printDecisionsSummary({ packageManager, options }: Decisions): void {
+export function printDecisionsSummary({
+  packageManager,
+  options,
+}: Decisions): void {
   const databaseLabel = getDatabaseLabel(options.databaseDriver);
 
   const headline = [

@@ -249,9 +249,7 @@ export async function resolveAgentTargets(
   fetchImpl: typeof fetch = fetch,
 ): Promise<string[]> {
   const targets =
-    requested && requested.length > 0
-      ? requested
-      : [DEFAULT_AGENT_KIT_TARGET];
+    requested && requested.length > 0 ? requested : [DEFAULT_AGENT_KIT_TARGET];
 
   const needsValidation = targets.some(
     target => !BUILTIN_AGENT_KIT_TARGETS.includes(target),
