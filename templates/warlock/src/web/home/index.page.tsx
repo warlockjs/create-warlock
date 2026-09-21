@@ -1,4 +1,4 @@
-import type { PageLoader, PageProps } from "@warlock.js/web";
+import type { PageConfig, PageLoader, PageProps } from "@warlock.js/web";
 import { getHomeService } from "app/home/services/home.service";
 import { isLocaleCode } from "../../shared/locales";
 import { ContactSection } from "./components/contact-section";
@@ -10,12 +10,6 @@ import "./styles/home.css";
 
 export { register } from "./register";
 
-export const route = { path: "/", name: "home" };
-export const metadata = {
-  title: "Warlock.js — Build with uncommon power",
-  description:
-    "A TypeScript framework for production backends, server-rendered React applications, and AI-native systems.",
-};
 type HomeLoaderOptions = Parameters<PageLoader>[0];
 
 export async function loader({ request, response }: HomeLoaderOptions) {
@@ -28,6 +22,15 @@ export async function loader({ request, response }: HomeLoaderOptions) {
 
   return { locale, ...homeData };
 }
+
+export const config = {
+  route: { path: "/", name: "home" },
+  metadata: {
+    title: "Warlock.js — Build with uncommon power",
+    description:
+      "A TypeScript framework for production backends, server-rendered React applications, and AI-native systems.",
+  },
+} satisfies PageConfig<typeof loader>;
 
 type HomePageProps = PageProps<typeof loader>;
 

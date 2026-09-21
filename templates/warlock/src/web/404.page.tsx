@@ -1,8 +1,10 @@
 import "./404.css";
 
-export const metadata = {
-  title: "Page not found",
-  robots: "noindex",
+export const config = {
+  metadata: {
+    title: "Page not found",
+    robots: "noindex",
+  },
 };
 
 export default function NotFoundPage() {
