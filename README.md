@@ -108,11 +108,13 @@ not from source.
 
 - **`specs`** — on pushes to `main`/`master` and on pull requests: `node scripts/check-resolver-boundaries.mjs`
   (below), a smoke test that the built CLI's `--version` output matches `package.json`, then
-  `vitest`.
+  `npm run test:standalone`. This excludes only the source-bound template typecheck, which
+  deliberately requires sibling framework repositories and remains available through the default
+  `npm test` / `npm run typecheck:template` workspace lane.
 - **`scaffold-typecheck`** — scaffolds a real project with the current scaffolder, installs
   it, and runs that project's own `tsc --noEmit` (`npm run typecheck:scaffold`; see the
   header of `scripts/typecheck-scaffold.mjs` for why this can't be done by typechecking
-  `templates/warlock/` in place).
+  `templates/warlock/` in place). This registry-backed consumer check remains mandatory.
 
 Both jobs also run nightly (`cron "0 4 * * *"`) and on `workflow_dispatch`, in addition to
 push/PR — `scaffold-typecheck` installs the framework from the registry, so a framework

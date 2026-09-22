@@ -62,8 +62,12 @@ jobs:
             exit 1
           fi
 
-      - name: Vitest
-        run: npm test
+      # This checkout is independent: the source-bound template spec requires
+      # sibling framework repositories and stays in the default `npm test` lane.
+      # The mandatory scaffold job below installs and typechecks the published
+      # framework surface a standalone consumer actually receives.
+      - name: Standalone specs
+        run: npm run test:standalone
 
   scaffold-typecheck:
     name: Fresh scaffold typechecks
