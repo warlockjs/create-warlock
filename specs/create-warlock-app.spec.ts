@@ -97,6 +97,7 @@ function makeFakeApp(
     })),
     installFeatures: vi.fn(async () => hooks.installFeaturesResult ?? true),
     pinViteResolution: vi.fn(() => true),
+    approveSelectedFeatureBuilds: vi.fn(() => true),
     git: vi.fn(async () => true),
     exec: vi.fn(async () => true),
   };
@@ -190,7 +191,7 @@ describe("createWarlockApp — feature batch", () => {
     ]);
   });
 
-  it("pins vite AFTER the features are recorded and BEFORE the batched install", async () => {
+  it("pins Vite and records selected native build approvals before the batched install", async () => {
     const order: string[] = [];
     const fake = makeFakeApp({ features: ["web"] });
 
@@ -200,6 +201,10 @@ describe("createWarlockApp — feature batch", () => {
     });
     fake.pinViteResolution.mockImplementation(() => {
       order.push("pinViteResolution");
+      return true;
+    });
+    fake.approveSelectedFeatureBuilds.mockImplementation(() => {
+      order.push("approveSelectedFeatureBuilds");
       return true;
     });
     fake.install.mockImplementation(() => {
@@ -216,6 +221,7 @@ describe("createWarlockApp — feature batch", () => {
       "install", // base install (step 2)
       "installFeatures",
       "pinViteResolution",
+      "approveSelectedFeatureBuilds",
       "install", // batched feature install
     ]);
   });
