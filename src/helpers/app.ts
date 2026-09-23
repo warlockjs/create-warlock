@@ -16,8 +16,11 @@ import { executeCommand, runCommand } from "./exec";
 import { insertImportInSortedPosition } from "./insert-import";
 import { getPackageManager } from "./package-manager";
 import { packageRoot, Template, template } from "./paths";
+import {
+  mergePnpmBuildApprovals,
+  requiredPnpmBuildApprovals,
+} from "./pnpm-build-approvals";
 import { fallbackRange } from "./warlock-versions";
-import { mergePnpmBuildApprovals, requiredPnpmBuildApprovals } from "./pnpm-build-approvals";
 
 /**
  * Environment for every install the scaffolder spawns.
