@@ -38,6 +38,14 @@ If the business has an "orders team" and a "payments team", you probably have an
 
 Every module follows this folder shape. Not every folder is required — only the ones the module actually uses.
 
+`src/web/<feature>/` follows the same ownership rule as an app module: one
+feature owns its presentation, browser behavior, feature utilities, styles,
+and locales; backend domain decisions stay in `src/app/<domain>/services`.
+Web features use `components/`, `hooks/`, and `utils/` without barrel indexes.
+They use `types/` for several contracts or a single `<feature>.types.ts` for a
+small one. This web exception does not permit a catch-all `lib/` folder or
+cross-feature imports into private implementation files.
+
 ```
 src/app/<module>/
   controllers/              ← HTTP handlers (one per endpoint)

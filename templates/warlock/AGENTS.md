@@ -59,7 +59,7 @@ automatically on `postinstall`).
 - **code-standards** — TypeScript style: `interface` (contracts) vs `type` (data),
   access modifiers on every class member, no `any`, single-responsibility files
   with the documented naming suffixes, JSDoc on the public surface.
-- **web-code-standards** — Thin web pages, service-owned data, feature hooks, and browser-safe rendering.
+- **web-code-standards** — `src/web/**` feature boundaries, page/setup ownership, components, hooks, CSS, locales, and accessible browser rendering.
 - **data-and-persistence** — modeling, storing, and migrating data with
   `@warlock.js/cascade` (money as integer minor units, migrations, indexes).
 - **module-boundaries** — how modules under `src/app/**` relate; one domain noun

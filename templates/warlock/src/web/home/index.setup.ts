@@ -1,4 +1,30 @@
 import { groupedTranslations } from "@mongez/localization";
+import type { PageConfig, PageLoader } from "@warlock.js/web";
+import { getHomeService } from "app/home/services/home.service";
+import { isLocaleCode } from "../../shared/locales";
+
+type HomeLoaderOptions = Parameters<PageLoader>[0];
+
+export async function loader({ request, response }: HomeLoaderOptions) {
+  const locale = request.locale;
+
+  if (!isLocaleCode(locale)) {
+    return response.notFound();
+  }
+
+  const homeData = await getHomeService();
+
+  return { locale, ...homeData };
+}
+
+export const config = {
+  route: { path: "/", name: "home" },
+  metadata: {
+    title: "Warlock.js — Build with uncommon power",
+    description:
+      "A TypeScript framework for production backends, server-rendered React applications, and AI-native systems.",
+  },
+} satisfies PageConfig<typeof loader>;
 
 export function register() {
   groupedTranslations({

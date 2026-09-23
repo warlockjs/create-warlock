@@ -8,7 +8,7 @@
 
 ---
 name: create-a-warlock-project
-description: 'Scaffold a brand-new Warlock.js project with `create-warlock` — fully headless by default (at most one prompt — API-only vs full-stack web) plus `--interactive`/`--customize` for the full long-form wizard. Every flag (`--name`, `--stack`, `--db`, `--pm`, `--features`, `--ai`, `--agents`, `--git/--no-git`, `--jwt/--no-jwt`, `--no-db`, `--yes`, `--interactive`), every valid database-driver / feature / AI-provider / agent-kit-target key, opting out of a database (`--db=none` / `--no-db`, which removes `src/config/database.ts`), the post-scaffold decisions summary, and the directory tree the template emits. Triggers: `create-warlock`, `npm create warlock`, `npx create-warlock`; "scaffold a warlock app", "start a new warlock project", "create-warlock flags", "non-interactive warlock scaffold", "scaffold without a database", "which features can I pass to create-warlock", "agent-kit targets". Skip: running an already-created project (`@warlock.js/core/run-app/SKILL.md`); adding a feature to an existing project (`warlock add`, `@warlock.js/core/add-connector/SKILL.md`); generating a module inside a project (`@warlock.js/core/create-module/SKILL.md`).'
+description: "Create a Warlock project with the canonical scaffold, package selection, and project conventions."
 ---
 
 # create-warlock — scaffold a new project
@@ -83,6 +83,12 @@ Using npm · database: none · agent-kit targets: claude
 | `--agents`                  | yes (CSV)   | `claude`       | Comma-separated `agent-kit` targets — see below.                    |
 | `--git` / `--no-git`        | no          | off            | Initialize a Git repo (`git init` + `main` branch + initial commit).|
 | `--jwt` / `--no-jwt`        | no          | off            | Generate JWT secrets via the project's `jwt` script.               |
+
+With `--pm=pnpm`, selecting the `image` feature records only Sharp's required
+native build approval in the generated `pnpm-workspace.yaml` before install.
+An explicit existing denial is retained. If selected feature dependencies do
+not install, JWT generation is skipped and reported rather than retried through
+the package manager.
 | `--yes` / `-y`              | no          | off            | Fully headless mode.                                                 |
 | `--interactive`, `--customize` | no       | off            | Restore the full long-form wizard.                                   |
 

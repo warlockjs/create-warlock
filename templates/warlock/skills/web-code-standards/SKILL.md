@@ -42,6 +42,15 @@ directory namespace. Every flattened translation key must have one owner;
 ancestor and child dictionaries cannot redefine the same key. Keep legacy
 `register()` dictionaries only where global translations are still needed.
 
+Within a web feature, use `components/`, `hooks/`, and `utils/` for their
+named purpose; do not create `lib/` as a catch-all. These folders have no
+barrel `index.ts`: import the named component, hook, or helper from its own
+file. Keep types in `types/` when a feature has several contracts, or in one
+`<feature>.types.ts` file when they are small. Do not duplicate a contract in
+both places. Put component props in that dedicated type module by default;
+keep a tiny private prop type beside a component only when extracting it would
+make the feature harder to read.
+
 ## 1. Keep the page contract, make the implementation thin
 
 Warlock's file-routed modules have one policy export: `config`. A page's
@@ -134,6 +143,35 @@ not a hidden link or a client-side redirect.
 output; the page composes `PostArticle`, `PostComments`, and `RelatedPosts`;
 `use-post-comments.ts` owns subscription, state, and handlers for
 `PostComments`. Each piece has one reason to change.
+
+## Setup and component files
+
+Use a setup file when a feature registers framework behavior. The setup file
+owns its `register`, `config`, and `loader` exports; its matching component
+only renders the supplied data. Keep loader inference type-only so it does
+not pull server work into a browser component:
+
+The default starter follows this boundary: `root.setup.ts` owns strict-mode
+configuration, `home/index.setup.ts` owns route policy, its loader, and the
+universal translations `register()`, and `404.setup.ts` owns not-found
+metadata. Do not add an empty setup file when a component has no server
+configuration, loader, or registration work.
+
+```tsx
+import type { PageProps } from "@warlock.js/web";
+import type { loader } from "./posts.setup";
+
+export default function PostsPage({ data }: PageProps<typeof loader>) {
+  return <PostsList posts={data.posts} />;
+}
+```
+
+Each React component file has one named default component. Export hooks,
+utilities, and types by name. A component renders; its feature hook owns
+state, effects, handlers, navigation, and client mutations. A utility stays
+pure and has no React or browser lifecycle dependency. Keep feature CSS beside
+the feature and import it from the owning presentation boundary; keep loading,
+error, empty, focus, reduced-motion, and locale behavior with that boundary.
 
 ## 2. Make the server-to-browser data contract explicit
 

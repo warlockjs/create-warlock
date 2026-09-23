@@ -17,6 +17,7 @@ import { insertImportInSortedPosition } from "./insert-import";
 import { getPackageManager } from "./package-manager";
 import { packageRoot, Template, template } from "./paths";
 import { fallbackRange } from "./warlock-versions";
+import { mergePnpmBuildApprovals, requiredPnpmBuildApprovals } from "./pnpm-build-approvals";
 
 /**
  * Environment for every install the scaffolder spawns.
@@ -75,6 +76,18 @@ export class App {
     return runCommand(getPackageManager(), ["install"], this.path, {
       env: installEnvironment(),
     });
+  }
+
+  /** Record native build approvals before pnpm installs selected feature dependencies. */
+  public approveSelectedFeatureBuilds(features: readonly string[]) {
+    if (getPackageManager() !== "pnpm") return this;
+    const packages = requiredPnpmBuildApprovals(features);
+    if (packages.length === 0) return this;
+    const workspacePath = path.join(this.path, "pnpm-workspace.yaml");
+    if (!fileExists(workspacePath)) return this;
+    const current = getFile(workspacePath) as string;
+    putFile(workspacePath, mergePnpmBuildApprovals(current, packages));
+    return this;
   }
 
   public async exec(command: string) {

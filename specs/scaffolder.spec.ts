@@ -457,6 +457,7 @@ describe("App template emission", () => {
     app.use("warlock").configureWebStarter(true);
 
     expect(existsSync(path.join(appPath, "src/web/root.tsx"))).toBe(true);
+    expect(existsSync(path.join(appPath, "src/web/root.setup.ts"))).toBe(true);
     expect(
       existsSync(path.join(appPath, "skills/web-code-standards/SKILL.md")),
     ).toBe(true);
@@ -466,6 +467,9 @@ describe("App template emission", () => {
     expect(existsSync(path.join(appPath, "src/web/home/index.page.tsx"))).toBe(
       true,
     );
+    expect(existsSync(path.join(appPath, "src/web/home/index.setup.ts"))).toBe(true);
+    expect(existsSync(path.join(appPath, "src/web/404.setup.ts"))).toBe(true);
+    expect(existsSync(path.join(appPath, "src/web/home/register.ts"))).toBe(false);
     expect(existsSync(path.join(appPath, "src/web/home/styles/home.css"))).toBe(
       true,
     );
@@ -481,10 +485,16 @@ describe("App template emission", () => {
     );
 
     const root = readFileSync(path.join(appPath, "src/web/root.tsx"), "utf8");
+    const rootSetup = readFileSync(path.join(appPath, "src/web/root.setup.ts"), "utf8");
     const page = readFileSync(
       path.join(appPath, "src/web/home/index.page.tsx"),
       "utf8",
     );
+    const pageSetup = readFileSync(
+      path.join(appPath, "src/web/home/index.setup.ts"),
+      "utf8",
+    );
+    const notFoundSetup = readFileSync(path.join(appPath, "src/web/404.setup.ts"), "utf8");
     const contact = readFileSync(
       path.join(appPath, "src/web/home/components/contact-section.tsx"),
       "utf8",
@@ -500,8 +510,14 @@ describe("App template emission", () => {
 
     expect(root).toContain('import "./app.css"');
     expect(root).not.toContain("setLocalizationConfigurations");
+    expect(root).not.toContain("RootConfig");
+    expect(rootSetup).toContain("strictMode: true");
     expect(page).toContain('import "./styles/home.css"');
-    expect(page).toContain("getHomeService");
+    expect(page).toContain('import type { loader } from "./index.setup"');
+    expect(page).not.toContain("getHomeService");
+    expect(pageSetup).toContain("getHomeService");
+    expect(pageSetup).toContain("export function register()");
+    expect(notFoundSetup).toContain('title: "Page not found"');
     expect(contact).toContain("useTrans()");
     expect(contact).not.toContain("transFrom(");
     expect(config).toContain("webConnector()");

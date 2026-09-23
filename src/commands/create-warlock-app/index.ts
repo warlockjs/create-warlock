@@ -140,6 +140,7 @@ export async function createWarlockApp(
 
   // Features the user asked for that are not in the project when we finish.
   const failedFeatures: { feature: string; reason: string }[] = [];
+  let featureDependencyInstallFailed = false;
 
   if (selectedFeatures.length > 0) {
     const featuresSpinner = spinner();
@@ -176,6 +177,7 @@ export async function createWarlockApp(
       // different major — two copies, and yarn 1 aborts the whole link phase
       // on them. Pin one copy BEFORE the batched install, not after.
       application.pinViteResolution();
+      application.approveSelectedFeatureBuilds(addedFeatures);
 
       const install = application.install();
       const installed = await install.install;
@@ -192,6 +194,7 @@ export async function createWarlockApp(
         }
 
         addedFeatures = [];
+        featureDependencyInstallFailed = true;
       }
     }
 
@@ -245,7 +248,16 @@ export async function createWarlockApp(
   }
 
   // Step 5: Generate JWT or warm cache
-  if (useJWT) {
+  if (useJWT && featureDependencyInstallFailed) {
+    problems.push({
+      step: "JWT secrets",
+      detail:
+        "Skipped because the selected feature dependencies did not install.",
+      hints: [
+        `Install the failed feature dependencies, then run \`${runPackageManagerCommand("jwt")}\` inside the project.`,
+      ],
+    });
+  } else if (useJWT) {
     const jwtSpinner = spinner();
     jwtSpinner.start(spinnerMessages.generatingJwt);
 

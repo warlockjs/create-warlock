@@ -1,9 +1,6 @@
-import type { AppProps, RootConfig } from "@warlock.js/web";
+import type { AppProps } from "@warlock.js/web";
 import { Head, Scripts, useLocale, useTextDirection } from "@warlock.js/web";
 import "./app.css";
-
-/** Enable React's development checks for the hydrated page/layout tree. */
-export const config = { strictMode: true } satisfies RootConfig;
 
 /**
  * The application root.

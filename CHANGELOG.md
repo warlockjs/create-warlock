@@ -4,6 +4,21 @@ All notable changes to `create-warlock` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@warlock.js/*` packages are released in lockstep — every package shares the same version number, so a version below may list only the changes that affected this package.
 
+## 5.19.0
+
+### Changed
+
+- Refined package skill-discovery descriptions and regenerated the llms projections.
+- The default Web starter now keeps root, page, and not-found server exports in
+  paired `*.setup.ts` modules. Components remain presentation-only and import
+  the home loader type-only, while the setup module retains the universal
+  localization `register()` projection.
+- PNPM image scaffolds approve only Sharp's required native build in the
+  generated `pnpm-workspace.yaml` before installing the selected feature. An
+  existing explicit denial is preserved. If selected feature dependencies fail
+  to install, JWT generation is reported as skipped instead of retrying through
+  the package manager.
+
 ## 5.17.0 - 2026-09-21
 
 ### Changed
