@@ -32,7 +32,7 @@ vi.mock("@clack/prompts", () => ({
   // spinner/log are pulled in transitively by create-warlock-app, but that
   // module is mocked below, so these are only here for completeness.
   spinner: () => ({ start: vi.fn(), stop: vi.fn() }),
-  log: { error: vi.fn() },
+  log: { error: vi.fn(), warn: vi.fn() },
 }));
 
 // --- @warlock.js/fs (version read) ------------------------------------------
@@ -296,6 +296,54 @@ describe("createNewApp — interactive flow", () => {
     const app = capturedApp();
     expect(app.options.features).toEqual([]);
     expect(app.options.aiProviders).toEqual([]);
+  });
+
+  it("offers None last for AI and normalizes it away before scaffolding", async () => {
+    primeHappyPath({ ai: ["none"] });
+
+    await createNewApp({ interactive: true });
+
+    const aiPrompt = multiselect.mock.calls[1][0] as {
+      options: { value: string; label: string }[];
+    };
+    expect(aiPrompt.options.at(-1)).toMatchObject({
+      value: "none",
+      label: "None",
+    });
+    expect(capturedApp().options.aiProviders).toEqual([]);
+  });
+
+  it("warns and re-prompts when None is combined with AI packages", async () => {
+    primeHappyPath({ ai: ["none", "ai-openai"] });
+    multiselect.mockReset();
+    multiselect
+      .mockResolvedValueOnce(["test"])
+      .mockResolvedValueOnce(["none", "ai-openai"])
+      .mockResolvedValueOnce(["ai-openai"])
+      .mockResolvedValueOnce(["claude"]);
+
+    await createNewApp({ interactive: true });
+
+    const { log } = await import("@clack/prompts");
+    expect(log.warn).toHaveBeenCalledWith(
+      "Choose None by itself, or select one or more AI packages.",
+    );
+    expect(multiselect.mock.calls[2][0].initialValues).toEqual(["ai-openai"]);
+    expect(capturedApp().options.aiProviders).toEqual(["ai-openai"]);
+  });
+
+  it("allows cancellation after a conflicting AI selection", async () => {
+    primeHappyPath({ ai: ["none", "ai-openai"] });
+    multiselect.mockReset();
+    multiselect
+      .mockResolvedValueOnce(["test"])
+      .mockResolvedValueOnce(["none", "ai-openai"])
+      .mockResolvedValueOnce(CANCEL);
+
+    await expect(createNewApp({ interactive: true })).rejects.toThrow(
+      ProcessExit,
+    );
+    expect(cancel).toHaveBeenCalledWith("AI provider selection cancelled");
   });
 });
 
@@ -934,49 +982,49 @@ describe("createNewApp — explicit package-manager values", () => {
   });
 });
 
-describe("createNewApp — default TTY path (at most one structural question)", () => {
+describe("createNewApp — default TTY path", () => {
   /**
    * With a TTY present but neither `--yes` nor `--interactive`/`--customize`,
-   * the default path must ask AT MOST ONE question — the structural
-   * API-only vs full-stack-web fork — and take every other answer from a
-   * flag or its default, exactly like the non-interactive path.
+   * the default path asks for the preset and, unless the database is explicit,
+   * its database. Every other answer comes from a flag or its default.
    */
   beforeEach(() => {
     hasInteractiveStdin.mockReturnValue(true);
   });
 
-  it("asks only the stack question when the project name is already known", async () => {
-    select.mockResolvedValueOnce("api");
+  it.each(["api", "web"] as const)(
+    "asks the %s preset's database choice, including None",
+    async stack => {
+      select.mockResolvedValueOnce(stack).mockResolvedValueOnce("none");
 
-    await createNewApp({ name: "default-app" });
+      await createNewApp({ name: "default-app" });
 
-    expect(text).not.toHaveBeenCalled();
-    expect(select).toHaveBeenCalledTimes(1);
-    expect(multiselect).not.toHaveBeenCalled();
-    expect(confirm).not.toHaveBeenCalled();
+      expect(text).not.toHaveBeenCalled();
+      expect(select).toHaveBeenCalledTimes(2);
+      expect(multiselect).not.toHaveBeenCalled();
+      expect(confirm).not.toHaveBeenCalled();
 
-    const app = capturedApp();
-    expect(app.name).toBe("default-app");
-    expect(app.options.databaseDriver).toBe("mongodb");
-    expect(app.options.features).toEqual([]);
-    expect(app.options.agents).toEqual(["claude"]);
-    expect(app.options.useGit).toBe(false);
-    expect(app.options.useJWT).toBe(false);
-  });
+      const databasePrompt = select.mock.calls[1][0] as {
+        options: { value: string }[];
+      };
+      expect(databasePrompt.options.at(-1)?.value).toBe("none");
+      expect(capturedApp().options.databaseDriver).toBe("none");
+    },
+  );
 
-  it("prompts for the project name first when it is missing, still asking only one further question", async () => {
+  it("prompts for the project name before the preset and database", async () => {
     text.mockResolvedValueOnce("typed-app");
-    select.mockResolvedValueOnce("api");
+    select.mockResolvedValueOnce("api").mockResolvedValueOnce("mongodb");
 
     await createNewApp({});
 
     expect(text).toHaveBeenCalledTimes(1);
-    expect(select).toHaveBeenCalledTimes(1);
+    expect(select).toHaveBeenCalledTimes(2);
     expect(capturedApp().name).toBe("typed-app");
   });
 
   it('offers "Customize" as a third entry in the structural question', async () => {
-    select.mockResolvedValueOnce("api");
+    select.mockResolvedValueOnce("api").mockResolvedValueOnce("mongodb");
 
     await createNewApp({ name: "menu-app" });
 
@@ -1021,13 +1069,51 @@ describe("createNewApp — default TTY path (at most one structural question)", 
     expect(app.options.useJWT).toBe(true);
   });
 
-  it("asks nothing at all when --stack is also already answered by a flag", async () => {
-    await createNewApp({ name: "flagged-app", stack: "api" });
+  it("bypasses the database prompt when --db is explicit", async () => {
+    await createNewApp({
+      name: "flagged-app",
+      stack: "api",
+      db: "postgres",
+    });
 
     expect(text).not.toHaveBeenCalled();
     expect(select).not.toHaveBeenCalled();
     expect(multiselect).not.toHaveBeenCalled();
     expect(confirm).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["api", []],
+    ["web", ["web"]],
+  ] as const)(
+    "uses PostgreSQL for the %s preset without changing its features",
+    async (stack, features) => {
+      select.mockResolvedValueOnce(stack).mockResolvedValueOnce("postgres");
+
+      await createNewApp({ name: `${stack}-postgres` });
+
+      const app = capturedApp();
+      expect(app.options.databaseDriver).toBe("postgres");
+      expect(app.options.databasePort).toBe(5432);
+      expect(app.options.features).toEqual(features);
+    },
+  );
+
+  it("honors explicit --db=none without showing the database prompt", async () => {
+    await createNewApp({ name: "no-db", stack: "web", db: "none" });
+
+    expect(select).not.toHaveBeenCalled();
+    expect(capturedApp().options.databaseDriver).toBe("none");
+  });
+
+  it("does not scaffold when the preset database prompt is cancelled", async () => {
+    select.mockResolvedValueOnce("api").mockResolvedValueOnce(CANCEL);
+
+    await expect(createNewApp({ name: "cancel-db" })).rejects.toThrow(
+      ProcessExit,
+    );
+    expect(cancel).toHaveBeenCalledWith("Database selection cancelled");
+    expect(createWarlockApp).not.toHaveBeenCalled();
   });
 
   it("accepts every detected --pm value before default TTY scaffolding", async () => {

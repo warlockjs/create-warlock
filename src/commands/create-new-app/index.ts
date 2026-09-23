@@ -27,6 +27,7 @@ import {
 import { packageRoot } from "../../helpers/paths";
 import { hasInteractiveStdin } from "../../helpers/tty";
 import { askAgentTargets } from "../../prompts/ask-agent-targets";
+import { askAiFeatures } from "../../prompts/ask-ai-features";
 import { askProjectName } from "../../prompts/ask-project-name";
 import { askStack } from "../../prompts/ask-stack";
 import { showIntroBanner } from "../../ui/banner";
@@ -87,7 +88,7 @@ export default async function createNewApp(cli: CliFlags = {}) {
 
   // `--interactive` (alias `--customize`) restores the full long-form wizard
   // below. Everyone else with a TTY falls through to the default path, which
-  // asks at most ONE structural question — see createDefaultInteractive.
+  // asks the preset plus database choice — see createDefaultInteractive.
   if (cli.interactive) {
     await createFullWizard(cli, pmDetectionPromise);
     return;
@@ -183,13 +184,7 @@ async function createFullWizard(
   // @warlock.js/ai automatically. The result still flows through the
   // `selectedAiProviders` → `aiProviders` pipeline, which now also carries the
   // capability packages (ai-tools / ai-panoptic / ai-workspace).
-  const selectedAiProviders = await multiselect({
-    message:
-      "Add AI packages? Providers + capabilities — the core AI package is included automatically",
-    options: [...getAiProviderOptions(), ...getAiPackageOptions()],
-    initialValues: seeds.aiProviders,
-    required: false,
-  });
+  const selectedAiProviders = await askAiFeatures(seeds.aiProviders);
 
   if (isCancel(selectedAiProviders)) {
     cancel("AI provider selection cancelled");
@@ -250,9 +245,9 @@ async function createFullWizard(
  * The default TTY path: neither `--yes` nor `--interactive` was given, but a
  * terminal is available. Asks the project name when missing (a required
  * answer with no sane default — same treatment as the non-interactive path)
- * plus the ONE structural question (API-only vs full-stack web) when `--stack`
- * was not already supplied. Every other choice is resolved exactly like
- * `createNonInteractive` — flags, with defaults, never a prompt.
+ * plus the preset's database choice when `--db`/`--no-db` was not supplied.
+ * Every other choice is resolved exactly like `createNonInteractive` — flags,
+ * with defaults, never a prompt.
  */
 async function createDefaultInteractive(
   cli: CliFlags,
@@ -283,10 +278,23 @@ async function createDefaultInteractive(
 
   setPackageManager(packageManager);
 
+  const databaseDriver =
+    cli.db ??
+    (await select({
+      message: "Choose your database driver",
+      options: getDatabaseDriverOptions(),
+      initialValue: "mongodb",
+    }));
+
+  if (isCancel(databaseDriver)) {
+    cancel("Database selection cancelled");
+    process.exit(0);
+  }
+
   let options: AppOptions;
 
   try {
-    options = await resolveAppOptions({ ...cli, stack });
+    options = await resolveAppOptions({ ...cli, stack, db: databaseDriver });
   } catch (error) {
     cancel((error as Error).message);
     process.exit(1);

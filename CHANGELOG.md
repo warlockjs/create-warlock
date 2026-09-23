@@ -4,6 +4,12 @@ All notable changes to `create-warlock` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@warlock.js/*` packages are released in lockstep — every package shares the same version number, so a version below may list only the changes that affected this package.
 
+## 5.19.1 - 2026-09-24
+
+### Changed
+
+- The default interactive scaffold flow now asks for a database after the API-only/full-stack choice unless `--db` or `--no-db` already answered it; the same selector includes **None** for a database-free app. Customize's AI multiselect now offers **None** last, treats it alone like an empty selection, and asks again when it is combined with an AI provider or capability.
+
 ## 5.19.0 - 2026-09-23
 
 ### Changed

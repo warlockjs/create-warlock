@@ -2,12 +2,10 @@ import { cancel, isCancel, select } from "@clack/prompts";
 import type { SetupChoice } from "../commands/create-new-app/types";
 
 /**
- * The ONE structural question the default (non-`--interactive`) interactive
- * path is allowed to ask: does the generated app need server-rendered web
- * pages, or is it an API only? This is the sole fork that changes the shape
- * of the generated project — every other choice (database, features,
- * package manager, agent-kit targets, …) is reversible within minutes and
- * ships as a flag with a default instead.
+ * The structural question in the default (non-`--interactive`) interactive
+ * path: does the generated app need server-rendered web pages, or is it an
+ * API only? The following database prompt is shared by both presets; the
+ * remaining choices stay behind flags or the Customize wizard.
  *
  * The third entry is not a third stack: `customize` selects the FLOW, handing
  * the run to the full wizard (`--customize`) so every one of those reversible

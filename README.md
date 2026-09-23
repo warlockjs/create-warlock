@@ -28,16 +28,16 @@ Then follow the instructions, it is easy as that!
 
 `create-warlock` is fully headless: every prompt has a flag that answers it,
 `--yes` takes the default for anything you leave unset, and it works with no
-terminal at all (CI, a script, an agent). With a terminal and neither `--yes`
-nor `--interactive`, it asks **at most one question** — API-only or
-full-stack web, the only choice that changes the generated app's shape.
-Everything else below is a flag with a default; a summary of what was decided
-prints after scaffolding, along with how to change each one.
+terminal at all (CI, a script, an agent). With a terminal and neither `--yes` nor `--interactive`, it asks for API-only
+or full-stack web, then for a database unless `--db` or `--no-db` already
+answered that choice. The stack is the only choice that changes the generated
+app's shape. Everything else below is a flag with a default; a summary of what
+was decided prints after scaffolding, along with how to change each one.
 
 | Flag | Description | Default |
 | --- | --- | --- |
 | `--name=<name>` | Project name (or the first positional arg) | required — prompted with a TTY, otherwise fails naming this flag |
-| `--stack=<api\|web>` | The one structural question: API-only or full-stack web | `api` |
+| `--stack=<api\|web>` | API-only or full-stack web; the structural choice | `api` |
 | `--db=<driver>` / `--no-db` | Database driver (`postgres`, `mongodb`, …), or skip one entirely | `mongodb` |
 | `--features=<list>` | Comma-separated feature keys (e.g. `test,herald`) | none (or `["web"]` when `--stack=web` and `--features` is not given) |
 | `--ai=<list>` | Comma-separated AI provider keys (e.g. `openai,anthropic`) | none |
@@ -66,6 +66,22 @@ honoured.
 (cached locally after the first successful lookup); `claude`, the default,
 always works offline. An unrecognized target fails the run with the full list
 of valid targets rather than silently falling back.
+
+### Interactive database and AI choices
+
+The default interactive flow offers the same database choices as Customize:
+MongoDB and PostgreSQL, while MySQL remains shown as disabled, followed by
+**None**. Choosing **None** is the same as
+`--db=none` / `--no-db`: no database driver is installed and the generated
+`src/config/database.ts` is removed. A supplied `--db` or `--no-db` skips this
+prompt.
+
+Customize keeps AI optional. Pressing Enter with no AI selections skips it. Its
+last option, **None**, does the same when selected alone. **None** cannot be
+combined with an AI provider or capability package; the wizard explains the
+conflict and asks for the AI choices again, keeping the non-**None** choices
+for correction. Headless `--ai` flags keep their existing provider/capability
+key behavior.
 
 ## Developing this package locally
 
