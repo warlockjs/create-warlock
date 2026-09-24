@@ -15,8 +15,8 @@ importers:
         specifier: ^2.1.2
         version: 2.1.2
       '@mongez/reinforcements':
-        specifier: ^4.0.1
-        version: 4.0.1
+        specifier: ^4.0.2
+        version: 4.0.2
       '@warlock.js/fs':
         specifier: '*'
         version: 5.8.0
@@ -270,8 +270,8 @@ packages:
   '@mongez/copper@2.1.2':
     resolution: {integrity: sha512-PlKh2hfORUAla9BSU/X1aKCjb2TV/o90WDltYZycqjZocATQSOajrI6uAC+vHTOj60UHFisdbDano8Mfss7dKw==}
 
-  '@mongez/reinforcements@4.0.1':
-    resolution: {integrity: sha512-PRPyRDpSKNGBhH9i8ayGaUVsq1+nSOBYp8J0ao6MGncBk9j0Y4xUmf3+7IhOiJdTexG2c7SDUTaf131z1vIE2Q==}
+  '@mongez/reinforcements@4.0.2':
+    resolution: {integrity: sha512-fQ4BZcAonziQ6s1aV5bOcBzBlCmwvDaY/2hKvwwDx0c9EA9wAeePRKy1Ss4q9hsc5AcjtoourEBZhFZTRtdzHw==}
     engines: {node: '>=20'}
 
   '@nodelib/fs.scandir@2.1.5':
@@ -1422,7 +1422,7 @@ snapshots:
 
   '@mongez/copper@2.1.2': {}
 
-  '@mongez/reinforcements@4.0.1': {}
+  '@mongez/reinforcements@4.0.2': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
