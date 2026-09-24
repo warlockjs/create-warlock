@@ -32,7 +32,7 @@
     "@clack/prompts": "^0.7.0",
     "@mongez/copper": "^2.1.2",
     "@warlock.js/fs": "*",
-    "@mongez/reinforcements": "^4.0.1",
+    "@mongez/reinforcements": "^4.0.2",
     "cross-spawn": "^7.0.3",
     "rimraf": "^6.0.1",
     "which-pm-runs": "^1.1.0"

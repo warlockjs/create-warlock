@@ -31,9 +31,9 @@
     "lf": "find . -type d ( -name 'node_modules' -o -name '.git' ) -prune -o -type f -exec dos2unix {} ;"
   },
   "dependencies": {
-    "@mongez/reinforcements": "^4.0.1",
-    "@mongez/localization": "^3.5.0",
-    "@mongez/supportive-is": "^2.1.4",
+    "@mongez/reinforcements": "^4.0.2",
+    "@mongez/localization": "^3.5.1",
+    "@mongez/supportive-is": "^2.1.5",
     "@warlock.js/auth": "0.0.0-set-by-scaffolder",
     "@warlock.js/cache": "0.0.0-set-by-scaffolder",
     "@warlock.js/cascade": "0.0.0-set-by-scaffolder",
@@ -45,7 +45,7 @@
     "dayjs": "^1.11.19"
   },
   "devDependencies": {
-    "@mongez/agent-kit": "^1.2.1",
+    "@mongez/agent-kit": "^1.3.1",
     "@types/node": "^25.0.3",
     "@types/prettier": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^8.50.0",
