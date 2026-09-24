@@ -15,3 +15,7 @@ allowBuilds:
 # by our own release, which installs and executes them from the registry origin first.
 minimumReleaseAgeExclude:
   - '@warlock.js/*'
+  # @mongez/* is the same owner's library family (agent-kit, reinforcements,
+  # localization, ...). The family bumps it on release day, so it trips the gate
+  # exactly like @warlock.js/* did (5.20.0: @mongez/reinforcements@4.0.2).
+  - '@mongez/*'
