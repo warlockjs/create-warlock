@@ -4,6 +4,13 @@ All notable changes to `create-warlock` are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). `@warlock.js/*` packages are released in lockstep — every package shares the same version number, so a version below may list only the changes that affected this package.
 
+## 5.20.0
+
+### Changed
+
+- Added a package-level skill index and clearer discovery descriptions for grouped agent guidance.
+- Web starter loaders use named functions and public loader-context types while retaining inferred return types in paired setup modules.
+
 ## 5.19.1 - 2026-09-24
 
 ### Changed

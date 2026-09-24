@@ -113,6 +113,12 @@ export const config = {
 } satisfies RootConfig;
 ```
 
+Every loader is an exported named `async function` with a public typed context;
+let TypeScript infer its return. Use
+`PageLoaderContext<typeof config.validation, typeof config.route>` for a page,
+`LayoutLoaderContext` for a layout, and `AppLoaderContext` for the root. Do not
+annotate the whole function as `PageLoader`, use `satisfies` on a loader,
+duplicate its payload shape, or cast an unknown return.
 A page file declares its route contract, coordinates a controller-like loader,
 and composes presentational components. The loader validates input, calls
 named services under `src/app/<domain>/services/`, converts results through
@@ -172,6 +178,15 @@ state, effects, handlers, navigation, and client mutations. A utility stays
 pure and has no React or browser lifecycle dependency. Keep feature CSS beside
 the feature and import it from the owning presentation boundary; keep loading,
 error, empty, focus, reduced-motion, and locale behavior with that boundary.
+
+## Declaration spacing and local types
+
+Put one blank line after the final import. Keep a short related declaration run
+together, then put a blank line before a substantial multiline expression such
+as a `useSubmitForm()` configuration. Declare a schema alias immediately after
+its `const` schema instead of repeating `typeof schema` through the file. When
+state starts unset, write `useState<ErrorText>()`; do not add a redundant
+`| undefined` union or pass `undefined` explicitly.
 
 ## 2. Make the server-to-browser data contract explicit
 
