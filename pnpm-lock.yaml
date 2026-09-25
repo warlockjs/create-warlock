@@ -12,8 +12,8 @@ importers:
         specifier: ^0.7.0
         version: 0.7.0
       '@mongez/copper':
-        specifier: ^2.1.2
-        version: 2.1.2
+        specifier: ^2.1.3
+        version: 2.1.3
       '@mongez/reinforcements':
         specifier: ^4.0.2
         version: 4.0.2
@@ -267,8 +267,8 @@ packages:
   '@jridgewell/sourcemap-codec@1.6.0':
     resolution: {integrity: sha512-T7jf+5zgsZHwNJ4lvQ7/aezbyk0nNX+zJVWpmHA7VYsEx7a7qr5Rg5IbtJFqkgze5Y2sruq1RUY8Q837Od7iFw==}
 
-  '@mongez/copper@2.1.2':
-    resolution: {integrity: sha512-PlKh2hfORUAla9BSU/X1aKCjb2TV/o90WDltYZycqjZocATQSOajrI6uAC+vHTOj60UHFisdbDano8Mfss7dKw==}
+  '@mongez/copper@2.1.3':
+    resolution: {integrity: sha512-b/14P5BnZqPsCs+tmhC/OsWtafQQ+t8r9ZbdAKj417rOqNGW70cLmwJ92IGAKHLclL0xF0DGobn/YmPJoaiNPg==}
 
   '@mongez/reinforcements@4.0.2':
     resolution: {integrity: sha512-fQ4BZcAonziQ6s1aV5bOcBzBlCmwvDaY/2hKvwwDx0c9EA9wAeePRKy1Ss4q9hsc5AcjtoourEBZhFZTRtdzHw==}
@@ -1420,7 +1420,7 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.6.0': {}
 
-  '@mongez/copper@2.1.2': {}
+  '@mongez/copper@2.1.3': {}
 
   '@mongez/reinforcements@4.0.2': {}
 
