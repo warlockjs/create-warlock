@@ -5,7 +5,6 @@ import { HeroSection } from "./components/hero-section";
 import { HomeFooter } from "./components/home-footer";
 import { HomeHeader } from "./components/home-header";
 import type { loader } from "./index.setup";
-import "./styles/home.css";
 
 export default function HomePage({ data }: PageProps<typeof loader>) {
   return (

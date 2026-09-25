@@ -504,6 +504,7 @@ describe("App template emission", () => {
       "utf8",
     );
     const tsconfig = readFileSync(path.join(appPath, "tsconfig.json"), "utf8");
+    const appCss = readFileSync(path.join(appPath, "src/web/app.css"), "utf8");
     const packageJson = JSON.parse(
       readFileSync(path.join(appPath, "package.json"), "utf8"),
     );
@@ -512,7 +513,9 @@ describe("App template emission", () => {
     expect(root).not.toContain("setLocalizationConfigurations");
     expect(root).not.toContain("RootConfig");
     expect(rootSetup).toContain("strictMode: true");
-    expect(page).toContain('import "./styles/home.css"');
+    expect(appCss).toContain('@import "./home/styles/home.css"');
+    expect(appCss).toContain('@import "./404.css"');
+    expect(page).not.toContain('import "./styles/home.css"');
     expect(page).toContain('import type { loader } from "./index.setup"');
     expect(page).not.toContain("getHomeService");
     expect(pageSetup).toContain("getHomeService");

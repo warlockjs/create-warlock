@@ -1,5 +1,3 @@
-import "./404.css";
-
 export default function NotFoundPage() {
   return (
     <main className="not-found">
