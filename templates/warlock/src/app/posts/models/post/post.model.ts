@@ -4,10 +4,10 @@ import { type Infer, v } from "@warlock.js/seal";
 import { PostResource } from "app/posts/resources/post.resource";
 
 export const postSchema = v.object({
-  title: v.string().required(),
-  description: v.string().required(),
+  title: v.string(),
+  description: v.string(),
   slug: v.computed(useComputedSlug()),
-  image: v.string().required(),
+  image: v.string(),
 });
 
 type PostSchema = Infer<typeof postSchema>;

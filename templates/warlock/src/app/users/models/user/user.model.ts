@@ -5,7 +5,7 @@ import { type Infer, v } from "@warlock.js/seal";
 import { UserResource } from "app/users/resources/user.resource";
 
 export const userSchema = v.object({
-  name: v.string().required(),
+  name: v.string(),
   email: v.email().requiredIfEmpty("id"),
   // Required at the controller layer (`create-user.schema.ts`) on
   // registration, but not here: a freshly-registered user's record is

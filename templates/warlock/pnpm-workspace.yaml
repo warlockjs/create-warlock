@@ -1,2 +1,7 @@
 allowBuilds:
   esbuild: true
+
+# Our own release family is published minutes before installs run; exclude the
+# scope by pattern, never by pinned version or a package the app does not use.
+minimumReleaseAgeExclude:
+  - '@warlock.js/*'

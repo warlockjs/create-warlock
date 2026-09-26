@@ -20,6 +20,6 @@ forgotPasswordController.description = "Request password reset";
 
 forgotPasswordController.validation = {
   schema: v.object({
-    email: v.email().required(),
+    email: v.email(),
   }),
 };

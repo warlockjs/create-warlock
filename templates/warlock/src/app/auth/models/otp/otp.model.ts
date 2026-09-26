@@ -2,13 +2,13 @@ import { Model, RegisterModel } from "@warlock.js/cascade";
 import { v, type Infer } from "@warlock.js/seal";
 
 const otpSchema = v.object({
-  code: v.string().required(),
-  type: v.string().required(),
-  target: v.string().required(),
-  channel: v.string().required(),
-  userId: v.number().required(),
-  userType: v.string().required(),
-  expiresAt: v.date().required(),
+  code: v.string(),
+  type: v.string(),
+  target: v.string(),
+  channel: v.string(),
+  userId: v.number(),
+  userType: v.string(),
+  expiresAt: v.date(),
   usedAt: v.date().optional(),
   attempts: v.number().default(0),
   maxAttempts: v.number().default(5),

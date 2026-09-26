@@ -36,6 +36,18 @@ export function installEnvironment(): NodeJS.ProcessEnv {
   return { NODE_ENV: "development" };
 }
 
+/** True when any ancestor of `targetPath` (starting at its parent) has a pnpm-workspace.yaml. */
+export function isInsidePnpmWorkspace(targetPath: string): boolean {
+  let dir = path.dirname(path.resolve(targetPath));
+
+  while (true) {
+    if (existsSync(path.join(dir, "pnpm-workspace.yaml"))) return true;
+    const parent = path.dirname(dir);
+    if (parent === dir) return false;
+    dir = parent;
+  }
+}
+
 export class App {
   /**
    * Resolved files
@@ -63,6 +75,12 @@ export class App {
     }
 
     renameFile(this.path + "/_.gitignore", this.path + "/.gitignore");
+
+    // Inside an existing pnpm workspace the parent owns the policy; a per-app
+    // workspace file would nest a second workspace root.
+    if (isInsidePnpmWorkspace(this.path)) {
+      rmSync(path.join(this.path, "pnpm-workspace.yaml"), { force: true });
+    }
 
     return this;
   }
@@ -189,26 +207,38 @@ export class App {
       putJsonFile(packageJsonPath, packageJson);
     }
 
-    let envContent = getFile(this.path + "/.env") as string;
+    // Both files carry the driver defaults: `.env` is what runs, `.env.example`
+    // is what the next developer copies.
+    for (const fileName of [".env", ".env.example"]) {
+      const envPath = this.path + "/" + fileName;
+      if (!fileExists(envPath)) continue;
 
-    envContent = envContent.replace(
-      /DB_PORT=\d+/,
-      `DB_PORT=${driver.defaultPort}`,
-    );
+      let envContent = getFile(envPath) as string;
 
-    if (envContent.includes("DB_DRIVER=")) {
-      envContent = envContent.replace(
-        /DB_DRIVER=\w*/,
-        `DB_DRIVER=${driver.value}`,
-      );
-    } else {
       envContent = envContent.replace(
         /DB_PORT=\d+/,
-        `DB_PORT=${driver.defaultPort}\nDB_DRIVER=${driver.value}`,
+        `DB_PORT=${driver.defaultPort}`,
       );
-    }
 
-    putFile(this.path + "/.env", envContent);
+      if (envContent.includes("DB_DRIVER=")) {
+        envContent = envContent.replace(
+          /DB_DRIVER=\w*/,
+          `DB_DRIVER=${driver.value}`,
+        );
+      } else {
+        envContent = envContent.replace(
+          /DB_PORT=\d+/,
+          `DB_PORT=${driver.defaultPort}\nDB_DRIVER=${driver.value}`,
+        );
+      }
+
+      // DB_AUTH is Mongo's authSource; no other driver reads it.
+      if (driver.value !== "mongodb") {
+        envContent = envContent.replace(/^DB_AUTH=.*\r?\n?/m, "");
+      }
+
+      putFile(envPath, envContent);
+    }
 
     return this;
   }

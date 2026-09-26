@@ -21,6 +21,6 @@ refreshTokenController.description = "Refresh Access Token";
 
 refreshTokenController.validation = {
   schema: v.object({
-    refreshToken: v.string().required(),
+    refreshToken: v.string(),
   }),
 };

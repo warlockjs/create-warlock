@@ -786,7 +786,13 @@ describe("App template emission", () => {
       makeApplication(appPath, { databaseDriver: "postgres" }),
     );
 
-    app.use("warlock").updateDotEnv().configureDatabaseEnv("postgres");
+    // The real flow always pairs the env and config steps: the env step drops
+    // the Mongo-only DB_AUTH, the config step swaps in the postgres config.
+    app
+      .use("warlock")
+      .updateDotEnv()
+      .configureDatabaseEnv("postgres")
+      .configureDatabaseConfig("postgres");
 
     const env = readFileSync(path.join(appPath, ".env"), "utf8");
     const dbConfig = readFileSync(
