@@ -6,9 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## 5.23.0 - 2026-09-25
 
+### Fixed
+
+- Scaffolding inside an existing pnpm workspace no longer writes a nested `pnpm-workspace.yaml`; a standalone app still gets one.
+- Postgres apps get their own database defaults in `.env` and `.env.example` (MongoDB keeps `DB_AUTH` and port 27017).
+- The `gen.*` scripts use the registered `warlock generate.<x>` commands.
+- `minimumReleaseAgeExclude` covers `@warlock.js/*` by pattern, so a freshly published family installs without listing versions or unused packages.
+
 ### Changed
 
-- Lockstep patch release; package APIs are unchanged.
+- Template schemas and models drop redundant `.required()` and non-load-bearing `satisfies`, matching the framework skills.
 
 ## 5.22.1 - 2026-09-25
 
