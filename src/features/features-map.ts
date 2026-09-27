@@ -106,6 +106,12 @@ export const features: FeatureOption[] = [
     group: "Rendering & Mail",
   },
   {
+    key: "devtools",
+    label: "Devtools (/__warlock)",
+    hint: "Development-only dashboard: request timeline, queries + EXPLAIN, N+1 warnings, dev mailbox, logs, cache, routes — installed as a dev dependency, never runs in production",
+    group: "Rendering & Mail",
+  },
+  {
     key: "react",
     label: "React (rendering & mails)",
     hint: "React + ReactDOM for non-interactive rendering and HTML/email generation",
