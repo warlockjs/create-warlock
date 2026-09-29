@@ -17,6 +17,9 @@ const databaseConfigurations: ConnectionOptions<MongoDriverOptions, MongoClientO
   uri: env("DB_URL"),
 
   driverOptions: {
+    // Cascade assigns sequential numeric `id`s on insert alongside Mongo's `_id`.
+    // Turn this off for an existing database whose documents only have `_id`, then
+    // set each model's primaryKey to "_id".
     autoGenerateId: true,
     counterCollection: "counters",
   },
