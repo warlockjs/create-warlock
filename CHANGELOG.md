@@ -8,7 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
-- Lockstep release; package APIs are unchanged.
+- The generated app's README is rewritten for the current template: `dev` / `build` / `start`, migrations, generators, the web stack vs API-only, `warlock add`, tests and the AI agent skills.
+- The generated database config explains `autoGenerateId` and when to turn it off for an existing `_id`-only MongoDB.
+- **Removed broken template scripts:** `gen.v` (called a command that doesn't exist), `gen.md` (duplicate of `gen.m`), `serve` (POSIX-only `nohup`, and tied to one package manager) and `lf` (needed `dos2unix`). Use `npm run build && npm run start` instead of `serve`.
+
+### Fixed
+
+- `docs/new-module.md` in the generated app named `warlock create.module`; it is `warlock generate.module`.
 
 ## 5.24.0 - 2026-09-27
 

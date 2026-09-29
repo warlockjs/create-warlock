@@ -123,8 +123,9 @@ export class App {
   }
 
   /**
-   * Write the project's `package.json`: the project name, the chosen package
-   * manager, and the version of every `@warlock.js/*` dependency.
+   * Write the project's `package.json`: the project name and the version of
+   * every `@warlock.js/*` dependency. No template script names a package
+   * manager, so nothing here depends on the one the user chose.
    *
    * `versions` comes from {@link resolveWarlockVersions} — versions the
    * registry has confirmed exist. It is optional because the fluent chain is
@@ -136,28 +137,9 @@ export class App {
    * so an unverified pin resolves to nothing and the install dies with ETARGET.
    */
   public updatePackageJson(versions: Record<string, string> = {}) {
-    const packageManager = getPackageManager();
-
     const pkg = this.package.replace("name", this.name.replaceAll("/", "-"));
 
     const content: any = pkg.content;
-
-    // Substitute the chosen package manager ONLY into the fields the template
-    // writes it into literally — the `serve` script — by path, never with a
-    // blanket substring replace over the serialized JSON. A raw
-    // `replaceAll("yarn", pm)` rewrites every occurrence of the substring
-    // "yarn" anywhere in the document, so a project named `my-yarn-app`, or any
-    // dependency/path containing "yarn", is silently corrupted (`--pm=npm`
-    // turned `my-yarn-app` into `my-npm-app`). Field-scoped rewriting is also
-    // order-independent: the name lives in `content.name` and this token lives
-    // in `scripts.serve`, a disjoint field that cannot collide with the name
-    // substitution above regardless of which runs first.
-    if (typeof content.scripts?.serve === "string") {
-      content.scripts.serve = content.scripts.serve.replaceAll(
-        "yarn",
-        packageManager,
-      );
-    }
 
     const warlockVersion: string = (
       getJsonFile(packageRoot("package.json")) as { version: string }

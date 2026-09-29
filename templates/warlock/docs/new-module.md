@@ -3,7 +3,7 @@
 You can create a new module using the following command:
 
 ```bash
-warlock create.module <module-name>
+warlock generate.module <module-name>
 ```
 
 Each module should consist of the following structure:

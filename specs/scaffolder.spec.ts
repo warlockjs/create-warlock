@@ -679,7 +679,7 @@ describe("App template emission", () => {
     expect(app.configureDatabaseEnv("mongodb")).toBe(app);
   });
 
-  it("rewrites the template's yarn scripts to the chosen package manager", () => {
+  it("generates no script that is tied to a specific package manager", () => {
     setPackageManager("pnpm");
     const app = new App(makeApplication(appPath, {}, "pnpm"));
 
@@ -689,10 +689,12 @@ describe("App template emission", () => {
       readFileSync(path.join(appPath, "package.json"), "utf8"),
     );
 
-    // The template's `serve` script shells out to `yarn build` — it must follow
-    // the selected package manager after updatePackageJson().
-    expect(packageJson.scripts.serve).toContain("pnpm build");
-    expect(packageJson.scripts.serve).not.toContain("yarn build");
+    // Scripts run through whichever manager invokes them (`pnpm dev`,
+    // `npm run dev`), so none may shell out to one by name.
+    for (const script of Object.values<string>(packageJson.scripts)) {
+      expect(script).not.toMatch(/\b(yarn|pnpm|bun) /);
+      expect(script).not.toMatch(/\bnpm run /);
+    }
   });
 
   it("preserves package.json structural fields while substituting the name", () => {
