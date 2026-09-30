@@ -6,9 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## 5.26.0 - 2026-09-30
 
-### Changed
+### Fixed
 
-- Lockstep release; package APIs are unchanged.
+- The generated `src/config/app.ts` falls back to `Warlock` as the app name when `APP_NAME` is unset (it said `Mongez`). New apps still get their project name in `.env`.
 
 ## 5.25.0 - 2026-09-28
 
