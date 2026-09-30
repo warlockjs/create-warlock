@@ -29,7 +29,7 @@
   "dependencies": {
     "@mongez/reinforcements": "^4.0.2",
     "@mongez/localization": "^3.5.1",
-    "@mongez/supportive-is": "^2.1.5",
+    "@mongez/supportive-is": "^3.0.0",
     "@warlock.js/auth": "0.0.0-set-by-scaffolder",
     "@warlock.js/cache": "0.0.0-set-by-scaffolder",
     "@warlock.js/cascade": "0.0.0-set-by-scaffolder",
