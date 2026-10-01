@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
-- New apps: a failed AI-skills sync during install now prints a warning with the fix (`pnpm skills:sync`) instead of a silent `skills-sync-skipped`.
+- New apps: a failed AI-skills sync during install now prints a warning with the fix (the `skills:sync` script) instead of a silent `skills-sync-skipped`.
 - New apps: `AGENTS.md` describes the app as full-stack (APIs plus `src/web/**` pages) and points agents to the `warlock-js-web` skill.
 
 ## 5.27.0 - 2026-10-01
