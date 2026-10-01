@@ -22,7 +22,7 @@
     "lint": "npx eslint --fix ./src --max-warnings=0",
     "format": "npx prettier --write ./src/**/*.{js,jsx,ts,tsx,css,md,json} --config ./.prettierrc.json",
     "tsc": "warlock generate.typings && npx tsc --noEmit",
-    "postinstall": "agent-kit init && agent-kit sync || echo skills-sync-skipped",
+    "postinstall": "agent-kit init && agent-kit sync || echo \"warning: AI agent skills were NOT synced, so coding agents will not see the @warlock.js skills. Run: pnpm skills:sync\"",
     "skills:sync": "agent-kit sync",
     "skills:watch": "agent-kit watch"
   },

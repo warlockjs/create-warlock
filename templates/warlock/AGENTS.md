@@ -10,11 +10,13 @@
 
 ## Project overview
 
-This is a [Warlock.js](https://warlock.js.org) application — a TypeScript, Node.js
-framework for building APIs. The framework and its companion libraries ship under
-the `@warlock.js/*` scope (`core`, `cascade`, `cache`, `seal`, `auth`, `logger`,
-`fs`, `scheduler`, …). Application code lives under `src/app/**`, organized one
-module per domain noun.
+This is a [Warlock.js](https://warlock.js.org) application — a full-stack
+TypeScript, Node.js framework: APIs plus server-rendered React pages. The
+framework and its companion libraries ship under the `@warlock.js/*` scope
+(`core`, `web`, `cascade`, `cache`, `seal`, `auth`, `logger`, `fs`,
+`scheduler`, …). API code lives under `src/app/**`, organized one module per
+domain noun; pages, layouts and the document root live under `src/web/**` (the
+`warlock-js-web` skill covers them).
 
 ## Skills come first — read them before anything else
 
