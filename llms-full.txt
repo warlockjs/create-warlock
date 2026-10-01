@@ -183,8 +183,8 @@ Failures surface the error and halt; there is no rollback. After it finishes, `c
 
 ## See also
 
-- `@warlock.js/core/run-app/SKILL.md` — `warlock dev` / `build` / `start` once the project exists.
-- `@warlock.js/core/create-module/SKILL.md` — generate a new module inside the project.
-- `@warlock.js/core/add-connector/SKILL.md` — what `warlock add` wires when a feature pulls a connector.
+- The `run-app` topic of the `warlock-js-core` skill — `warlock dev` / `build` / `start` once the project exists.
+- The `create-module` topic of the `warlock-js-core` skill — generate a new module inside the project.
+- The `add-connector` topic of the `warlock-js-core` skill — what `warlock add` wires when a feature pulls a connector.
 
 
